@@ -7,7 +7,7 @@ require_once dirname(__DIR__) . '/includes/admin-layout.php';
 
 $pdo = db();
 
-$totalপ্রকাশ করুনedPosts = (int) $pdo->query("SELECT COUNT(*) FROM public.posts WHERE status = 'published'")->fetchColumn();
+$totalPublishedPosts = (int) $pdo->query("SELECT COUNT(*) FROM public.posts WHERE status = 'published'")->fetchColumn();
 $totalImages = (int) $pdo->query("SELECT COUNT(*) FROM public.gallery_images")->fetchColumn();
 $totalVideos = (int) $pdo->query("SELECT COUNT(*) FROM public.posts WHERE post_type = 'video'")->fetchColumn();
 $totalCategories = (int) $pdo->query("SELECT (SELECT COUNT(*) FROM public.gallery_categories) + (SELECT COUNT(*) FROM public.post_categories)")->fetchColumn();
@@ -38,7 +38,7 @@ if (is_super_admin($currentAdmin)) {
 <section class="adm-stats-grid" aria-label="কমিউনিটির সারসংক্ষেপ">
   <div class="adm-stat-card">
     <p class="adm-stat-label">প্রকাশিত পোস্ট</p>
-    <p class="adm-stat-val"><?= $totalপ্রকাশ করুনedPosts ?></p>
+    <p class="adm-stat-val"><?= $totalPublishedPosts ?></p>
   </div>
   <div class="adm-stat-card">
     <p class="adm-stat-label">গ্যালারির ছবি</p>
