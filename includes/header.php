@@ -99,7 +99,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
               <?php endif; ?>
 
               <?php if ($isMega): ?>
-                <div class="mega-menu" role="region" aria-label="<?= e($item['label']) ?> menu">
+                <div class="mega-menu" role="region" aria-label="উপমেনু: <?= e($item['label']) ?>">
                   <div class="mega-menu-grid">
                     <div class="mega-intro">
                       <h3 class="mega-heading"><?= e($item['label']) ?></h3>
@@ -185,7 +185,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
                   </a>
                 <?php endif; ?>
                 <?php if (!empty($item['children'])): ?>
-                  <button type="button" class="mobile-submenu-btn" aria-expanded="false" aria-label="Toggle <?= e($item['label']) ?> submenu">+</button>
+                  <button type="button" class="mobile-submenu-btn" aria-expanded="false" aria-label="<?= e($item['label']) ?> উপমেনু খুলুন বা বন্ধ করুন">+</button>
                 <?php endif; ?>
               </div>
               <?php if (!empty($item['children'])): ?>
