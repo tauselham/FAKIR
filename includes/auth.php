@@ -313,7 +313,7 @@ function attempt_admin_login(string $identifier, string $password): array
 
     log_admin_activity((int) $admin['id'], 'admin_login', 'admin', (int) $admin['id']);
 
-    return ['ok' => true, 'message' => 'Signed in successfully.'];
+    return ['ok' => true, 'message' => 'সফলভাবে লগইন করা হয়েছে।'];
 }
 
 function logout_admin(bool $logActivity = true): void
