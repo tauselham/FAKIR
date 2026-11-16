@@ -330,9 +330,9 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
       <?php foreach ($posts as $p): ?>
         <tr>
           <td><?php if ($p['post_type'] === 'image' && !empty($p['media_url'])): ?><img src="<?= e(safe_url($p['media_url'])) ?>" alt="" class="adm-thumb">
-              <?php elseif ($p['post_type'] === 'video'): ?><span>Video</span><?php elseif ($p['post_type'] === 'custom'): ?><span>Custom Code</span><?php else: ?><span>Text</span><?php endif; ?></td>
-          <td><strong><?= e($p['title'] ?: '(Untitled)') ?></strong><div class="post-admin-excerpt"><?= e($p['description']) ?></div></td>
-          <td><?= e(ucfirst($p['post_type'])) ?></td><td><?= e($p['category_name'] ?? '—') ?></td><td><?= e(ucfirst($p['status'])) ?></td>
+              <?php elseif ($p['post_type'] === 'video'): ?><span>ভিডিও</span><?php elseif ($p['post_type'] === 'custom'): ?><span>কাস্টম কোড</span><?php else: ?><span>লেখা</span><?php endif; ?></td>
+          <td><strong><?= e($p['title'] ?: '(শিরোনামহীন)') ?></strong><div class="post-admin-excerpt"><?= e($p['description']) ?></div></td>
+          <td><?= e(ucfirst($p['post_type'])) ?></td><td><?= e($p['category_name'] ?? '—') ?></td><td><?= e($p['status'] === 'published' ? 'প্রকাশিত' : 'খসড়া') ?></td>
           <td class="num-tab"><?= e(format_date($p['published_at'] ?? $p['created_at'])) ?></td>
           <td><div style="display:flex;gap:6px;flex-wrap:wrap;">
             <a href="<?= e(admin_url('posts.php')) ?>?edit=<?= (int) $p['id'] ?>" class="btn btn-outline btn-sm">Edit</a>

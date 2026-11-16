@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $order    = (int) ($_POST['sort_order'] ?? 0);
 
             if ($label === '') {
-                throw new RuntimeException('Menu label is required.');
+                throw new RuntimeException('মেনুর নাম লিখতে হবে।');
             }
 
             if ($action === 'add_nav_item') {
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':vis'  => $visible ? 'true' : 'false',
                 ]);
                 log_admin_activity((int) $currentAdmin['id'], 'nav_item_created', 'navigation_items', (int) $ins->fetchColumn());
-                set_flash('success', 'Navigation item added.');
+                set_flash('success', 'মেনুর আইটেম যোগ করা হয়েছে।');
             } else {
                 if ($parentId === $itemId) {
                     $parentId = null;
@@ -126,14 +126,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':mid'  => $headerMenuId,
                 ]);
                 log_admin_activity((int) $currentAdmin['id'], 'nav_item_updated', 'navigation_items', $itemId);
-                set_flash('success', 'Navigation item updated.');
+                set_flash('success', 'মেনুর আইটেম হালনাগাদ হয়েছে।');
             }
         } elseif ($action === 'delete_nav_item') {
             $itemId = (int) ($_POST['item_id'] ?? 0);
             $pdo->prepare('DELETE FROM public.navigation_items WHERE id = :id AND menu_id = :mid')
                 ->execute([':id' => $itemId, ':mid' => $headerMenuId]);
             log_admin_activity((int) $currentAdmin['id'], 'nav_item_deleted', 'navigation_items', $itemId);
-            set_flash('success', 'Menu item deleted.');
+            set_flash('success', 'মেনুর আইটেম মুছে ফেলা হয়েছে।');
         }
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());

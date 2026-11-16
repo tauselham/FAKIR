@@ -149,7 +149,7 @@ foreach ($pages as $pageRow) {
         <label class="form-label" for="page_type">পেজের ধরন</label>
         <select class="form-control" name="page_type" id="page_type" <?= $editPage && $editPage['page_type'] === 'about' ? 'disabled' : '' ?>>
           <option value="landing" <?= (($editPage['page_type'] ?? 'landing') === 'landing') ? 'selected' : '' ?>>নতুন পেজ</option>
-          <option value="about" <?= (($editPage['page_type'] ?? '') === 'about') ? 'selected' : '' ?> <?= (!$editPage && $hasAbout) ? 'disabled' : '' ?>>আমাদের পরিচিতি <?= $hasAbout && (!$editPage || $editPage['page_type'] !== 'about') ? '(already exists)' : '' ?></option>
+          <option value="about" <?= (($editPage['page_type'] ?? '') === 'about') ? 'selected' : '' ?> <?= (!$editPage && $hasAbout) ? 'disabled' : '' ?>>আমাদের পরিচিতি <?= $hasAbout && (!$editPage || $editPage['page_type'] !== 'about') ? '(আগেই তৈরি আছে)' : '' ?></option>
         </select>
         <?php if ($editPage && $editPage['page_type'] === 'about'): ?><input type="hidden" name="page_type" value="about"><?php endif; ?>
       </div>
@@ -190,7 +190,7 @@ foreach ($pages as $pageRow) {
 
     <div id="page_separate_code_fields" style="<?= !empty($editPage['code_document']) ? 'display:none;' : '' ?>">
     <div class="form-row">
-      <label class="form-label" for="html_content">HTML Body Content (fragment, not a full document)</label>
+      <label class="form-label" for="html_content">HTML-এর মূল অংশ (সম্পূর্ণ ডকুমেন্ট নয়)</label>
       <textarea class="form-control" id="html_content" name="html_content" rows="14" spellcheck="false" required><?= e($editPage['html_content'] ?? '') ?></textarea>
     </div>
     <div class="form-row">
@@ -200,7 +200,7 @@ foreach ($pages as $pageRow) {
     <div class="form-row">
       <label class="form-label" for="js_content">JavaScript</label>
       <textarea class="form-control" id="js_content" name="js_content" rows="10" spellcheck="false"><?= e($editPage['js_content'] ?? '') ?></textarea>
-      <span class="form-hint">Write JavaScript code only (without surrounding script tags). Fetch/XHR/WebSocket, forms, popups and parent-page access are blocked; HTTPS images may load.</span>
+      <span class="form-hint">শুধু JavaScript কোড লিখুন (script ট্যাগ ছাড়া)। নিরাপত্তার জন্য Fetch/XHR/WebSocket, ফর্ম, পপআপ এবং মূল পেজে প্রবেশ বন্ধ থাকবে; HTTPS ছবি লোড হতে পারে।</span>
     </div>
     </div>
     <div class="form-row" id="page_single_code_field" style="<?= empty($editPage['code_document']) ? 'display:none;' : '' ?>">
@@ -229,7 +229,7 @@ foreach ($pages as $pageRow) {
           <td><strong><?= e($p['title']) ?></strong></td>
           <td><?= $p['page_type'] === 'about' ? 'আমাদের পরিচিতি' : 'নতুন পেজ' ?></td>
           <td><code>/<?= e($p['slug']) ?></code></td>
-          <td><?= e(ucfirst($p['status'])) ?></td>
+          <td><?= e($p['status'] === 'published' ? 'প্রকাশিত' : 'খসড়া') ?></td>
           <td><?= e(format_date($p['updated_at'])) ?></td>
           <td>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">

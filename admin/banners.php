@@ -240,10 +240,10 @@ if (!empty($_GET['edit'])) {
         <?php foreach ($banners as $b): ?>
           <tr>
             <td><img src="<?= e(safe_url($b['image_url'])) ?>" alt="" class="adm-thumb"></td>
-            <td><?= e($b['title'] ?: '(Image-only banner)') ?></td>
+            <td><?= e($b['title'] ?: '(শুধু ছবি)') ?></td>
             <td><?= e($b['button_text'] ?: '—') ?></td>
             <td class="num-tab"><?= (int) $b['sort_order'] ?></td>
-            <td><?= !empty($b['is_active']) ? 'চালু' : 'Disabled' ?></td>
+            <td><?= !empty($b['is_active']) ? 'চালু' : 'বন্ধ' ?></td>
             <td>
               <div style="display: flex; gap: 6px;">
                 <a href="<?= e(admin_url('banners.php')) ?>?edit=<?= (int) $b['id'] ?>" class="btn btn-outline btn-sm">Edit</a>

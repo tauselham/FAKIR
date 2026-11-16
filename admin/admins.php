@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'admins';
-$adminPageTitle = 'অ্যাডমিন ব্যবহারকারী & Permissions';
+$adminPageTitle = 'অ্যাডমিন ব্যবহারকারী ও অনুমতি';
 $requiredSuperAdmin = true;
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 
@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
                 });
 
-                set_flash('success', "অ্যাডমিন account '@{$existing['username']}' updated.");
+                set_flash('success', "অ্যাডমিন অ্যাকাউন্ট '@{$existing['username']}' হালনাগাদ হয়েছে।");
                 redirect_to(admin_url('admins.php'));
             }
         } elseif ($action === 'toggle_active') {
@@ -203,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare('UPDATE public.admins SET is_active = :act WHERE id = :id')
                 ->execute([':act' => $newActive ? 'true' : 'false', ':id' => $adminId]);
             log_admin_activity((int) $currentAdmin['id'], $newActive ? 'admin_enabled' : 'admin_disabled', 'admin', $adminId);
-            set_flash('success', "অ্যাডমিন '@{$target['username']}' " . ($newActive ? 'enabled.' : 'disabled.'));
+            set_flash('success', "অ্যাডমিন '@{$target['username']}' " . ($newActive ? 'চালু করা হয়েছে।' : 'বন্ধ করা হয়েছে।'));
             redirect_to(admin_url('admins.php'));
         } elseif ($action === 'delete') {
             $adminId = (int) ($_POST['admin_id'] ?? 0);
@@ -224,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $pdo->prepare('DELETE FROM public.admins WHERE id = :id')->execute([':id' => $adminId]);
                 log_admin_activity((int) $currentAdmin['id'], 'admin_account_deleted', 'admin', $adminId, ['username' => $target['username']]);
-                set_flash('success', "অ্যাডমিন account '@{$target['username']}' removed.");
+                set_flash('success', "অ্যাডমিন অ্যাকাউন্ট '@{$target['username']}' মুছে ফেলা হয়েছে।");
             }
             redirect_to(admin_url('admins.php'));
         }
@@ -259,7 +259,7 @@ if (!empty($_GET['edit'])) {
 
 <section class="adm-panel">
   <h2 class="adm-panel-title">
-    <?= $editAdmin ? 'Edit অ্যাডমিন Permissions — @' . e($editAdmin['username']) : 'Add New অ্যাডমিন & Assign Permissions' ?>
+    <?= $editAdmin ? 'অ্যাডমিনের অনুমতি সম্পাদনা — @' . e($editAdmin['username']) : 'নতুন অ্যাডমিন যোগ করুন ও অনুমতি নির্ধারণ করুন' ?>
   </h2>
   <p style="margin-top: 0; color: var(--adm-muted); font-size: 0.9rem;">
     Create multiple administrators and choose exactly which sections each person can manage — for example, Posts only, ছবির গ্যালারি only, both Posts &amp; Photos, or full access.
@@ -306,16 +306,16 @@ if (!empty($_GET['edit'])) {
         <label class="form-label" for="admin_role_select">অ্যাকাউন্টের ভূমিকা</label>
         <?php $curRole = $editAdmin['role'] ?? 'admin'; ?>
         <select class="form-control" id="admin_role_select" name="role">
-          <option value="admin" <?= $curRole === 'admin' ? 'selected' : '' ?>>অ্যাডমিন (Custom Permissions Below)</option>
-          <option value="editor" <?= $curRole === 'editor' ? 'selected' : '' ?>>সম্পাদক (Custom Permissions Below)</option>
-          <option value="super_admin" <?= $curRole === 'super_admin' ? 'selected' : '' ?>>সুপার অ্যাডমিন (Full Access + Manage Admins)</option>
+          <option value="admin" <?= $curRole === 'admin' ? 'selected' : '' ?>>অ্যাডমিন (নিচে অনুমতি নির্ধারণ করুন)</option>
+          <option value="editor" <?= $curRole === 'editor' ? 'selected' : '' ?>>সম্পাদক (নিচে অনুমতি নির্ধারণ করুন)</option>
+          <option value="super_admin" <?= $curRole === 'super_admin' ? 'selected' : '' ?>>সুপার অ্যাডমিন (সম্পূর্ণ প্রবেশাধিকার ও অ্যাডমিন পরিচালনা)</option>
         </select>
       </div>
     </div>
 
     <div class="form-row">
       <label class="form-label" for="admin_password_input">
-        <?= $editAdmin ? 'New পাসওয়ার্ড (Optional — leave blank to keep current password)' : 'Initial পাসওয়ার্ড' ?>
+        <?= $editAdmin ? 'নতুন পাসওয়ার্ড (ঐচ্ছিক — বর্তমান পাসওয়ার্ড রাখতে ফাঁকা রাখুন)' : 'প্রাথমিক পাসওয়ার্ড' ?>
       </label>
       <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
         <input
@@ -392,7 +392,7 @@ if (!empty($_GET['edit'])) {
       <thead>
         <tr>
           <th>অ্যাডমিন</th>
-          <th>Role</th>
+          <th>ভূমিকা</th>
           <th>অনুমোদিত কাজ</th>
           <th>অবস্থা</th>
           <th>সর্বশেষ লগইন</th>
@@ -413,10 +413,10 @@ if (!empty($_GET['edit'])) {
             </td>
             <td><?= e($isSuper ? 'সুপার অ্যাডমিন' : ucfirst((string) $adm['role'])) ?></td>
             <td style="max-width: 280px; font-size: 0.84rem;">
-              <?= $isSuper ? 'সম্পূর্ণ প্রবেশাধিকার (সব বিভাগ ও ব্যবহারকারী)' : e($permLabels ? implode(', ', $permLabels) : 'ড্যাশবোর্ড &amp; পাসওয়ার্ড Only') ?>
+              <?= $isSuper ? 'সম্পূর্ণ প্রবেশাধিকার (সব বিভাগ ও ব্যবহারকারী)' : e($permLabels ? implode(', ', $permLabels) : 'শুধু ড্যাশবোর্ড ও পাসওয়ার্ড') ?>
             </td>
             <td>
-              <?= !empty($adm['is_active']) ? 'চালু' : 'Disabled' ?>
+              <?= !empty($adm['is_active']) ? 'চালু' : 'বন্ধ' ?>
               <?php if (!empty($adm['must_change_password'])): ?>
                 <div style="font-size: 0.76rem; color: var(--adm-muted);">Temp password</div>
               <?php endif; ?>
@@ -431,7 +431,7 @@ if (!empty($_GET['edit'])) {
                     <input type="hidden" name="action" value="toggle_active">
                     <input type="hidden" name="admin_id" value="<?= (int) $adm['id'] ?>">
                     <button type="submit" class="btn btn-outline btn-sm">
-                      <?= !empty($adm['is_active']) ? 'Disable' : 'Enable' ?>
+                      <?= !empty($adm['is_active']) ? 'বন্ধ করুন' : 'চালু করুন' ?>
                     </button>
                   </form>
                   <form method="post" action="<?= e(admin_url('admins.php')) ?>" data-confirm="Delete admin account '@<?= e($adm['username']) ?>' permanently?">

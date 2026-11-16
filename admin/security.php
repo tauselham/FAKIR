@@ -86,7 +86,7 @@ $logs = $securityLogs->fetchAll();
     <div class="form-row">
       <label class="form-check">
         <input type="checkbox" name="logout_after_change" value="1" checked>
-        <span>Sign out after changing password (recommended)</span>
+        <span>পাসওয়ার্ড পরিবর্তনের পর লগআউট করুন (সুপারিশকৃত)</span>
       </label>
     </div>
 

@@ -336,7 +336,7 @@ if (!empty($_GET['edit'])) {
           <?php foreach ($images as $img): ?>
             <tr>
               <td><img src="<?= e(safe_url($img['image_url'])) ?>" alt="" class="adm-thumb"></td>
-              <td><?= e($img['title'] ?: '(Untitled)') ?></td>
+              <td><?= e($img['title'] ?: '(শিরোনামহীন)') ?></td>
               <td><?= e($img['category_name'] ?? '—') ?></td>
               <td class="num-tab"><?= (int) $img['sort_order'] ?></td>
               <td>
@@ -347,7 +347,7 @@ if (!empty($_GET['edit'])) {
                   echo e($flags ? implode(', ', $flags) : 'Gallery');
                 ?>
               </td>
-              <td><?= e(ucfirst($img['status'])) ?></td>
+              <td><?= e($img['status'] === 'published' ? 'প্রকাশিত' : 'লুকানো') ?></td>
               <td>
                 <div style="display: flex; gap: 6px;">
                   <a href="<?= e(admin_url('gallery.php')) ?>?edit=<?= (int) $img['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
