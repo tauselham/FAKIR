@@ -1,6 +1,12 @@
 <?php
 declare(strict_types=1);
 
+// Admin modules process POST actions after including this layout. Buffer the
+// layout output so redirects and other response headers remain available.
+if (ob_get_level() === 0) {
+    ob_start();
+}
+
 require_once __DIR__ . '/auth.php';
 
 if (!defined('ADMIN_ROUTED_ENTRY')) {
