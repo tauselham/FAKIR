@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $upd = $pdo->prepare('UPDATE public.website_settings SET hero_interval_ms = :ms WHERE id = 1');
             $upd->execute([':ms' => $interval]);
             log_admin_activity((int) $currentAdmin['id'], 'hero_interval_updated', 'website_settings', 1);
-            set_flash('success', 'Slideshow interval updated.');
+            set_flash('success', 'স্লাইডশোর সময় হালনাগাদ হয়েছে।');
             redirect_to(admin_url('banners.php'));
         } elseif ($action === 'create' || $action === 'update') {
             $bannerId   = (int) ($_POST['banner_id'] ?? 0);
@@ -29,11 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $buttonText = trim((string) ($_POST['button_text'] ?? ''));
             $buttonUrl  = trim((string) ($_POST['button_url'] ?? ''));
             $sortOrder  = (int) ($_POST['sort_order'] ?? 0);
-            $isActive   = !empty($_POST['is_active']);
+            $isচালু   = !empty($_POST['is_active']);
 
             if ($action === 'create') {
                 if (empty($_FILES['banner_image']['name'])) {
-                    throw new RuntimeException('Banner image file is required.');
+                    throw new RuntimeException('ব্যানারের ছবি নির্বাচন করতে হবে।');
                 }
                 $res = $storage->upload($_FILES['banner_image'], BUCKET_HERO_BANNERS, ALLOWED_BANNER_MIMES, MAX_IMAGE_UPLOAD_BYTES, 'banners');
                 try {
@@ -51,20 +51,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':path'   => $res['path'],
                         ':url'    => $res['url'],
                         ':ord'    => $sortOrder,
-                        ':act'    => $isActive ? 'true' : 'false',
+                        ':act'    => $isচালু ? 'true' : 'false',
                     ]);
                     log_admin_activity((int) $currentAdmin['id'], 'banner_created', 'hero_banner', (int) $ins->fetchColumn());
                 } catch (Throwable $dbErr) {
                     $storage->delete($res['bucket'], $res['path']);
                     throw $dbErr;
                 }
-                set_flash('success', 'Hero banner added.');
+                set_flash('success', 'ব্যানার যোগ করা হয়েছে।');
             } else {
                 $st = $pdo->prepare('SELECT * FROM public.hero_banners WHERE id = :id LIMIT 1');
                 $st->execute([':id' => $bannerId]);
                 $existing = $st->fetch();
                 if (!$existing) {
-                    throw new RuntimeException('Hero banner not found.');
+                    throw new RuntimeException('ব্যানারটি পাওয়া যায়নি।');
                 }
 
                 $bucket = $existing['storage_bucket'];
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':bt'     => $buttonText !== '' ? $buttonText : null,
                         ':bu'     => $buttonUrl !== '' ? $buttonUrl : null,
                         ':ord'    => $sortOrder,
-                        ':act'    => $isActive ? 'true' : 'false',
+                        ':act'    => $isচালু ? 'true' : 'false',
                         ':bucket' => $bucket,
                         ':path'   => $path,
                         ':url'    => $url,
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($oldBucket !== null && $oldPath !== null) {
                     $storage->delete($oldBucket, $oldPath);
                 }
-                set_flash('success', 'Hero banner updated.');
+                set_flash('success', 'ব্যানার হালনাগাদ হয়েছে।');
             }
             redirect_to(admin_url('banners.php'));
         } elseif ($action === 'delete') {
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->prepare('DELETE FROM public.hero_banners WHERE id = :id')->execute([':id' => $bannerId]);
                 log_admin_activity((int) $currentAdmin['id'], 'banner_deleted', 'hero_banner', $bannerId);
             }
-            set_flash('success', 'Hero banner deleted.');
+            set_flash('success', 'ব্যানার মুছে ফেলা হয়েছে।');
             redirect_to(admin_url('banners.php'));
         }
     } catch (Throwable $e) {
@@ -179,7 +179,7 @@ if (!empty($_GET['edit'])) {
         </div>
       </div>
       <div class="form-row">
-        <label class="form-label" for="sort_order">Display ক্রম</label>
+        <label class="form-label" for="sort_order">প্রদর্শনের ক্রম</label>
         <input class="form-control" type="number" id="sort_order" name="sort_order" value="<?= (int) ($editBanner['sort_order'] ?? 0) ?>">
       </div>
     </div>
@@ -201,7 +201,7 @@ if (!empty($_GET['edit'])) {
         <input class="form-control" type="text" id="button_text" name="button_text" value="<?= e($editBanner['button_text'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="button_url">Button লিংক (Optional)</label>
+        <label class="form-label" for="button_url">বাটনের লিংক (ঐচ্ছিক)</label>
         <input class="form-control" type="text" id="button_url" name="button_url" value="<?= e($editBanner['button_url'] ?? '') ?>" placeholder="/gallery.php or #posts-section">
       </div>
     </div>
@@ -228,11 +228,11 @@ if (!empty($_GET['edit'])) {
     <table class="adm-table">
       <thead>
         <tr>
-          <th>Image</th>
-          <th>Title</th>
-          <th>Button</th>
+          <th>ছবি</th>
+          <th>শিরোনাম</th>
+          <th>বাটন</th>
           <th>ক্রম</th>
-          <th>Status</th>
+          <th>অবস্থা</th>
           <th>করণীয়</th>
         </tr>
       </thead>
@@ -243,7 +243,7 @@ if (!empty($_GET['edit'])) {
             <td><?= e($b['title'] ?: '(Image-only banner)') ?></td>
             <td><?= e($b['button_text'] ?: '—') ?></td>
             <td class="num-tab"><?= (int) $b['sort_order'] ?></td>
-            <td><?= !empty($b['is_active']) ? 'Active' : 'Disabled' ?></td>
+            <td><?= !empty($b['is_active']) ? 'চালু' : 'Disabled' ?></td>
             <td>
               <div style="display: flex; gap: 6px;">
                 <a href="<?= e(admin_url('banners.php')) ?>?edit=<?= (int) $b['id'] ?>" class="btn btn-outline btn-sm">Edit</a>

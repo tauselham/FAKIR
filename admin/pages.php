@@ -27,21 +27,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
 
             if ($title === '' || mb_strlen($title) > 220) {
-                throw new RuntimeException('Page title is required and must be 220 characters or fewer.');
+                throw new RuntimeException('পেজের শিরোনাম দিতে হবে এবং তা ২২০ অক্ষরের মধ্যে হতে হবে।');
             }
             if ($editorMode === 'single') {
-                if (trim($codeDocument) === '') throw new RuntimeException('Complete HTML document code is required.');
-                if (strlen($codeDocument) > 2097152) throw new RuntimeException('Complete HTML document must be 2 MB or smaller.');
+                if (trim($codeDocument) === '') throw new RuntimeException('সম্পূর্ণ HTML ডকুমেন্টের কোড দিতে হবে।');
+                if (strlen($codeDocument) > 2097152) throw new RuntimeException('সম্পূর্ণ HTML ডকুমেন্ট ২ মেগাবাইটের মধ্যে হতে হবে।');
                 $html = $css = $js = '';
             } else {
                 if (strlen($html) > 1048576 || strlen($css) > 524288 || strlen($js) > 524288) {
-                    throw new RuntimeException('Code size limit exceeded. HTML max 1 MB; CSS and JavaScript max 512 KB each.');
+                    throw new RuntimeException('কোডের আকার নির্ধারিত সীমা ছাড়িয়েছে। HTML সর্বোচ্চ ১ মেগাবাইট এবং CSS ও JavaScript প্রতিটি সর্বোচ্চ ৫১২ কিলোবাইট হতে পারবে।');
                 }
-                if (trim($html) === '') throw new RuntimeException('HTML content is required.');
+                if (trim($html) === '') throw new RuntimeException('HTML কনটেন্ট দিতে হবে।');
                 $codeDocument = '';
             }
             if (mb_strlen($meta) > 300) {
-                throw new RuntimeException('SEO description must be 300 characters or fewer.');
+                throw new RuntimeException('সার্চ বিবরণ ৩০০ অক্ষরের বেশি হতে পারবে না।');
             }
 
             if ($pageId > 0) {
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $exists->execute([':id' => $pageId]);
                 $existing = $exists->fetch();
                 if (!$existing) {
-                    throw new RuntimeException('Page not found.');
+                    throw new RuntimeException('পেজটি পাওয়া যায়নি।');
                 }
                 if ($existing['page_type'] === 'about') {
                     $pageType = 'about';
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':status_check' => $status, ':id' => $pageId,
                 ]);
                 log_admin_activity((int) $currentAdmin['id'], 'content_page_updated', 'content_page', $pageId, ['slug' => $slug, 'status' => $status]);
-                set_flash('success', 'Page updated successfully.');
+                set_flash('success', 'পেজ হালনাগাদ হয়েছে।');
             } else {
                 $stmt = $pdo->prepare(
                     "INSERT INTO public.content_pages
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
                 $newId = (int) $stmt->fetchColumn();
                 log_admin_activity((int) $currentAdmin['id'], 'content_page_created', 'content_page', $newId, ['slug' => $slug, 'type' => $pageType]);
-                set_flash('success', 'Page created successfully.');
+                set_flash('success', 'পেজ তৈরি হয়েছে।');
             }
             redirect_to(admin_url('pages.php'));
         } elseif ($action === 'delete') {
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($deleted) {
                 log_admin_activity((int) $currentAdmin['id'], 'content_page_deleted', 'content_page', (int) $deleted['id'], ['slug' => $deleted['slug']]);
             }
-            set_flash('success', 'Page deleted.');
+            set_flash('success', 'পেজ মুছে ফেলা হয়েছে।');
             redirect_to(admin_url('pages.php'));
         }
     } catch (Throwable $e) {
@@ -138,7 +138,7 @@ foreach ($pages as $pageRow) {
 ?>
 <section class="adm-panel">
   <h2 class="adm-panel-title"><?= $editPage ? 'Edit Page' : 'Create a Page' ?></h2>
-  <p style="color:var(--adm-muted);margin-top:0;">Create a landing page or manage the আমাদের পরিচিতি page using your own HTML, CSS and JavaScript. Custom code runs inside a restricted sandbox and cannot access the অ্যাডমিন প্যানেল session.</p>
+  <p style="color:var(--adm-muted);margin-top:0;">নিজস্ব HTML, CSS ও JavaScript ব্যবহার করে নতুন পেজ তৈরি করুন অথবা আমাদের পরিচিতি পেজ পরিচালনা করুন। নিরাপত্তার জন্য কাস্টম কোড আলাদা সীমাবদ্ধ পরিবেশে চলে এবং অ্যাডমিন সেশনে প্রবেশ করতে পারে না।</p>
   <form method="post" action="<?= e(admin_url('pages.php')) ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save">
@@ -146,7 +146,7 @@ foreach ($pages as $pageRow) {
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="page_type">Page ধরন</label>
+        <label class="form-label" for="page_type">পেজের ধরন</label>
         <select class="form-control" name="page_type" id="page_type" <?= $editPage && $editPage['page_type'] === 'about' ? 'disabled' : '' ?>>
           <option value="landing" <?= (($editPage['page_type'] ?? 'landing') === 'landing') ? 'selected' : '' ?>>নতুন পেজ</option>
           <option value="about" <?= (($editPage['page_type'] ?? '') === 'about') ? 'selected' : '' ?> <?= (!$editPage && $hasAbout) ? 'disabled' : '' ?>>আমাদের পরিচিতি <?= $hasAbout && (!$editPage || $editPage['page_type'] !== 'about') ? '(already exists)' : '' ?></option>
@@ -168,19 +168,19 @@ foreach ($pages as $pageRow) {
         <input class="form-control" type="text" id="title" name="title" maxlength="220" required value="<?= e($editPage['title'] ?? '') ?>" placeholder="Example: Summer Festival">
       </div>
       <div class="form-row">
-        <label class="form-label" for="slug">Public লিংক Slug</label>
+        <label class="form-label" for="slug">পাবলিক লিংকের শেষ অংশ</label>
         <input class="form-control" type="text" id="slug" name="slug" maxlength="120" required pattern="[a-z0-9]+(-[a-z0-9]+)*" value="<?= e($editPage['slug'] ?? '') ?>" placeholder="summer-festival">
-        <span class="form-hint">Public লিংক: <?= e(APP_URL) ?>/your-slug — lowercase letters, numbers and hyphens only.</span>
+        <span class="form-hint">পাবলিক লিংক: <?= e(APP_URL) ?>/আপনার-পেজ — ইংরেজি ছোট অক্ষর, সংখ্যা ও হাইফেন ব্যবহার করুন।</span>
       </div>
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="meta_description">সার্চ ফলাফলের বিবরণ (Optional)</label>
+      <label class="form-label" for="meta_description">সার্চ ফলাফলের বিবরণ (ঐচ্ছিক)</label>
       <input class="form-control" type="text" id="meta_description" name="meta_description" maxlength="300" value="<?= e($editPage['meta_description'] ?? '') ?>">
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="editor_mode">Code সম্পাদক Mode</label>
+      <label class="form-label" for="editor_mode">কোড লেখার ধরন</label>
       <select class="form-control" name="editor_mode" id="page_editor_mode">
         <option value="separate" <?= empty($editPage['code_document']) ? 'selected' : '' ?>>HTML, CSS ও JavaScript আলাদা ঘরে লিখুন</option>
         <option value="single" <?= !empty($editPage['code_document']) ? 'selected' : '' ?>>One complete HTML document (HTML + CSS + JavaScript together)</option>
@@ -206,7 +206,7 @@ foreach ($pages as $pageRow) {
     <div class="form-row" id="page_single_code_field" style="<?= empty($editPage['code_document']) ? 'display:none;' : '' ?>">
       <label class="form-label" for="code_document">সম্পূর্ণ HTML ডকুমেন্ট</label>
       <textarea class="form-control code-document-editor" id="code_document" name="code_document" rows="24" spellcheck="false"><?= e($editPage['code_document'] ?? '') ?></textarea>
-      <span class="form-hint">একই document-এর মধ্যে &lt;style&gt; ও &lt;script&gt; লিখবে। এটি sandboxed iframe-এ চলবে; same-origin access ও fetch/XHR/WebSocket বন্ধ; HTTPS images load হতে পারে।</span>
+      <span class="form-hint">একই ডকুমেন্টের মধ্যে &lt;style&gt; ও &lt;script&gt; লিখবে। এটি sandboxed iframe-এ চলবে; একই উৎসে প্রবেশ ও fetch/XHR/WebSocket বন্ধ; HTTPS ছবি লোড হতে পারে।</span>
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -222,7 +222,7 @@ foreach ($pages as $pageRow) {
     <p style="color:var(--adm-muted);">No pages have been created yet.</p>
   <?php else: ?>
     <div class="table-wrap"><table class="adm-table">
-      <thead><tr><th>Title</th><th>ধরন</th><th>লিংক</th><th>Status</th><th>হালনাগাদ</th><th>করণীয়</th></tr></thead>
+      <thead><tr><th>শিরোনাম</th><th>ধরন</th><th>লিংক</th><th>অবস্থা</th><th>হালনাগাদ</th><th>করণীয়</th></tr></thead>
       <tbody>
       <?php foreach ($pages as $p): ?>
         <tr>

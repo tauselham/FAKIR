@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $isSlider    = !empty($_POST['is_slider_item']);
 
             if (empty($_FILES['images']['name'][0])) {
-                throw new RuntimeException('Please choose at least one image to upload.');
+                throw new RuntimeException('আপলোড করার জন্য অন্তত একটি ছবি নির্বাচন করুন।');
             }
 
             $filesToUpload = [];
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($filesToUpload === []) {
-                throw new RuntimeException('Please choose at least one valid image to upload.');
+                throw new RuntimeException('আপলোড করার জন্য অন্তত একটি সঠিক ছবি নির্বাচন করুন।');
             }
 
             $uploadedCount = 0;
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $uploadedCount++;
             }
 
-            set_flash('success', "Uploaded {$uploadedCount} image(s) to the gallery.");
+            set_flash('success', "গ্যালারিতে {$uploadedCount}টি ছবি আপলোড হয়েছে।");
             redirect_to(admin_url('gallery.php'));
         } elseif ($action === 'update') {
             $imgId       = (int) ($_POST['image_id'] ?? 0);
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $st->execute([':id' => $imgId]);
             $existing = $st->fetch();
             if (!$existing) {
-                throw new RuntimeException('Image record not found.');
+                throw new RuntimeException('ছবির তথ্য পাওয়া যায়নি।');
             }
 
             $bucket = $existing['storage_bucket'];
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($oldBucket !== null && $oldPath !== null) {
                 $storage->delete($oldBucket, $oldPath);
             }
-            set_flash('success', 'Gallery image updated.');
+            set_flash('success', 'গ্যালারির ছবি হালনাগাদ হয়েছে।');
             redirect_to(admin_url('gallery.php'));
         } elseif ($action === 'delete') {
             $imgId = (int) ($_POST['image_id'] ?? 0);
@@ -168,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $del->execute([':id' => $imgId]);
                 log_admin_activity((int) $currentAdmin['id'], 'gallery_image_deleted', 'gallery_image', $imgId);
             }
-            set_flash('success', 'Gallery image deleted.');
+            set_flash('success', 'গ্যালারির ছবি মুছে ফেলা হয়েছে।');
             redirect_to(admin_url('gallery.php'));
         }
     } catch (Throwable $e) {
@@ -194,7 +194,7 @@ if (!empty($_GET['edit'])) {
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title"><?= $editImage ? 'Edit Photo #' . (int) $editImage['id'] : 'গ্যালারিতে ছবি আপলোড (Multiple Supported)' ?></h2>
+  <h2 class="adm-panel-title"><?= $editImage ? 'ছবি সম্পাদনা #' . (int) $editImage['id'] : 'গ্যালারিতে ছবি আপলোড (একাধিক ছবি দেওয়া যাবে)' ?></h2>
 
   <?php if ($editImage): ?>
     <form method="post" action="<?= e(admin_url('gallery.php')) ?>" enctype="multipart/form-data">
@@ -279,7 +279,7 @@ if (!empty($_GET['edit'])) {
         <div class="form-row">
           <label class="form-label" for="category_id">Category (Optional)</label>
           <select class="form-control" name="category_id" id="category_id">
-            <option value="">All Photos / বিভাগবিহীন</option>
+            <option value="">সব ছবি / বিভাগবিহীন</option>
             <?php foreach ($categories as $cat): ?>
               <option value="<?= (int) $cat['id'] ?>"><?= e($cat['name']) ?></option>
             <?php endforeach; ?>
@@ -323,12 +323,12 @@ if (!empty($_GET['edit'])) {
       <table class="adm-table">
         <thead>
           <tr>
-            <th>Photo</th>
-            <th>Title</th>
-            <th>Category</th>
+            <th>ছবি</th>
+            <th>শিরোনাম</th>
+            <th>বিভাগ</th>
             <th>ক্রম</th>
             <th>অবস্থান</th>
-            <th>Status</th>
+            <th>অবস্থা</th>
             <th>করণীয়</th>
           </tr>
         </thead>

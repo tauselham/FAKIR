@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username   = trim((string) ($_POST['username'] ?? ''));
             $email      = trim((string) ($_POST['email'] ?? ''));
             $role       = in_array($_POST['role'] ?? '', $validRoles, true) ? (string) $_POST['role'] : 'admin';
-            $isActive   = !empty($_POST['is_active']);
+            $isচালু   = !empty($_POST['is_active']);
             $mustChange = !empty($_POST['must_change_password']);
             $password   = (string) ($_POST['password'] ?? '');
 
@@ -31,34 +31,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 : decode_admin_permissions($rawPerms);
 
             if ($fullName === '') {
-                throw new RuntimeException('Full name is required.');
+                throw new RuntimeException('পুরো নাম লিখতে হবে।');
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                throw new RuntimeException('Please enter a valid email address.');
+                throw new RuntimeException('সঠিক ইমেইল ঠিকানা লিখুন।');
             }
 
             if ($action === 'create') {
                 if (strlen($username) < 3 || !preg_match('/^[a-zA-Z0-9_.-]+$/', $username)) {
-                    throw new RuntimeException('ব্যবহারকারীর নাম must be at least 3 characters (letters, numbers, dot, underscore, or hyphen).');
+                    throw new RuntimeException('ব্যবহারকারীর নাম কমপক্ষে ৩ অক্ষরের হতে হবে। ইংরেজি অক্ষর, সংখ্যা, ডট, আন্ডারস্কোর অথবা হাইফেন ব্যবহার করুন।');
                 }
                 $pwErrors = validate_password_strength($password);
                 if ($pwErrors !== []) {
                     throw new RuntimeException(implode(' ', $pwErrors));
                 }
                 if ($role !== 'super_admin' && $permissions === []) {
-                    throw new RuntimeException('Please assign at least one permission (e.g., গ্রামের খবর ও পোস্ট or ছবির গ্যালারি).');
+                    throw new RuntimeException('অন্তত একটি অনুমতি নির্বাচন করুন (যেমন: গ্রামের খবর ও পোস্ট অথবা ছবির গ্যালারি)।');
                 }
 
                 $dup = $pdo->prepare('SELECT id FROM public.admins WHERE LOWER(username) = LOWER(:u) OR LOWER(email) = LOWER(:e) LIMIT 1');
                 $dup->execute([':u' => $username, ':e' => $email]);
                 if ($dup->fetch()) {
-                    throw new RuntimeException('An admin account with this username or email already exists.');
+                    throw new RuntimeException('এই ব্যবহারকারীর নাম অথবা ইমেইল দিয়ে একটি অ্যাডমিন অ্যাকাউন্ট আগে থেকেই রয়েছে।');
                 }
 
                 $hash = hash_admin_password($password);
                 $permJson = json_encode($permissions, JSON_THROW_ON_ERROR);
 
-                $newId = db_transaction(function (PDO $pdo) use ($username, $email, $hash, $fullName, $role, $permJson, $mustChange, $isActive, $currentAdmin, $permissions): int {
+                $newId = db_transaction(function (PDO $pdo) use ($username, $email, $hash, $fullName, $role, $permJson, $mustChange, $isচালু, $currentAdmin, $permissions): int {
                     $ins = $pdo->prepare(
                         'INSERT INTO public.admins
                          (username, email, password_hash, full_name, role, permissions, must_change_password, is_active, created_by)
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':r'   => $role,
                         ':p'   => $permJson,
                         ':mc'  => $mustChange ? 'true' : 'false',
-                        ':act' => $isActive ? 'true' : 'false',
+                        ':act' => $isচালু ? 'true' : 'false',
                         ':cb'  => (int) $currentAdmin['id'],
                     ]);
                     $id = (int) $ins->fetchColumn();
@@ -85,44 +85,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     return $id;
                 });
 
-                set_flash('success', "অ্যাডমিন account '@{$username}' (#{$newId}) created successfully.");
+                set_flash('success', "অ্যাডমিন অ্যাকাউন্ট '@{$username}' (#{$newId}) সফলভাবে তৈরি হয়েছে।");
                 redirect_to(admin_url('admins.php'));
             } else {
                 $st = $pdo->prepare('SELECT * FROM public.admins WHERE id = :id LIMIT 1');
                 $st->execute([':id' => $adminId]);
                 $existing = $st->fetch();
                 if (!$existing) {
-                    throw new RuntimeException('অ্যাডমিন account not found.');
+                    throw new RuntimeException('অ্যাডমিন অ্যাকাউন্ট পাওয়া যায়নি।');
                 }
 
                 // Prevent locking out or demoting self
                 if ($adminId === (int) $currentAdmin['id']) {
                     if ($role !== 'super_admin') {
-                        throw new RuntimeException('You cannot downgrade your own সুপার অ্যাডমিন role.');
+                        throw new RuntimeException('নিজের সুপার অ্যাডমিন ভূমিকা কমাতে পারবেন না।');
                     }
-                    if (!$isActive) {
-                        throw new RuntimeException('You cannot deactivate your own active account.');
+                    if (!$isচালু) {
+                        throw new RuntimeException('নিজের সক্রিয় অ্যাকাউন্ট বন্ধ করতে পারবেন না।');
                     }
                 }
 
                 // Ensure at least one active super_admin always exists
-                if ($existing['role'] === 'super_admin' && ($role !== 'super_admin' || !$isActive)) {
+                if ($existing['role'] === 'super_admin' && ($role !== 'super_admin' || !$isচালু)) {
                     $otherSuperCount = (int) $pdo->query(
                         "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_active = TRUE AND id <> " . (int) $adminId
                     )->fetchColumn();
                     if ($otherSuperCount < 1) {
-                        throw new RuntimeException('At least one active সুপার অ্যাডমিন must remain.');
+                        throw new RuntimeException('অন্তত একজন সক্রিয় সুপার অ্যাডমিন থাকতে হবে।');
                     }
                 }
 
                 if ($role !== 'super_admin' && $permissions === []) {
-                    throw new RuntimeException('Please assign at least one permission (e.g., গ্রামের খবর ও পোস্ট or ছবির গ্যালারি).');
+                    throw new RuntimeException('অন্তত একটি অনুমতি নির্বাচন করুন (যেমন: গ্রামের খবর ও পোস্ট অথবা ছবির গ্যালারি)।');
                 }
 
                 $dup = $pdo->prepare('SELECT id FROM public.admins WHERE LOWER(email) = LOWER(:e) AND id <> :id LIMIT 1');
                 $dup->execute([':e' => $email, ':id' => $adminId]);
                 if ($dup->fetch()) {
-                    throw new RuntimeException('Another admin account is already using this email address.');
+                    throw new RuntimeException('এই ইমেইল ঠিকানাটি অন্য একটি অ্যাডমিন অ্যাকাউন্টে ব্যবহার হচ্ছে।');
                 }
 
                 $newHash = null;
@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $permJson = json_encode($permissions, JSON_THROW_ON_ERROR);
 
-                db_transaction(function (PDO $pdo) use ($adminId, $fullName, $email, $role, $permJson, $isActive, $newHash, $mustChange, $currentAdmin, $permissions): void {
+                db_transaction(function (PDO $pdo) use ($adminId, $fullName, $email, $role, $permJson, $isচালু, $newHash, $mustChange, $currentAdmin, $permissions): void {
                     if ($newHash !== null) {
                         $upd = $pdo->prepare(
                             'UPDATE public.admins
@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ':e'   => $email,
                             ':r'   => $role,
                             ':p'   => $permJson,
-                            ':act' => $isActive ? 'true' : 'false',
+                            ':act' => $isচালু ? 'true' : 'false',
                             ':h'   => $newHash,
                             ':mc'  => $mustChange ? 'true' : 'false',
                             ':id'  => $adminId,
@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ':e'   => $email,
                             ':r'   => $role,
                             ':p'   => $permJson,
-                            ':act' => $isActive ? 'true' : 'false',
+                            ':act' => $isচালু ? 'true' : 'false',
                             ':id'  => $adminId,
                         ]);
                     }
@@ -183,32 +183,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($action === 'toggle_active') {
             $adminId = (int) ($_POST['admin_id'] ?? 0);
             if ($adminId === (int) $currentAdmin['id']) {
-                throw new RuntimeException('You cannot disable your own account.');
+                throw new RuntimeException('নিজের অ্যাকাউন্ট বন্ধ করতে পারবেন না।');
             }
             $st = $pdo->prepare('SELECT id, username, role, is_active FROM public.admins WHERE id = :id LIMIT 1');
             $st->execute([':id' => $adminId]);
             $target = $st->fetch();
             if (!$target) {
-                throw new RuntimeException('অ্যাডমিন account not found.');
+                throw new RuntimeException('অ্যাডমিন অ্যাকাউন্ট পাওয়া যায়নি।');
             }
-            $newActive = empty($target['is_active']);
-            if (!$newActive && $target['role'] === 'super_admin') {
+            $newচালু = empty($target['is_active']);
+            if (!$newচালু && $target['role'] === 'super_admin') {
                 $otherSuperCount = (int) $pdo->query(
                     "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_active = TRUE AND id <> " . (int) $adminId
                 )->fetchColumn();
                 if ($otherSuperCount < 1) {
-                    throw new RuntimeException('Cannot disable the last active সুপার অ্যাডমিন.');
+                    throw new RuntimeException('শেষ সক্রিয় সুপার অ্যাডমিনকে বন্ধ করা যাবে না।');
                 }
             }
             $pdo->prepare('UPDATE public.admins SET is_active = :act WHERE id = :id')
-                ->execute([':act' => $newActive ? 'true' : 'false', ':id' => $adminId]);
-            log_admin_activity((int) $currentAdmin['id'], $newActive ? 'admin_enabled' : 'admin_disabled', 'admin', $adminId);
-            set_flash('success', "অ্যাডমিন '@{$target['username']}' " . ($newActive ? 'enabled.' : 'disabled.'));
+                ->execute([':act' => $newচালু ? 'true' : 'false', ':id' => $adminId]);
+            log_admin_activity((int) $currentAdmin['id'], $newচালু ? 'admin_enabled' : 'admin_disabled', 'admin', $adminId);
+            set_flash('success', "অ্যাডমিন '@{$target['username']}' " . ($newচালু ? 'enabled.' : 'disabled.'));
             redirect_to(admin_url('admins.php'));
         } elseif ($action === 'delete') {
             $adminId = (int) ($_POST['admin_id'] ?? 0);
             if ($adminId === (int) $currentAdmin['id']) {
-                throw new RuntimeException('You cannot delete your own account.');
+                throw new RuntimeException('নিজের অ্যাকাউন্ট মুছে ফেলতে পারবেন না।');
             }
             $st = $pdo->prepare('SELECT id, username, role FROM public.admins WHERE id = :id LIMIT 1');
             $st->execute([':id' => $adminId]);
@@ -219,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_active = TRUE AND id <> " . (int) $adminId
                     )->fetchColumn();
                     if ($otherSuperCount < 1) {
-                        throw new RuntimeException('Cannot delete the last active সুপার অ্যাডমিন.');
+                        throw new RuntimeException('শেষ সক্রিয় সুপার অ্যাডমিনকে মুছে ফেলা যাবে না।');
                     }
                 }
                 $pdo->prepare('DELETE FROM public.admins WHERE id = :id')->execute([':id' => $adminId]);
@@ -341,7 +341,7 @@ if (!empty($_GET['edit'])) {
           <button type="button" class="btn btn-outline btn-sm" data-perm-preset="gallery">শুধু ছবি</button>
           <button type="button" class="btn btn-outline btn-sm" data-perm-preset="both">পোস্ট ও ছবি</button>
           <button type="button" class="btn btn-outline btn-sm" data-perm-preset="all">সব কনটেন্ট</button>
-          <button type="button" class="btn btn-outline btn-sm" data-perm-preset="none">Clear</button>
+          <button type="button" class="btn btn-outline btn-sm" data-perm-preset="none">মুছে ফেলুন</button>
         </div>
       </div>
 
@@ -368,16 +368,16 @@ if (!empty($_GET['edit'])) {
     <div class="form-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
       <label class="form-check">
         <input type="checkbox" name="is_active" value="1" <?= (!$editAdmin || !empty($editAdmin['is_active'])) ? 'checked' : '' ?>>
-        <span>Account Active (Can লগইন করুন)</span>
+        <span>অ্যাকাউন্ট চালু (লগইন করতে পারবে)</span>
       </label>
       <label class="form-check">
         <input type="checkbox" name="must_change_password" value="1" <?= (!$editAdmin || !empty($editAdmin['must_change_password'])) ? 'checked' : '' ?>>
-        <span>Prompt পাসওয়ার্ড Change After Login</span>
+        <span>লগইনের পর পাসওয়ার্ড পরিবর্তন করতে বলবে</span>
       </label>
     </div>
 
     <div style="display: flex; gap: 10px;">
-      <button type="submit" class="btn btn-green"><?= $editAdmin ? 'Save অ্যাডমিন & Permissions' : 'Create অ্যাডমিন Account' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editAdmin ? 'অ্যাডমিন ও অনুমতি সংরক্ষণ করুন' : 'অ্যাডমিন অ্যাকাউন্ট তৈরি করুন' ?></button>
       <?php if ($editAdmin): ?>
         <a href="<?= e(admin_url('admins.php')) ?>" class="btn btn-outline">সম্পাদনা বাতিল</a>
       <?php endif; ?>
@@ -394,7 +394,7 @@ if (!empty($_GET['edit'])) {
           <th>অ্যাডমিন</th>
           <th>Role</th>
           <th>অনুমোদিত কাজ</th>
-          <th>Status</th>
+          <th>অবস্থা</th>
           <th>সর্বশেষ লগইন</th>
           <th>করণীয়</th>
         </tr>
@@ -413,10 +413,10 @@ if (!empty($_GET['edit'])) {
             </td>
             <td><?= e($isSuper ? 'সুপার অ্যাডমিন' : ucfirst((string) $adm['role'])) ?></td>
             <td style="max-width: 280px; font-size: 0.84rem;">
-              <?= $isSuper ? 'Full Access (All Modules &amp; Users)' : e($permLabels ? implode(', ', $permLabels) : 'ড্যাশবোর্ড &amp; পাসওয়ার্ড Only') ?>
+              <?= $isSuper ? 'সম্পূর্ণ প্রবেশাধিকার (সব বিভাগ ও ব্যবহারকারী)' : e($permLabels ? implode(', ', $permLabels) : 'ড্যাশবোর্ড &amp; পাসওয়ার্ড Only') ?>
             </td>
             <td>
-              <?= !empty($adm['is_active']) ? 'Active' : 'Disabled' ?>
+              <?= !empty($adm['is_active']) ? 'চালু' : 'Disabled' ?>
               <?php if (!empty($adm['must_change_password'])): ?>
                 <div style="font-size: 0.76rem; color: var(--adm-muted);">Temp password</div>
               <?php endif; ?>

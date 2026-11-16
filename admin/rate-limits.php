@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'rate_limits';
-$adminPageTitle = 'Rate Limiting Settings';
+$adminPageTitle = 'অনুরোধ সীমা সেটিংস';
 $requiredSuperAdmin = true;
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 
@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$isSuperAdmin) {
         http_response_code(403);
-        set_flash('error', 'Only a সুপার অ্যাডমিন can modify rate limiting rules or reset active buckets.');
+        set_flash('error', 'শুধুমাত্র সুপার অ্যাডমিন অনুরোধ সীমার নিয়ম পরিবর্তন অথবা সক্রিয় সীমা পুনরায় সেট করতে পারবেন।');
         redirect_to(admin_url('rate-limits.php'));
     }
 
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'is_enabled'   => $isEnabled,
             ]);
 
-            set_flash('success', "Rate limit for '{$scope}' updated ({$maxRequests} requests per {$windowValue} {$windowUnit}).");
+            set_flash('success', "'{$scope}' ক্ষেত্রের অনুরোধ সীমা হালনাগাদ হয়েছে (প্রতি {$windowValue} {$windowUnit}-এ {$maxRequests}টি অনুরোধ)।");
         } elseif ($action === 'reset_scope') {
             $scope = trim((string) ($_POST['scope'] ?? ''));
             $cleared = $limiter->resetScope($scope);
@@ -53,10 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'scope'   => $scope,
                 'cleared' => $cleared,
             ]);
-            set_flash('success', "Cleared {$cleared} active rate-limit bucket(s) for '{$scope}'.");
+            set_flash('success', "মুছে ফেলুনed {$cleared} active rate-limit bucket(s) for '{$scope}'.");
         } elseif ($action === 'purge_expired') {
             $purged = $limiter->purgeExpired();
-            set_flash('success', "Purged {$purged} expired rate-limit record(s).");
+            set_flash('success', "{$purged}টি মেয়াদোত্তীর্ণ অনুরোধ সীমার তথ্য মুছে ফেলা হয়েছে।");
         }
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
@@ -71,7 +71,7 @@ $rules = $limiter->getAllRulesWithStats();
 <section class="adm-panel">
   <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
     <div>
-      <h2 class="adm-panel-title" style="margin-bottom: 4px;">Configurable Server-Side অনুরোধ সীমা</h2>
+      <h2 class="adm-panel-title" style="margin-bottom: 4px;">সার্ভারভিত্তিক অনুরোধ সীমা</h2>
       <p style="margin: 0; color: var(--adm-muted); font-size: 0.9rem;">
         Enforced in PostgreSQL by IP address and account identifier (independent of browser sessions). Expired windows reset automatically.
       </p>
@@ -99,9 +99,9 @@ $rules = $limiter->getAllRulesWithStats();
         <tr>
           <th>এন্ডপয়েন্ট / ক্ষেত্র</th>
           <th>সর্বোচ্চ অনুরোধ</th>
-          <th>সময় Window</th>
-          <th>সময় Unit</th>
-          <th>Status</th>
+          <th>সময়সীমা</th>
+          <th>সময়ের একক</th>
+          <th>অবস্থা</th>
           <th>সক্রিয় / অবরুদ্ধ</th>
           <th>করণীয়</th>
         </tr>
@@ -184,7 +184,7 @@ $rules = $limiter->getAllRulesWithStats();
               <?php if ($isSuperAdmin): ?>
                 <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                   <button type="submit" form="rl-form-<?= e($rule['scope']) ?>" class="btn btn-green btn-sm">Save</button>
-                  <form method="post" action="<?= e(admin_url('rate-limits.php')) ?>" data-confirm="সব সক্রিয় অনুরোধ সীমার হিসাব পুনরায় সেট করুন for <?= e($rule['label']) ?>?">
+                  <form method="post" action="<?= e(admin_url('rate-limits.php')) ?>" data-confirm="সব সক্রিয় অনুরোধ সীমার হিসাব পুনরায় সেট করুন: <?= e($rule['label']) ?>?">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="reset_scope">
                     <input type="hidden" name="scope" value="<?= e($rule['scope']) ?>">
@@ -192,7 +192,7 @@ $rules = $limiter->getAllRulesWithStats();
                   </form>
                 </div>
               <?php else: ?>
-                <span style="font-size: 0.8rem; color: var(--adm-muted);">সুপার অ্যাডমিন only</span>
+                <span style="font-size: 0.8rem; color: var(--adm-muted);">শুধু সুপার অ্যাডমিন</span>
               <?php endif; ?>
             </td>
           </tr>

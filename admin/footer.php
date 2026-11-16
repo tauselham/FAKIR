@@ -80,14 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($oldLogoPath !== null) {
                 $storage->delete(BUCKET_WEBSITE_ASSETS, $oldLogoPath);
             }
-            set_flash('success', 'Footer settings updated.');
+            set_flash('success', 'ফুটারের সেটিংস হালনাগাদ হয়েছে।');
         } elseif ($action === 'add_link' || $action === 'update_link') {
             $id    = (int) ($_POST['item_id'] ?? 0);
             $label = trim((string) ($_POST['label'] ?? ''));
             $url   = trim((string) ($_POST['url'] ?? '/'));
             $order = (int) ($_POST['sort_order'] ?? 0);
             if ($label === '') {
-                throw new RuntimeException('লিংকের নাম is required.');
+                throw new RuntimeException('লিংকের নাম লিখতে হবে।');
             }
 
             if ($action === 'add_link') {
@@ -95,19 +95,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "INSERT INTO public.navigation_items (menu_id, label, url, item_type, sort_order, is_visible)
                      VALUES (:mid, :lbl, :url, 'link', :ord, TRUE)"
                 )->execute([':mid' => $footerMenuId, ':lbl' => $label, ':url' => $url, ':ord' => $order]);
-                set_flash('success', 'Footer link added.');
+                set_flash('success', 'ফুটারের লিংক যোগ করা হয়েছে।');
             } else {
                 $pdo->prepare(
                     'UPDATE public.navigation_items SET label = :lbl, url = :url, sort_order = :ord WHERE id = :id AND menu_id = :mid'
                 )->execute([':lbl' => $label, ':url' => $url, ':ord' => $order, ':id' => $id, ':mid' => $footerMenuId]);
-                set_flash('success', 'Footer link updated.');
+                set_flash('success', 'ফুটারের লিংক হালনাগাদ হয়েছে।');
             }
             log_admin_activity((int) $currentAdmin['id'], 'footer_links_updated', 'navigation_items', $id ?: null);
         } elseif ($action === 'delete_link') {
             $id = (int) ($_POST['item_id'] ?? 0);
             $pdo->prepare('DELETE FROM public.navigation_items WHERE id = :id AND menu_id = :mid')
                 ->execute([':id' => $id, ':mid' => $footerMenuId]);
-            set_flash('success', 'Footer link deleted.');
+            set_flash('success', 'ফুটারের লিংক মুছে ফেলা হয়েছে।');
         }
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
@@ -123,14 +123,14 @@ $footerLinks = $linksStmt->fetchAll();
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Footer Content, Colors &amp; দৃশ্যমানতা</h2>
+  <h2 class="adm-panel-title">ফুটারের লেখা, রং ও প্রদর্শন</h2>
   <form method="post" action="<?= e(admin_url('footer.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save_footer">
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="site_name">Footer ওয়েবসাইটের নাম</label>
+        <label class="form-label" for="site_name">ফুটারে ওয়েবসাইটের নাম</label>
         <input class="form-control" type="text" id="site_name" name="site_name" value="<?= e($footer['site_name']) ?>" required>
       </div>
       <div class="form-row">
@@ -173,22 +173,22 @@ $footerLinks = $linksStmt->fetchAll();
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="facebook_url">Facebook লিংক</label>
+        <label class="form-label" for="facebook_url">ফেসবুক লিংক</label>
         <input class="form-control" type="url" id="facebook_url" name="facebook_url" value="<?= e($footer['facebook_url'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="instagram_url">Instagram লিংক</label>
+        <label class="form-label" for="instagram_url">ইনস্টাগ্রাম লিংক</label>
         <input class="form-control" type="url" id="instagram_url" name="instagram_url" value="<?= e($footer['instagram_url'] ?? '') ?>">
       </div>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="youtube_url">YouTube লিংক</label>
+        <label class="form-label" for="youtube_url">ইউটিউব লিংক</label>
         <input class="form-control" type="url" id="youtube_url" name="youtube_url" value="<?= e($footer['youtube_url'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="x_url">X লিংক</label>
+        <label class="form-label" for="x_url">এক্স লিংক</label>
         <input class="form-control" type="url" id="x_url" name="x_url" value="<?= e($footer['x_url'] ?? '') ?>">
       </div>
     </div>

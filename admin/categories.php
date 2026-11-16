@@ -19,36 +19,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name      = trim((string) ($_POST['name'] ?? ''));
             $sortOrder = (int) ($_POST['sort_order'] ?? 0);
             if ($name === '') {
-                throw new RuntimeException('Category name is required.');
+                throw new RuntimeException('বিভাগের নাম লিখতে হবে।');
             }
             $slug = slugify($name);
             $stmt = $pdo->prepare("INSERT INTO public.{$table} (name, slug, sort_order, is_active) VALUES (:name, :slug, :ord, TRUE) RETURNING id");
             $stmt->execute([':name' => $name, ':slug' => $slug, ':ord' => $sortOrder]);
             log_admin_activity((int) $currentAdmin['id'], $scope . '_category_created', $table, (int) $stmt->fetchColumn());
-            set_flash('success', 'Category added.');
+            set_flash('success', 'বিভাগ যোগ করা হয়েছে।');
         } elseif ($action === 'update') {
             $id        = (int) ($_POST['id'] ?? 0);
             $name      = trim((string) ($_POST['name'] ?? ''));
             $sortOrder = (int) ($_POST['sort_order'] ?? 0);
-            $isActive  = !empty($_POST['is_active']);
+            $isচালু  = !empty($_POST['is_active']);
             if ($name === '') {
-                throw new RuntimeException('Category name cannot be empty.');
+                throw new RuntimeException('বিভাগের নাম ফাঁকা রাখা যাবে না।');
             }
             $stmt = $pdo->prepare("UPDATE public.{$table} SET name = :name, slug = :slug, sort_order = :ord, is_active = :act WHERE id = :id");
             $stmt->execute([
                 ':name' => $name,
                 ':slug' => slugify($name),
                 ':ord'  => $sortOrder,
-                ':act'  => $isActive ? 'true' : 'false',
+                ':act'  => $isচালু ? 'true' : 'false',
                 ':id'   => $id,
             ]);
             log_admin_activity((int) $currentAdmin['id'], $scope . '_category_updated', $table, $id);
-            set_flash('success', 'Category updated.');
+            set_flash('success', 'বিভাগ হালনাগাদ হয়েছে।');
         } elseif ($action === 'delete') {
             $id = (int) ($_POST['id'] ?? 0);
             $pdo->prepare("DELETE FROM public.{$table} WHERE id = :id")->execute([':id' => $id]);
             log_admin_activity((int) $currentAdmin['id'], $scope . '_category_deleted', $table, $id);
-            set_flash('success', 'Category deleted.');
+            set_flash('success', 'বিভাগ মুছে ফেলা হয়েছে।');
         }
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
@@ -61,9 +61,9 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
 ?>
 
 <div class="adm-grid-2">
-  <!-- Gallery বিভাগসমূহ -->
+  <!-- গ্যালারির বিভাগসমূহ -->
   <section class="adm-panel">
-    <h2 class="adm-panel-title">Gallery বিভাগসমূহ</h2>
+    <h2 class="adm-panel-title">গ্যালারির বিভাগসমূহ</h2>
     <form method="post" action="<?= e(admin_url('categories.php')) ?>" style="display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap;">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="create">
@@ -76,7 +76,7 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
     <div class="table-wrap">
       <table class="adm-table">
         <thead>
-          <tr><th>Name &amp; ক্রম</th><th>করণীয়</th></tr>
+          <tr><th>নাম ও ক্রম</th><th>করণীয়</th></tr>
         </thead>
         <tbody>
           <?php foreach ($galleryCats as $c): ?>
@@ -91,7 +91,7 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
                   <input class="form-control" type="number" name="sort_order" value="<?= (int) $c['sort_order'] ?>" style="width: 70px;">
                   <label class="form-check" style="font-size: 0.8rem;">
                     <input type="checkbox" name="is_active" value="1" <?= !empty($c['is_active']) ? 'checked' : '' ?>>
-                    <span>Active</span>
+                    <span>চালু</span>
                   </label>
                   <button type="submit" class="btn btn-outline btn-sm">Save</button>
                 </form>
@@ -112,9 +112,9 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
     </div>
   </section>
 
-  <!-- Post বিভাগসমূহ -->
+  <!-- পোস্টের বিভাগসমূহ -->
   <section class="adm-panel">
-    <h2 class="adm-panel-title">Post বিভাগসমূহ</h2>
+    <h2 class="adm-panel-title">পোস্টের বিভাগসমূহ</h2>
     <form method="post" action="<?= e(admin_url('categories.php')) ?>" style="display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap;">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="create">
@@ -127,7 +127,7 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
     <div class="table-wrap">
       <table class="adm-table">
         <thead>
-          <tr><th>Name &amp; ক্রম</th><th>করণীয়</th></tr>
+          <tr><th>নাম ও ক্রম</th><th>করণীয়</th></tr>
         </thead>
         <tbody>
           <?php foreach ($postCats as $c): ?>
@@ -142,7 +142,7 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
                   <input class="form-control" type="number" name="sort_order" value="<?= (int) $c['sort_order'] ?>" style="width: 70px;">
                   <label class="form-check" style="font-size: 0.8rem;">
                     <input type="checkbox" name="is_active" value="1" <?= !empty($c['is_active']) ? 'checked' : '' ?>>
-                    <span>Active</span>
+                    <span>চালু</span>
                   </label>
                   <button type="submit" class="btn btn-outline btn-sm">Save</button>
                 </form>

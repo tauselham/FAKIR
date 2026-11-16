@@ -32,16 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $customExcerpt = trim((string) ($_POST['custom_excerpt'] ?? ''));
 
             if ($title !== '' && mb_strlen($title) > 220) {
-                throw new RuntimeException('Post title must be 220 characters or fewer.');
+                throw new RuntimeException('পোস্টের শিরোনাম সর্বোচ্চ ২২০ অক্ষরের হতে পারবে।');
             }
             if (strlen($richHtml) > 1048576 || strlen($customCode) > 2097152) {
-                throw new RuntimeException('Content size limit exceeded. Rich content max 1 MB; custom HTML document max 2 MB.');
+                throw new RuntimeException('কনটেন্টের আকার নির্ধারিত সীমা ছাড়িয়েছে। সমৃদ্ধ লেখা সর্বোচ্চ ১ মেগাবাইট এবং কাস্টম HTML ডকুমেন্ট সর্বোচ্চ ২ মেগাবাইট হতে পারবে।');
             }
             if ($postType === 'custom' && trim($customCode) === '') {
-                throw new RuntimeException('Please add your complete HTML, CSS and JavaScript code.');
+                throw new RuntimeException('আপনার সম্পূর্ণ HTML, CSS ও JavaScript কোড যোগ করুন।');
             }
             if ($postType === 'text' && trim($richHtml) === '') {
-                throw new RuntimeException('Please write some post content or insert an image.');
+                throw new RuntimeException('পোস্টের লেখা লিখুন অথবা একটি ছবি যোগ করুন।');
             }
 
             $description = $postType === 'custom'
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $st = $pdo->prepare('SELECT * FROM public.posts WHERE id = :id LIMIT 1');
                 $st->execute([':id' => $postId]);
                 $existing = $st->fetch();
-                if (!$existing) throw new RuntimeException('Post not found.');
+                if (!$existing) throw new RuntimeException('পোস্টটি পাওয়া যায়নি।');
             }
 
             $mediaBucket = $existing['media_bucket'] ?? null;
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mediaUrl = $newlyUploaded['url'];
                 $mediaMime = $newlyUploaded['mime'];
             } elseif ($action === 'create' || !$existing || ($existing['post_type'] ?? '') !== $postType || empty($existing['media_path'])) {
-                throw new RuntimeException('Please upload an image or video file for this post type.');
+                throw new RuntimeException('এই ধরনের পোস্টের জন্য একটি ছবি অথবা ভিডিও আপলোড করুন।');
             }
 
             try {
@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
                     $newId = (int) $ins->fetchColumn();
                     log_admin_activity((int) $currentAdmin['id'], 'post_created', 'post', $newId);
-                    set_flash('success', 'Community post created successfully.');
+                    set_flash('success', 'পোস্ট তৈরি হয়েছে।');
                 } else {
                     $upd = $pdo->prepare(
                         'UPDATE public.posts
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':status' => $status, ':status_check' => $status, ':id' => $postId,
                     ]);
                     log_admin_activity((int) $currentAdmin['id'], 'post_updated', 'post', $postId);
-                    set_flash('success', 'Community post updated.');
+                    set_flash('success', 'পোস্ট হালনাগাদ হয়েছে।');
                 }
             } catch (Throwable $dbErr) {
                 if ($newlyUploaded !== null) $storage->delete($newlyUploaded['bucket'], $newlyUploaded['path']);
@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $upd = $pdo->prepare('UPDATE public.posts SET status = :status, published_at = CASE WHEN :status_check = \'published\' THEN COALESCE(published_at, NOW()) ELSE NULL END, updated_at = NOW() WHERE id = :id');
             $upd->execute([':status' => $newStatus, ':status_check' => $newStatus, ':id' => $postId]);
             log_admin_activity((int) $currentAdmin['id'], 'post_status_' . $newStatus, 'post', $postId);
-            set_flash('success', 'Post visibility updated.');
+            set_flash('success', 'পোস্টের দৃশ্যমানতা হালনাগাদ হয়েছে।');
             redirect_to(admin_url('posts.php'));
         } elseif ($action === 'delete') {
             $postId = (int) ($_POST['post_id'] ?? 0);
@@ -159,13 +159,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!empty($row['media_bucket']) && !empty($row['media_path'])) $storage->delete((string) $row['media_bucket'], (string) $row['media_path']);
                 log_admin_activity((int) $currentAdmin['id'], 'post_deleted', 'post', $postId);
             }
-            set_flash('success', 'Post deleted.');
+            set_flash('success', 'পোস্ট মুছে ফেলা হয়েছে।');
             redirect_to(admin_url('posts.php'));
         }
     } catch (Throwable $e) {
         if ($e instanceof PDOException) {
             error_log('Community post operation failed: ' . $e->getMessage());
-            set_flash('error', 'The post could not be saved because of a database error. Check the server log.');
+            set_flash('error', 'ডেটাবেসের সমস্যার কারণে পোস্ট সংরক্ষণ করা যায়নি। সার্ভার লগ পরীক্ষা করুন।');
         } else {
             set_flash('error', $e->getMessage());
         }
@@ -220,7 +220,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
 <section class="adm-panel">
   <div class="adm-section-heading">
     <h2 class="adm-panel-title" style="margin-bottom:0;"><?= $editPost ? 'Edit Community Post #' . (int) $editPost['id'] : 'Add Community Post' ?></h2>
-    <a href="<?= e(admin_url('posts.php')) ?>" class="btn btn-outline">← Back to গ্রামের খবর ও পোস্ট</a>
+    <a href="<?= e(admin_url('posts.php')) ?>" class="btn btn-outline">← সব পোস্টে ফিরে যান</a>
   </div>
   <form id="community-post-form" method="post" action="<?= e(admin_url('posts.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
@@ -276,36 +276,36 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
     </div>
 
     <div id="post_rich_editor_group" class="form-row">
-      <label class="form-label">Post Content — Visual সম্পাদক</label>
+      <label class="form-label">পোস্টের লেখা — ভিজ্যুয়াল এডিটর</label>
       <div class="rich-editor" data-rich-editor>
         <div class="rich-toolbar" role="toolbar" aria-label="লেখা সাজানোর টুল">
           <button type="button" class="rich-tool" data-editor-command="bold"><strong>B</strong></button>
           <button type="button" class="rich-tool" data-editor-command="italic"><em>I</em></button>
           <button type="button" class="rich-tool" data-editor-command="underline"><u>U</u></button>
           <button type="button" class="rich-tool" data-editor-command="strikeThrough"><s>S</s></button>
-          <select class="rich-tool-select" data-editor-block aria-label="Text style"><option value="P">অনুচ্ছেদ</option><option value="H2">শিরোনাম ২</option><option value="H3">শিরোনাম ৩</option><option value="H4">শিরোনাম ৪</option><option value="BLOCKQUOTE">উদ্ধৃতি</option></select>
+          <select class="rich-tool-select" data-editor-block aria-label="লেখার ধরন"><option value="P">অনুচ্ছেদ</option><option value="H2">শিরোনাম ২</option><option value="H3">শিরোনাম ৩</option><option value="H4">শিরোনাম ৪</option><option value="BLOCKQUOTE">উদ্ধৃতি</option></select>
           <select class="rich-tool-select" data-editor-size aria-label="লেখার আকার"><option value="14">14 px</option><option value="16" selected>16 px</option><option value="18">18 px</option><option value="22">22 px</option><option value="28">28 px</option><option value="36">36 px</option></select>
           <label class="rich-color-tool" title="লেখার রং">A <input type="color" data-editor-color value="#202820" aria-label="লেখার রং"></label>
           <button type="button" class="rich-tool" data-editor-command="justifyLeft" title="বামে সাজান">⇤</button>
           <button type="button" class="rich-tool" data-editor-command="justifyCenter" title="মাঝখানে সাজান">↔</button>
           <button type="button" class="rich-tool" data-editor-command="justifyRight" title="ডানে সাজান">⇥</button>
-          <button type="button" class="rich-tool" data-editor-command="insertUnorderedList" title="বুলেট তালিকা">• List</button>
-          <button type="button" class="rich-tool" data-editor-command="insertOrderedList" title="ক্রমিক তালিকা">1. List</button>
+          <button type="button" class="rich-tool" data-editor-command="insertUnorderedList" title="বুলেট তালিকা">• তালিকা</button>
+          <button type="button" class="rich-tool" data-editor-command="insertOrderedList" title="ক্রমিক তালিকা">১. তালিকা</button>
           <button type="button" class="rich-tool" data-editor-link>🔗 লিংক</button>
           <button type="button" class="rich-tool" data-editor-image>▧ Image</button>
-          <button type="button" class="rich-tool" data-editor-command="removeFormat" title="লেখার সাজসজ্জা মুছুন">Clear</button>
+          <button type="button" class="rich-tool" data-editor-command="removeFormat" title="লেখার সাজসজ্জা মুছুন">মুছে ফেলুন</button>
           <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-editor-image-file hidden>
         </div>
         <div id="post_rich_editor" class="rich-editor-surface" contenteditable="true" role="textbox" aria-multiline="true" aria-label="পোস্টের লেখা" dir="auto"><?= sanitize_rich_html($initialRichHtml) ?></div>
       </div>
       <textarea id="post_content_html" name="content_html" hidden></textarea>
-      <span class="form-hint">বাংলা ও English—দুই ভাষাতেই লিখতে পারবে। লেখা সিলেক্ট করে toolbar থেকে formatting, link বা image যোগ করো।</span>
+      <span class="form-hint">বাংলা ও ইংরেজি—দুই ভাষাতেই লিখতে পারবেন। লেখা নির্বাচন করে টুলবার থেকে সাজসজ্জা, লিংক বা ছবি যোগ করুন।</span>
     </div>
 
     <div class="form-row" id="post_custom_code_group" style="display:none;">
-      <label class="form-label" for="post_code_document">সম্পূর্ণ HTML ডকুমেন্ট (HTML + CSS + JavaScript together)</label>
+      <label class="form-label" for="post_code_document">সম্পূর্ণ HTML ডকুমেন্ট (HTML + CSS + JavaScript একসঙ্গে)</label>
       <textarea class="form-control code-document-editor" id="post_code_document" name="code_document" rows="24" spellcheck="false"><?= e($editPost['code_document'] ?? $legacyCodeDocument) ?></textarea>
-      <span class="form-hint">একটি সম্পূর্ণ HTML document পেস্ট করো। CSS-এর জন্য &lt;style&gt; এবং JavaScript-এর জন্য &lt;script&gt; ব্যবহার করো। এটি আলাদা sandboxed iframe-এ চলবে; fetch/XHR/WebSocket, forms, popups ও parent page access বন্ধ; HTTPS images load হতে পারে।</span>
+      <span class="form-hint">একটি সম্পূর্ণ HTML ডকুমেন্ট পেস্ট করুন। CSS-এর জন্য &lt;style&gt; এবং JavaScript-এর জন্য &lt;script&gt; ব্যবহার করুন। এটি আলাদা সীমাবদ্ধ iframe-এ চলবে; fetch/XHR/WebSocket, ফর্ম, পপআপ ও মূল পেজে প্রবেশ বন্ধ থাকবে; HTTPS ছবি লোড হতে পারে।</span>
       <div class="form-row" style="margin-top:12px;">
         <label class="form-label" for="custom_excerpt">Short Excerpt (Optional)</label>
         <input class="form-control" id="custom_excerpt" name="custom_excerpt" maxlength="500" value="<?= e((($editPost['post_type'] ?? '') === 'custom') ? ($editPost['description'] ?? '') : '') ?>" placeholder="পোস্টের তালিকায় দেখানো সংক্ষিপ্ত বিবরণ">
@@ -321,11 +321,11 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
 
 <?php else: ?>
 <section class="adm-panel">
-  <h2 class="adm-panel-title">All গ্রামের খবর ও পোস্ট</h2>
-  <?php if (empty($posts)): ?><p style="color:var(--adm-muted);margin:0;">এখনো কোনো পোস্ট তৈরি করা হয়নি। প্রথম পোস্ট প্রকাশ করতে <strong>পোস্ট যোগ করুন</strong> to publish the first update.</p>
+  <h2 class="adm-panel-title">সব পোস্ট</h2>
+  <?php if (empty($posts)): ?><p style="color:var(--adm-muted);margin:0;">এখনো কোনো পোস্ট তৈরি করা হয়নি। প্রথম পোস্ট প্রকাশ করতে <strong>পোস্ট যোগ করুন</strong> বাটনে ক্লিক করুন।</p>
   <?php else: ?>
     <div class="table-wrap"><table class="adm-table">
-      <thead><tr><th>পূর্বরূপ</th><th>শিরোনাম / সংক্ষিপ্ত বিবরণ</th><th>ধরন</th><th>Category</th><th>Status</th><th>তারিখ</th><th>করণীয়</th></tr></thead>
+      <thead><tr><th>পূর্বরূপ</th><th>শিরোনাম / সংক্ষিপ্ত বিবরণ</th><th>ধরন</th><th>বিভাগ</th><th>অবস্থা</th><th>তারিখ</th><th>করণীয়</th></tr></thead>
       <tbody>
       <?php foreach ($posts as $p): ?>
         <tr>

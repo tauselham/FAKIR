@@ -22,11 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($logoutAfter) {
                 logout_admin(false);
                 start_secure_session();
-                set_flash('success', 'পাসওয়ার্ড updated securely. Please sign in with your new password.');
+                set_flash('success', 'পাসওয়ার্ড নিরাপদভাবে পরিবর্তন হয়েছে। নতুন পাসওয়ার্ড দিয়ে লগইন করুন।');
                 redirect_to(admin_url('login.php'));
             }
             session_regenerate_id(true);
-            set_flash('success', 'Administrator password updated successfully.');
+            set_flash('success', 'অ্যাডমিনের পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে।');
             redirect_to(admin_url('security.php'));
         } else {
             $errors = $res['errors'];
@@ -44,14 +44,14 @@ $logs = $securityLogs->fetchAll();
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Change Administrator পাসওয়ার্ড</h2>
+  <h2 class="adm-panel-title">অ্যাডমিনের পাসওয়ার্ড পরিবর্তন</h2>
   <p style="color: var(--adm-muted); margin-top: 0; font-size: 0.9rem;">
     পাসওয়ার্ড PHP দিয়ে নিরাপদভাবে হ্যাশ করা হয় <code>password_hash()</code> (Argon2id / bcrypt) and never stored in plain text.
   </p>
 
   <?php if (!empty($currentAdmin['must_change_password'])): ?>
     <div class="alert alert-error" role="status">
-      Your account is currently using an initial or temporary password. Enter it below as your Current পাসওয়ার্ড and choose a new permanent password.
+      Your account is currently using an initial or temporary password. Enter it below as your বর্তমান পাসওয়ার্ড and choose a new permanent password.
     </div>
   <?php endif; ?>
 
@@ -68,7 +68,7 @@ $logs = $securityLogs->fetchAll();
     <input type="hidden" name="action" value="change_password">
 
     <div class="form-row">
-      <label class="form-label" for="current_password">Current পাসওয়ার্ড</label>
+      <label class="form-label" for="current_password">বর্তমান পাসওয়ার্ড</label>
       <input class="form-control" type="password" id="current_password" name="current_password" required autocomplete="current-password">
     </div>
 
@@ -90,7 +90,7 @@ $logs = $securityLogs->fetchAll();
       </label>
     </div>
 
-    <button type="submit" class="btn btn-green">Update পাসওয়ার্ড</button>
+    <button type="submit" class="btn btn-green">পাসওয়ার্ড হালনাগাদ করুন</button>
   </form>
 </section>
 
@@ -98,7 +98,7 @@ $logs = $securityLogs->fetchAll();
   <h2 class="adm-panel-title">সাম্প্রতিক নিরাপত্তা কার্যক্রম</h2>
   <div class="table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Event</th><th>আইপি ঠিকানা</th><th>সময়</th></tr></thead>
+      <thead><tr><th>ঘটনা</th><th>আইপি ঠিকানা</th><th>সময়</th></tr></thead>
       <tbody>
         <?php foreach ($logs as $log): ?>
           <tr>
