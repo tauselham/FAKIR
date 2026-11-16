@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$activePage = 'rate_limits';
+$সক্রিয়Page = 'rate_limits';
 $adminPageTitle = 'অনুরোধ সীমা সেটিংস';
 $requiredSuperAdmin = true;
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -73,7 +73,7 @@ $rules = $limiter->getAllRulesWithStats();
     <div>
       <h2 class="adm-panel-title" style="margin-bottom: 4px;">সার্ভারভিত্তিক অনুরোধ সীমা</h2>
       <p style="margin: 0; color: var(--adm-muted); font-size: 0.9rem;">
-        Enforced in PostgreSQL by IP address and account identifier (independent of browser sessions). Expired windows reset automatically.
+        ব্রাউজার সেশনের বাইরে IP ঠিকানা ও অ্যাকাউন্ট পরিচয়ের ভিত্তিতে PostgreSQL-এ অনুরোধের সীমা কার্যকর হয়। নির্ধারিত সময় শেষ হলে সীমা স্বয়ংক্রিয়ভাবে পুনরায় চালু হয়।
       </p>
     </div>
     <?php if ($isSuperAdmin): ?>
@@ -154,7 +154,7 @@ $rules = $limiter->getAllRulesWithStats();
               >
                 <?php foreach (RateLimiter::VALID_UNITS as $unit): ?>
                   <option value="<?= e($unit) ?>" <?= $rule['window_unit'] === $unit ? 'selected' : '' ?>>
-                    <?= e(ucfirst($unit)) ?>
+                    <?= e(['seconds' => 'সেকেন্ড', 'minutes' => 'মিনিট', 'hours' => 'ঘণ্টা', 'days' => 'দিন'][$unit] ?? $unit) ?>
                   </option>
                 <?php endforeach; ?>
               </select>
@@ -173,22 +173,22 @@ $rules = $limiter->getAllRulesWithStats();
               </label>
             </td>
             <td class="num-tab">
-              <?= (int) ($rule['active_buckets'] ?? 0) ?> active
-              <?php if ((int) ($rule['blocked_buckets'] ?? 0) > 0): ?>
+              <?= (int) ($rule['সক্রিয়_buckets'] ?? 0) ?> সক্রিয়
+              <?php if ((int) ($rule['অবরুদ্ধ_buckets'] ?? 0) > 0): ?>
                 <div style="font-size: 0.78rem; color: var(--adm-danger); font-weight: 600;">
-                  <?= (int) $rule['blocked_buckets'] ?> blocked
+                  <?= (int) $rule['অবরুদ্ধ_buckets'] ?> অবরুদ্ধ
                 </div>
               <?php endif; ?>
             </td>
             <td>
               <?php if ($isSuperAdmin): ?>
                 <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                  <button type="submit" form="rl-form-<?= e($rule['scope']) ?>" class="btn btn-green btn-sm">Save</button>
+                  <button type="submit" form="rl-form-<?= e($rule['scope']) ?>" class="btn btn-green btn-sm">সংরক্ষণ</button>
                   <form method="post" action="<?= e(admin_url('rate-limits.php')) ?>" data-confirm="সব সক্রিয় অনুরোধ সীমার হিসাব পুনরায় সেট করুন: <?= e($rule['label']) ?>?">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="reset_scope">
                     <input type="hidden" name="scope" value="<?= e($rule['scope']) ?>">
-                    <button type="submit" class="btn btn-outline btn-sm">Reset</button>
+                    <button type="submit" class="btn btn-outline btn-sm">পুনরায় সেট</button>
                   </form>
                 </div>
               <?php else: ?>

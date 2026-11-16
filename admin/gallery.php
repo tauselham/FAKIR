@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$activePage = 'gallery';
+$সক্রিয়Page = 'gallery';
 $adminPageTitle = 'ছবির গ্যালারি';
 $requiredPermission = 'manage_gallery';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -351,11 +351,11 @@ if (!empty($_GET['edit'])) {
               <td>
                 <div style="display: flex; gap: 6px;">
                   <a href="<?= e(admin_url('gallery.php')) ?>?edit=<?= (int) $img['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
-                  <form method="post" action="<?= e(admin_url('gallery.php')) ?>" data-confirm="Delete this photo from the gallery and Supabase Storage?">
+                  <form method="post" action="<?= e(admin_url('gallery.php')) ?>" data-confirm="মুছুন this photo from the gallery and Supabase Storage?">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="image_id" value="<?= (int) $img['id'] ?>">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    <button type="submit" class="btn btn-danger btn-sm">মুছুন</button>
                   </form>
                 </div>
               </td>

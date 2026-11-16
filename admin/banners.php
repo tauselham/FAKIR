@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$activePage = 'banners';
+$সক্রিয়Page = 'banners';
 $adminPageTitle = 'প্রধান ব্যানার';
 $requiredPermission = 'manage_banners';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -26,10 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $bannerId   = (int) ($_POST['banner_id'] ?? 0);
             $title      = trim((string) ($_POST['title'] ?? ''));
             $subtitle   = trim((string) ($_POST['subtitle'] ?? ''));
-            $buttonText = trim((string) ($_POST['button_text'] ?? ''));
+            $buttonলেখা = trim((string) ($_POST['button_text'] ?? ''));
             $buttonUrl  = trim((string) ($_POST['button_url'] ?? ''));
             $sortOrder  = (int) ($_POST['sort_order'] ?? 0);
-            $isActive   = !empty($_POST['is_active']);
+            $isচালু   = !empty($_POST['is_সক্রিয়']);
 
             if ($action === 'create') {
                 if (empty($_FILES['banner_image']['name'])) {
@@ -38,20 +38,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $res = $storage->upload($_FILES['banner_image'], BUCKET_HERO_BANNERS, ALLOWED_BANNER_MIMES, MAX_IMAGE_UPLOAD_BYTES, 'banners');
                 try {
                     $ins = $pdo->prepare(
-                        'INSERT INTO public.hero_banners (title, subtitle, button_text, button_url, storage_bucket, storage_path, image_url, sort_order, is_active)
+                        'INSERT INTO public.hero_banners (title, subtitle, button_text, button_url, storage_bucket, storage_path, image_url, sort_order, is_সক্রিয়)
                          VALUES (:title, :sub, :bt, :bu, :bucket, :path, :url, :ord, :act)
                          RETURNING id'
                     );
                     $ins->execute([
                         ':title'  => $title !== '' ? $title : null,
                         ':sub'    => $subtitle !== '' ? $subtitle : null,
-                        ':bt'     => $buttonText !== '' ? $buttonText : null,
+                        ':bt'     => $buttonলেখা !== '' ? $buttonলেখা : null,
                         ':bu'     => $buttonUrl !== '' ? $buttonUrl : null,
                         ':bucket' => $res['bucket'],
                         ':path'   => $res['path'],
                         ':url'    => $res['url'],
                         ':ord'    => $sortOrder,
-                        ':act'    => $isActive ? 'true' : 'false',
+                        ':act'    => $isচালু ? 'true' : 'false',
                     ]);
                     log_admin_activity((int) $currentAdmin['id'], 'banner_created', 'hero_banner', (int) $ins->fetchColumn());
                 } catch (Throwable $dbErr) {
@@ -87,17 +87,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $upd = $pdo->prepare(
                         'UPDATE public.hero_banners
                          SET title = :title, subtitle = :sub, button_text = :bt, button_url = :bu,
-                             sort_order = :ord, is_active = :act,
+                             sort_order = :ord, is_সক্রিয় = :act,
                              storage_bucket = :bucket, storage_path = :path, image_url = :url
                          WHERE id = :id'
                     );
                     $upd->execute([
                         ':title'  => $title !== '' ? $title : null,
                         ':sub'    => $subtitle !== '' ? $subtitle : null,
-                        ':bt'     => $buttonText !== '' ? $buttonText : null,
+                        ':bt'     => $buttonলেখা !== '' ? $buttonলেখা : null,
                         ':bu'     => $buttonUrl !== '' ? $buttonUrl : null,
                         ':ord'    => $sortOrder,
-                        ':act'    => $isActive ? 'true' : 'false',
+                        ':act'    => $isচালু ? 'true' : 'false',
                         ':bucket' => $bucket,
                         ':path'   => $path,
                         ':url'    => $url,
@@ -197,7 +197,7 @@ if (!empty($_GET['edit'])) {
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="button_text">Button Text (Optional)</label>
+        <label class="form-label" for="button_text">Button লেখা (Optional)</label>
         <input class="form-control" type="text" id="button_text" name="button_text" value="<?= e($editBanner['button_text'] ?? '') ?>">
       </div>
       <div class="form-row">
@@ -208,13 +208,13 @@ if (!empty($_GET['edit'])) {
 
     <div class="form-row">
       <label class="form-check">
-        <input type="checkbox" name="is_active" value="1" <?= (!$editBanner || !empty($editBanner['is_active'])) ? 'checked' : '' ?>>
+        <input type="checkbox" name="is_সক্রিয়" value="1" <?= (!$editBanner || !empty($editBanner['is_সক্রিয়'])) ? 'checked' : '' ?>>
         <span>মূল পাতায় ব্যানারটি দেখাবে</span>
       </label>
     </div>
 
     <div style="display: flex; gap: 10px;">
-      <button type="submit" class="btn btn-green"><?= $editBanner ? 'Save Banner' : 'Add Banner' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editBanner ? 'সংরক্ষণ Banner' : 'Add Banner' ?></button>
       <?php if ($editBanner): ?>
         <a href="<?= e(admin_url('banners.php')) ?>" class="btn btn-outline">Cancel</a>
       <?php endif; ?>
@@ -243,15 +243,15 @@ if (!empty($_GET['edit'])) {
             <td><?= e($b['title'] ?: '(শুধু ছবি)') ?></td>
             <td><?= e($b['button_text'] ?: '—') ?></td>
             <td class="num-tab"><?= (int) $b['sort_order'] ?></td>
-            <td><?= !empty($b['is_active']) ? 'চালু' : 'বন্ধ' ?></td>
+            <td><?= !empty($b['is_সক্রিয়']) ? 'চালু' : 'বন্ধ' ?></td>
             <td>
               <div style="display: flex; gap: 6px;">
                 <a href="<?= e(admin_url('banners.php')) ?>?edit=<?= (int) $b['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
-                <form method="post" action="<?= e(admin_url('banners.php')) ?>" data-confirm="Delete this banner?">
+                <form method="post" action="<?= e(admin_url('banners.php')) ?>" data-confirm="মুছুন this banner?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="banner_id" value="<?= (int) $b['id'] ?>">
-                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                  <button type="submit" class="btn btn-danger btn-sm">মুছুন</button>
                 </form>
               </div>
             </td>

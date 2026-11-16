@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$activePage = 'posts';
+$সক্রিয়Page = 'posts';
 $adminPageTitle = 'গ্রামের খবর ও পোস্ট';
 $requiredPermission = 'manage_posts';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -61,14 +61,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mediaPath = $existing['media_path'] ?? null;
             $mediaUrl = $existing['media_url'] ?? null;
             $mediaMime = $existing['media_mime'] ?? null;
-            $oldBucketToDelete = null;
-            $oldPathToDelete = null;
+            $oldBucketToমুছুন = null;
+            $oldPathToমুছুন = null;
             $newlyUploaded = null;
 
             if (in_array($postType, ['text', 'custom'], true)) {
                 if ($existing && !empty($existing['media_bucket']) && !empty($existing['media_path'])) {
-                    $oldBucketToDelete = (string) $existing['media_bucket'];
-                    $oldPathToDelete = (string) $existing['media_path'];
+                    $oldBucketToমুছুন = (string) $existing['media_bucket'];
+                    $oldPathToমুছুন = (string) $existing['media_path'];
                 }
                 $mediaBucket = $mediaPath = $mediaUrl = $mediaMime = null;
             } elseif (!empty($_FILES['media_file']['name'])) {
@@ -76,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $maxSize = $postType === 'video' ? MAX_VIDEO_UPLOAD_BYTES : MAX_IMAGE_UPLOAD_BYTES;
                 $newlyUploaded = $storage->upload($_FILES['media_file'], BUCKET_POST_MEDIA, $allowed, $maxSize, 'posts');
                 if ($existing && !empty($existing['media_bucket']) && !empty($existing['media_path'])) {
-                    $oldBucketToDelete = (string) $existing['media_bucket'];
-                    $oldPathToDelete = (string) $existing['media_path'];
+                    $oldBucketToমুছুন = (string) $existing['media_bucket'];
+                    $oldPathToমুছুন = (string) $existing['media_path'];
                 }
                 $mediaBucket = $newlyUploaded['bucket'];
                 $mediaPath = $newlyUploaded['path'];
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw $dbErr;
             }
 
-            if ($oldBucketToDelete !== null && $oldPathToDelete !== null) $storage->delete($oldBucketToDelete, $oldPathToDelete);
+            if ($oldBucketToমুছুন !== null && $oldPathToমুছুন !== null) $storage->delete($oldBucketToমুছুন, $oldPathToমুছুন);
             redirect_to(admin_url('posts.php'));
         } elseif ($action === 'toggle_status') {
             $postId = (int) ($_POST['post_id'] ?? 0);
@@ -232,7 +232,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
         <label class="form-label" for="post_type_select">পোস্টের ধরন</label>
         <select class="form-control" name="post_type" id="post_type_select">
           <?php $curType = $editPost['post_type'] ?? 'text'; ?>
-          <option value="text" <?= $curType === 'text' ? 'selected' : '' ?>>Rich Text Post (WordPress-style)</option>
+          <option value="text" <?= $curType === 'text' ? 'selected' : '' ?>>Rich লেখা Post (WordPress-style)</option>
           <option value="image" <?= $curType === 'image' ? 'selected' : '' ?>>ছবিসহ লেখা পোস্ট</option>
           <option value="video" <?= $curType === 'video' ? 'selected' : '' ?>>ভিডিওসহ লেখা পোস্ট</option>
           <option value="custom" <?= $curType === 'custom' ? 'selected' : '' ?>>সম্পূর্ণ HTML + CSS + JavaScript ডকুমেন্ট</option>
@@ -264,7 +264,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
     </div>
 
     <div class="form-row" id="post_media_group">
-      <label class="form-label" for="media_file">Featured Image or Video (Required for Image/Video format)</label>
+      <label class="form-label" for="media_file">Featured Image or ভিডিও (Required for Image/ভিডিও format)</label>
       <input class="form-control" type="file" id="media_file" name="media_file" data-preview-target="post_media_preview" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">
       <span class="form-hint">Image up to 10 MB; video up to 50 MB. The rich editor below can also contain multiple inline images.</span>
       <div class="adm-media-preview" id="post_media_preview">
@@ -313,7 +313,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button type="submit" class="btn btn-green"><?= $editPost ? 'Save Changes' : 'Publish Post' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editPost ? 'সংরক্ষণ Changes' : 'Publish Post' ?></button>
       <a href="<?= e(admin_url('posts.php')) ?>" class="btn btn-outline">Cancel</a>
     </div>
   </form>
@@ -337,7 +337,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
           <td><div style="display:flex;gap:6px;flex-wrap:wrap;">
             <a href="<?= e(admin_url('posts.php')) ?>?edit=<?= (int) $p['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
             <form method="post" action="<?= e(admin_url('posts.php')) ?>"><?= csrf_field() ?><input type="hidden" name="action" value="toggle_status"><input type="hidden" name="post_id" value="<?= (int) $p['id'] ?>"><input type="hidden" name="new_status" value="<?= $p['status'] === 'published' ? 'draft' : 'published' ?>"><button type="submit" class="btn btn-outline btn-sm"><?= $p['status'] === 'published' ? 'Unpublish' : 'Publish' ?></button></form>
-            <form method="post" action="<?= e(admin_url('posts.php')) ?>" data-confirm="Delete this post permanently? This cannot be undone."><?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="post_id" value="<?= (int) $p['id'] ?>"><button type="submit" class="btn btn-danger btn-sm">Delete</button></form>
+            <form method="post" action="<?= e(admin_url('posts.php')) ?>" data-confirm="মুছুন this post permanently? This cannot be undone."><?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="post_id" value="<?= (int) $p['id'] ?>"><button type="submit" class="btn btn-danger btn-sm">মুছুন</button></form>
           </div></td>
         </tr>
       <?php endforeach; ?>

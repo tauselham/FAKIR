@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$activePage = 'pages';
+$সক্রিয়Page = 'pages';
 $adminPageTitle = 'পেজ ব্যবস্থাপনা & আমাদের পরিচিতি';
 $requiredPermission = 'manage_pages';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Throwable $e) {
         if ($e instanceof PDOException) {
             $message = str_contains(strtolower($e->getMessage()), 'unique')
-                ? 'That লিংক Slug is already in use, or an আমাদের পরিচিতি page already exists.'
+                ? 'That লিংক Slug is already in use, or an আমাদের পরিচিতি page আগেই তৈরি আছে.'
                 : 'The page could not be saved because of a database error. Check the server log for details.';
             error_log('Content page save failed: ' . $e->getMessage());
         } else {
@@ -210,7 +210,7 @@ foreach ($pages as $pageRow) {
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button type="submit" class="btn btn-green"><?= $editPage ? 'Save Changes' : 'Create Page' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editPage ? 'সংরক্ষণ Changes' : 'Create Page' ?></button>
       <?php if ($editPage): ?><a href="<?= e(admin_url('pages.php')) ?>" class="btn btn-outline">Cancel</a><?php endif; ?>
     </div>
   </form>
@@ -235,9 +235,9 @@ foreach ($pages as $pageRow) {
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-outline btn-sm" href="<?= e(admin_url('pages.php')) ?>?edit=<?= (int) $p['id'] ?>">Edit</a>
               <?php if ($p['status'] === 'published'): ?><a class="btn btn-outline btn-sm" href="/<?= e($p['slug']) ?>" target="_blank" rel="noopener noreferrer">View</a><?php endif; ?>
-              <form method="post" action="<?= e(admin_url('pages.php')) ?>" data-confirm="Delete this page permanently?">
+              <form method="post" action="<?= e(admin_url('pages.php')) ?>" data-confirm="মুছুন this page permanently?">
                 <?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="page_id" value="<?= (int) $p['id'] ?>">
-                <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                <button class="btn btn-danger btn-sm" type="submit">মুছুন</button>
               </form>
             </div>
           </td>

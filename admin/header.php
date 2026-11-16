@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$activePage = 'header';
+$সক্রিয়Page = 'header';
 $adminPageTitle = 'হেডার ও নেভিগেশন';
 $requiredPermission = 'manage_navigation';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -174,7 +174,7 @@ if (!empty($_GET['edit'])) {
         <div class="adm-media-preview" id="header_logo_preview">
           <?php if (!empty($settings['logo_url'])): ?>
             <img src="<?= e(safe_url($settings['logo_url'])) ?>" alt="Current header logo" class="adm-preview-media adm-preview-logo">
-            <span class="form-hint">Current logo active. Upload a new file to replace it.</span>
+            <span class="form-hint">Current logo সক্রিয়. Upload a new file to replace it.</span>
           <?php endif; ?>
         </div>
       </div>
@@ -297,11 +297,11 @@ if (!empty($_GET['edit'])) {
             <td>
               <div style="display: flex; gap: 6px;">
                 <a href="<?= e(admin_url('header.php')) ?>?edit=<?= (int) $ni['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
-                <form method="post" action="<?= e(admin_url('header.php')) ?>" data-confirm="Delete this navigation item?">
+                <form method="post" action="<?= e(admin_url('header.php')) ?>" data-confirm="মুছুন this navigation item?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete_nav_item">
                   <input type="hidden" name="item_id" value="<?= (int) $ni['id'] ?>">
-                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                  <button type="submit" class="btn btn-danger btn-sm">মুছুন</button>
                 </form>
               </div>
             </td>
