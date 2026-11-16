@@ -52,11 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($starts && $ends && strtotime($ends) <= strtotime($starts)) throw new RuntimeException('End time must be later than start time.');
             if ($buttonText !== '' && $buttonUrl === '') throw new RuntimeException('Add a button URL or leave the button text empty.');
 
-            $imageLink = $imageLink !== '' ? safe_url($imageLink, '') : '';
-            $buttonUrl = $buttonUrl !== '' ? safe_url($buttonUrl, '') : '';
-            if (($imageLink !== '' && $imageLink === '') || ($buttonUrl !== '' && $buttonUrl === '')) throw new RuntimeException('Only relative, http, and https links are allowed.');
             if ($imageLink !== '' && safe_url($imageLink, '') === '') throw new RuntimeException('Image link must be a safe relative or http/https URL.');
             if ($buttonUrl !== '' && safe_url($buttonUrl, '') === '') throw new RuntimeException('Button link must be a safe relative or http/https URL.');
+            $imageLink = $imageLink !== '' ? safe_url($imageLink, '') : '';
+            $buttonUrl = $buttonUrl !== '' ? safe_url($buttonUrl, '') : '';
 
             $existing = null;
             if ($id > 0) {
@@ -196,7 +195,7 @@ $fmtLocal = static function (?string $value): string {
       <div class="popup-preview" id="popup-image-preview"><?php if ($edit && !empty($edit['image_url'])): ?><img src="<?= e(safe_url($edit['image_url'])) ?>" alt="Current popup image"><?php endif; ?></div>
       <div class="form-row">
         <label class="form-label" for="image_link_url">Image Click URL (optional)</label>
-        <input class="form-control" id="image_link_url" name="image_link_url" type="url" value="<?= e($edit['image_link_url'] ?? '') ?>" placeholder="https://example.com">
+        <input class="form-control" id="image_link_url" name="image_link_url" type="text" value="<?= e($edit['image_link_url'] ?? '') ?>" placeholder="https://example.com">
       </div>
       <div class="form-row">
         <label class="form-label" for="image_link_target">Open image link</label>
