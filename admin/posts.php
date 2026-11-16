@@ -142,10 +142,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect_to(admin_url('posts.php'));
         } elseif ($action === 'toggle_status') {
             $postId = (int) ($_POST['post_id'] ?? 0);
-            $newঅবস্থা্থা = ($_POST['new_status'] ?? 'draft') === 'published' ? 'published' : 'draft';
+            $newStatus্থা্থা = ($_POST['new_status'] ?? 'draft') === 'published' ? 'published' : 'draft';
             $upd = $pdo->prepare('UPDATE public.posts SET status = :status, published_at = CASE WHEN :status_check = \'published\' THEN COALESCE(published_at, NOW()) ELSE NULL END, updated_at = NOW() WHERE id = :id');
-            $upd->execute([':status' => $newঅবস্থা্থা, ':status_check' => $newঅবস্থা্থা, ':id' => $postId]);
-            log_admin_activity((int) $currentAdmin['id'], 'post_status_' . $newঅবস্থা্থা, 'post', $postId);
+            $upd->execute([':status' => $newStatus্থা্থা, ':status_check' => $newStatus্থা্থা, ':id' => $postId]);
+            log_admin_activity((int) $currentAdmin['id'], 'post_status_' . $newStatus্থা্থা, 'post', $postId);
             set_flash('success', 'পোস্টের দৃশ্যমানতা হালনাগাদ হয়েছে।');
             redirect_to(admin_url('posts.php'));
         } elseif ($action === 'delete') {
