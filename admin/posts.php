@@ -210,7 +210,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
   <div class="adm-section-heading">
     <div>
       <h2 class="adm-panel-title" style="margin-bottom:5px;">গ্রামের খবর ও পোস্ট</h2>
-      <p class="form-hint" style="margin:0;">Manage all existing community posts, or create a new post.</p>
+      <p class="form-hint" style="margin:0;">আগের পোস্টগুলো পরিচালনা করুন অথবা নতুন পোস্ট তৈরি করুন।</p>
     </div>
     <a class="btn btn-green" href="<?= e(admin_url('posts.php')) ?>?add=1">＋ পোস্ট যোগ করুন</a>
   </div>
@@ -219,7 +219,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
 <?php if ($showPostForm): ?>
 <section class="adm-panel">
   <div class="adm-section-heading">
-    <h2 class="adm-panel-title" style="margin-bottom:0;"><?= $editPost ? 'Edit Community Post #' . (int) $editPost['id'] : 'Add Community Post' ?></h2>
+    <h2 class="adm-panel-title" style="margin-bottom:0;"><?= $editPost ? 'পোস্ট সম্পাদনা #' . (int) $editPost['id'] : 'নতুন পোস্ট যোগ করুন' ?></h2>
     <a href="<?= e(admin_url('posts.php')) ?>" class="btn btn-outline">← সব পোস্টে ফিরে যান</a>
   </div>
   <form id="community-post-form" method="post" action="<?= e(admin_url('posts.php')) ?>" enctype="multipart/form-data">
@@ -232,14 +232,14 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
         <label class="form-label" for="post_type_select">পোস্টের ধরন</label>
         <select class="form-control" name="post_type" id="post_type_select">
           <?php $curType = $editPost['post_type'] ?? 'text'; ?>
-          <option value="text" <?= $curType === 'text' ? 'selected' : '' ?>>Rich Text Post (WordPress-style)</option>
+          <option value="text" <?= $curType === 'text' ? 'selected' : '' ?>>সমৃদ্ধ লেখা পোস্ট (WordPress-এর মতো)</option>
           <option value="image" <?= $curType === 'image' ? 'selected' : '' ?>>ছবিসহ লেখা পোস্ট</option>
           <option value="video" <?= $curType === 'video' ? 'selected' : '' ?>>ভিডিওসহ লেখা পোস্ট</option>
           <option value="custom" <?= $curType === 'custom' ? 'selected' : '' ?>>সম্পূর্ণ HTML + CSS + JavaScript ডকুমেন্ট</option>
         </select>
       </div>
       <div class="form-row">
-        <label class="form-label" for="category_id">Category</label>
+        <label class="form-label" for="category_id">বিভাগ</label>
         <select class="form-control" name="category_id" id="category_id">
           <option value="">বিভাগবিহীন</option>
           <?php foreach ($categories as $cat): ?>
@@ -264,9 +264,9 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
     </div>
 
     <div class="form-row" id="post_media_group">
-      <label class="form-label" for="media_file">Featured Image or Video (Required for Image/Video format)</label>
+      <label class="form-label" for="media_file">প্রধান ছবি অথবা ভিডিও (ছবি/ভিডিও পোস্টের জন্য আবশ্যক)</label>
       <input class="form-control" type="file" id="media_file" name="media_file" data-preview-target="post_media_preview" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">
-      <span class="form-hint">Image up to 10 MB; video up to 50 MB. The rich editor below can also contain multiple inline images.</span>
+      <span class="form-hint">ছবি সর্বোচ্চ ১০ মেগাবাইট এবং ভিডিও ৫০ মেগাবাইট। নিচের এডিটরে একাধিক ছবি যোগ করা যাবে।</span>
       <div class="adm-media-preview" id="post_media_preview">
         <?php if ($editPost && !empty($editPost['media_url'])): ?>
           <?php if ($editPost['post_type'] === 'video'): ?><video src="<?= e(safe_url($editPost['media_url'])) ?>" controls preload="metadata" class="adm-preview-media"></video>
@@ -292,7 +292,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
           <button type="button" class="rich-tool" data-editor-command="insertUnorderedList" title="বুলেট তালিকা">• তালিকা</button>
           <button type="button" class="rich-tool" data-editor-command="insertOrderedList" title="ক্রমিক তালিকা">১. তালিকা</button>
           <button type="button" class="rich-tool" data-editor-link>🔗 লিংক</button>
-          <button type="button" class="rich-tool" data-editor-image>▧ Image</button>
+          <button type="button" class="rich-tool" data-editor-image>▧ ছবি</button>
           <button type="button" class="rich-tool" data-editor-command="removeFormat" title="লেখার সাজসজ্জা মুছুন">মুছে ফেলুন</button>
           <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-editor-image-file hidden>
         </div>
@@ -307,13 +307,13 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
       <textarea class="form-control code-document-editor" id="post_code_document" name="code_document" rows="24" spellcheck="false"><?= e($editPost['code_document'] ?? $legacyCodeDocument) ?></textarea>
       <span class="form-hint">একটি সম্পূর্ণ HTML ডকুমেন্ট পেস্ট করুন। CSS-এর জন্য &lt;style&gt; এবং JavaScript-এর জন্য &lt;script&gt; ব্যবহার করুন। এটি আলাদা সীমাবদ্ধ iframe-এ চলবে; fetch/XHR/WebSocket, ফর্ম, পপআপ ও মূল পেজে প্রবেশ বন্ধ থাকবে; HTTPS ছবি লোড হতে পারে।</span>
       <div class="form-row" style="margin-top:12px;">
-        <label class="form-label" for="custom_excerpt">Short Excerpt (Optional)</label>
+        <label class="form-label" for="custom_excerpt">সংক্ষিপ্ত পরিচিতি (ঐচ্ছিক)</label>
         <input class="form-control" id="custom_excerpt" name="custom_excerpt" maxlength="500" value="<?= e((($editPost['post_type'] ?? '') === 'custom') ? ($editPost['description'] ?? '') : '') ?>" placeholder="পোস্টের তালিকায় দেখানো সংক্ষিপ্ত বিবরণ">
       </div>
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button type="submit" class="btn btn-green"><?= $editPost ? 'Save Changes' : 'Publish Post' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editPost ? 'পরিবর্তন সংরক্ষণ করুন' : 'পোস্ট প্রকাশ করুন' ?></button>
       <a href="<?= e(admin_url('posts.php')) ?>" class="btn btn-outline">Cancel</a>
     </div>
   </form>
@@ -336,8 +336,8 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
           <td class="num-tab"><?= e(format_date($p['published_at'] ?? $p['created_at'])) ?></td>
           <td><div style="display:flex;gap:6px;flex-wrap:wrap;">
             <a href="<?= e(admin_url('posts.php')) ?>?edit=<?= (int) $p['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
-            <form method="post" action="<?= e(admin_url('posts.php')) ?>"><?= csrf_field() ?><input type="hidden" name="action" value="toggle_status"><input type="hidden" name="post_id" value="<?= (int) $p['id'] ?>"><input type="hidden" name="new_status" value="<?= $p['status'] === 'published' ? 'draft' : 'published' ?>"><button type="submit" class="btn btn-outline btn-sm"><?= $p['status'] === 'published' ? 'Unpublish' : 'Publish' ?></button></form>
-            <form method="post" action="<?= e(admin_url('posts.php')) ?>" data-confirm="মুছুন this post permanently? This cannot be undone."><?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="post_id" value="<?= (int) $p['id'] ?>"><button type="submit" class="btn btn-danger btn-sm">মুছুন</button></form>
+            <form method="post" action="<?= e(admin_url('posts.php')) ?>"><?= csrf_field() ?><input type="hidden" name="action" value="toggle_status"><input type="hidden" name="post_id" value="<?= (int) $p['id'] ?>"><input type="hidden" name="new_status" value="<?= $p['status'] === 'published' ? 'draft' : 'published' ?>"><button type="submit" class="btn btn-outline btn-sm"><?= $p['status'] === 'published' ? 'অপ্রকাশ করুন' : 'প্রকাশ করুন' ?></button></form>
+            <form method="post" action="<?= e(admin_url('posts.php')) ?>" data-confirm="এই পোস্টটি স্থায়ীভাবে মুছে ফেলবেন? এটি আর ফেরানো যাবে না।"><?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="post_id" value="<?= (int) $p['id'] ?>"><button type="submit" class="btn btn-danger btn-sm">মুছুন</button></form>
           </div></td>
         </tr>
       <?php endforeach; ?>

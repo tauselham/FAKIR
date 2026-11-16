@@ -73,13 +73,13 @@ $logs = $securityLogs->fetchAll();
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="new_password_input">New পাসওয়ার্ড</label>
+      <label class="form-label" for="new_password_input">নতুন পাসওয়ার্ড</label>
       <input class="form-control" type="password" id="new_password_input" name="new_password" required minlength="10" autocomplete="new-password">
-      <span class="form-hint" id="pw_strength_feedback">Minimum 10 characters with uppercase, lowercase, number, and symbol.</span>
+      <span class="form-hint" id="pw_strength_feedback">কমপক্ষে ১০ অক্ষর দিন; বড় হাতের অক্ষর, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ চিহ্ন থাকতে হবে।</span>
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="confirm_password">Confirm New পাসওয়ার্ড</label>
+      <label class="form-label" for="confirm_password">Confirm নতুন পাসওয়ার্ড</label>
       <input class="form-control" type="password" id="confirm_password" name="confirm_password" required minlength="10" autocomplete="new-password">
     </div>
 
@@ -104,7 +104,7 @@ $logs = $securityLogs->fetchAll();
           <tr>
             <td><?= e($log['action']) ?></td>
             <td class="num-tab"><?= e($log['ip_address'] ?? '') ?></td>
-            <td class="num-tab"><?= e(format_date($log['created_at'], 'M j, Y H:i:s')) ?></td>
+            <td class="num-tab"><?= e(format_date($log['created_at'], 'd/m/Y H:i:s')) ?></td>
           </tr>
         <?php endforeach; ?>
       </tbody>

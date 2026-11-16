@@ -94,36 +94,36 @@ function all_admin_permissions(): array
 {
     return [
         'manage_posts' => [
-            'label'       => 'Community Posts',
-            'description' => 'Create, edit, publish/unpublish, and delete Text, Image, Video, and Custom Code posts.',
+            'label'       => 'গ্রামের খবর ও পোস্ট',
+            'description' => 'লেখা, ছবি, ভিডিও ও কাস্টম কোডসহ পোস্ট তৈরি, সম্পাদনা, প্রকাশ, অপ্রকাশ এবং মুছে ফেলুন।',
         ],
         'manage_pages' => [
-            'label'       => 'Landing Pages & About Us',
-            'description' => 'Create and publish custom HTML/CSS/JavaScript pages and manage the About Us URL.',
+            'label'       => 'পেজ ব্যবস্থাপনা ও আমাদের পরিচিতি',
+            'description' => 'নিজস্ব HTML/CSS/JavaScript পেজ তৈরি ও প্রকাশ করুন এবং আমাদের পরিচিতি পেজ পরিচালনা করুন।',
         ],
         'manage_gallery' => [
-            'label'       => 'Photo Gallery',
-            'description' => 'Upload, edit captions, reorder, feature, and delete gallery photos.',
+            'label'       => 'ছবির গ্যালারি',
+            'description' => 'গ্যালারিতে ছবি আপলোড, ক্যাপশন সম্পাদনা, ক্রম পরিবর্তন, বিশেষ ছবি নির্বাচন এবং মুছে ফেলুন।',
         ],
         'manage_banners' => [
-            'label'       => 'Hero Banners',
-            'description' => 'Upload, reorder, and configure homepage hero banner slides and timing.',
+            'label'       => 'প্রধান ব্যানার',
+            'description' => 'মূল পাতার ব্যানার আপলোড, ক্রম ও প্রদর্শনের সময় নির্ধারণ করুন।',
         ],
         'manage_popups' => [
-            'label'       => 'Popup Campaigns',
-            'description' => 'Create and schedule image or text popups, links, display targeting, and frequency.',
+            'label'       => 'পপআপ ব্যবস্থাপনা',
+            'description' => 'ছবি বা লেখার পপআপ তৈরি করুন এবং লিংক, প্রদর্শনের লক্ষ্য ও সময়সূচি নির্ধারণ করুন।',
         ],
         'manage_categories' => [
-            'label'       => 'Categories',
-            'description' => 'Create, edit, reorder, and delete Post and Gallery categories.',
+            'label'       => 'বিভাগসমূহ',
+            'description' => 'পোস্ট ও গ্যালারির বিভাগ তৈরি, সম্পাদনা, ক্রম পরিবর্তন এবং মুছে ফেলুন।',
         ],
         'manage_navigation' => [
-            'label'       => 'Header & Footer',
-            'description' => 'Customize header logo/colors/menus and footer content, links, and contacts.',
+            'label'       => 'হেডার ও ফুটার',
+            'description' => 'হেডারের লোগো, রং ও মেনু এবং ফুটারের লেখা, লিংক ও যোগাযোগের তথ্য পরিবর্তন করুন।',
         ],
         'manage_settings' => [
-            'label'       => 'Website Settings',
-            'description' => 'Edit website title, favicon, SEO metadata, accent colors, and social links.',
+            'label'       => 'ওয়েবসাইট সেটিংস',
+            'description' => 'ওয়েবসাইটের নাম, ফেভিকন, সার্চ ইঞ্জিনের তথ্য, প্রধান রং ও সামাজিক যোগাযোগের লিংক পরিবর্তন করুন।',
         ],
     ];
 }

@@ -7,10 +7,10 @@ require_once dirname(__DIR__) . '/includes/admin-layout.php';
 
 $pdo = db();
 
-$totalPublishedPosts = (int) $pdo->query("SELECT COUNT(*) FROM public.posts WHERE status = 'published'")->fetchColumn();
-$totalImages = (int) $pdo->query("SELECT COUNT(*) FROM public.gallery_images")->fetchColumn();
+$totalপ্রকাশ করুনedPosts = (int) $pdo->query("SELECT COUNT(*) FROM public.posts WHERE status = 'published'")->fetchColumn();
+$totalছবিs = (int) $pdo->query("SELECT COUNT(*) FROM public.gallery_images")->fetchColumn();
 $totalVideos = (int) $pdo->query("SELECT COUNT(*) FROM public.posts WHERE post_type = 'video'")->fetchColumn();
-$totalCategories = (int) $pdo->query("SELECT (SELECT COUNT(*) FROM public.gallery_categories) + (SELECT COUNT(*) FROM public.post_categories)")->fetchColumn();
+$totalবিভাগসমূহ = (int) $pdo->query("SELECT (SELECT COUNT(*) FROM public.gallery_categories) + (SELECT COUNT(*) FROM public.post_categories)")->fetchColumn();
 $totalBanners = (int) $pdo->query("SELECT COUNT(*) FROM public.hero_banners")->fetchColumn();
 
 if (is_super_admin($currentAdmin)) {
@@ -35,14 +35,14 @@ if (is_super_admin($currentAdmin)) {
 }
 ?>
 
-<section class="adm-stats-grid" aria-label="Community Overview Metrics">
+<section class="adm-stats-grid" aria-label="কমিউনিটির সারসংক্ষেপ">
   <div class="adm-stat-card">
     <p class="adm-stat-label">প্রকাশিত পোস্ট</p>
-    <p class="adm-stat-val"><?= $totalPublishedPosts ?></p>
+    <p class="adm-stat-val"><?= $totalপ্রকাশ করুনedPosts ?></p>
   </div>
   <div class="adm-stat-card">
     <p class="adm-stat-label">গ্যালারির ছবি</p>
-    <p class="adm-stat-val"><?= $totalImages ?></p>
+    <p class="adm-stat-val"><?= $totalছবিs ?></p>
   </div>
   <div class="adm-stat-card">
     <p class="adm-stat-label">ভিডিও পোস্ট</p>
@@ -50,7 +50,7 @@ if (is_super_admin($currentAdmin)) {
   </div>
   <div class="adm-stat-card">
     <p class="adm-stat-label">মোট বিভাগ</p>
-    <p class="adm-stat-val"><?= $totalCategories ?></p>
+    <p class="adm-stat-val"><?= $totalবিভাগসমূহ ?></p>
   </div>
   <div class="adm-stat-card">
     <p class="adm-stat-label">প্রধান ব্যানার</p>
@@ -94,7 +94,7 @@ if (is_super_admin($currentAdmin)) {
 <section class="adm-panel">
   <h2 class="adm-panel-title">সাম্প্রতিক অ্যাডমিন কার্যক্রম</h2>
   <?php if (empty($recentLogs)): ?>
-    <p style="color: var(--adm-muted); margin: 0;">No activity recorded yet.</p>
+    <p style="color: var(--adm-muted); margin: 0;">এখনো কোনো কার্যক্রমের তথ্য নেই।</p>
   <?php else: ?>
     <div class="table-wrap">
       <table class="adm-table">
@@ -110,8 +110,8 @@ if (is_super_admin($currentAdmin)) {
         <tbody>
           <?php foreach ($recentLogs as $log): ?>
             <tr>
-              <td class="num-tab"><?= e(format_date($log['created_at'], 'M j, Y H:i')) ?></td>
-              <td><?= e($log['username'] ?? 'System') ?></td>
+              <td class="num-tab"><?= e(format_date($log['created_at'], 'd/m/Y H:i')) ?></td>
+              <td><?= e($log['username'] ?? 'সিস্টেম') ?></td>
               <td><?= e($log['action']) ?></td>
               <td><?= e(($log['entity_type'] ?? '-') . ($log['entity_id'] ? ' #' . $log['entity_id'] : '')) ?></td>
               <td class="num-tab"><?= e($log['ip_address'] ?? '') ?></td>

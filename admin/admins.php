@@ -275,7 +275,7 @@ if (!empty($_GET['edit'])) {
     <div class="adm-grid-2">
       <div class="form-row">
         <label class="form-label" for="admin_full_name">পুরো নাম</label>
-        <input class="form-control" type="text" id="admin_full_name" name="full_name" value="<?= e($editAdmin['full_name'] ?? '') ?>" required placeholder="e.g., Rahim Uddin">
+        <input class="form-control" type="text" id="admin_full_name" name="full_name" value="<?= e($editAdmin['full_name'] ?? '') ?>" required placeholder="যেমন: রহিম উদ্দিন">
       </div>
 
       <div class="form-row">
@@ -288,10 +288,10 @@ if (!empty($_GET['edit'])) {
           value="<?= e($editAdmin['username'] ?? '') ?>"
           <?= $editAdmin ? 'readonly' : 'required' ?>
           pattern="[a-zA-Z0-9_.-]{3,}"
-          placeholder="e.g., rahim_editor"
+          placeholder="যেমন: rahim_editor"
         >
         <?php if ($editAdmin): ?>
-          <span class="form-hint">ব্যবহারকারীর নাম cannot be changed after creation.</span>
+          <span class="form-hint">তৈরি করার পর ব্যবহারকারীর নাম পরিবর্তন করা যাবে না।</span>
         <?php endif; ?>
       </div>
     </div>
@@ -326,16 +326,16 @@ if (!empty($_GET['edit'])) {
           <?= $editAdmin ? '' : 'required' ?>
           minlength="10"
           style="flex: 1; min-width: 240px;"
-          placeholder="<?= $editAdmin ? 'Leave blank unless resetting password' : 'Minimum 10 characters with upper, lower, number, symbol' ?>"
+          placeholder="<?= $editAdmin ? 'পাসওয়ার্ড পরিবর্তন না করতে চাইলে ফাঁকা রাখুন' : 'কমপক্ষে ১০ অক্ষর; বড় হাতের, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ চিহ্ন দিন' ?>"
         >
-        <button type="button" class="btn btn-outline" data-generate-password="admin_password_input">Generate Random পাসওয়ার্ড</button>
+        <button type="button" class="btn btn-outline" data-generate-password="admin_password_input">এলোমেলো পাসওয়ার্ড তৈরি করুন</button>
       </div>
-      <span class="form-hint">Each admin can update their own password anytime inside Security &amp; পাসওয়ার্ড.</span>
+      <span class="form-hint">প্রত্যেক অ্যাডমিন নিরাপত্তা ও পাসওয়ার্ড বিভাগ থেকে যেকোনো সময় নিজের পাসওয়ার্ড পরিবর্তন করতে পারবেন।</span>
     </div>
 
     <div class="form-row" id="admin_permissions_box">
       <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-        <label class="form-label" style="margin: 0;">Allowed অ্যাডমিন প্যানেল Permissions</label>
+        <label class="form-label" style="margin: 0;">অ্যাডমিন প্যানেলে অনুমোদিত কাজ</label>
         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
           <button type="button" class="btn btn-outline btn-sm" data-perm-preset="posts">শুধু পোস্ট</button>
           <button type="button" class="btn btn-outline btn-sm" data-perm-preset="gallery">শুধু ছবি</button>
@@ -411,7 +411,7 @@ if (!empty($_GET['edit'])) {
               <strong><?= e($adm['full_name']) ?></strong>
               <div style="font-size: 0.8rem; color: var(--adm-muted);">@<?= e($adm['username']) ?> · <?= e($adm['email']) ?></div>
             </td>
-            <td><?= e($isSuper ? 'সুপার অ্যাডমিন' : ucfirst((string) $adm['role'])) ?></td>
+            <td><?= e(['admin' => 'অ্যাডমিন', 'editor' => 'সম্পাদক', 'super_admin' => 'সুপার অ্যাডমিন'][$adm['role']] ?? $adm['role']) ?></td>
             <td style="max-width: 280px; font-size: 0.84rem;">
               <?= $isSuper ? 'সম্পূর্ণ প্রবেশাধিকার (সব বিভাগ ও ব্যবহারকারী)' : e($permLabels ? implode(', ', $permLabels) : 'শুধু ড্যাশবোর্ড ও পাসওয়ার্ড') ?>
             </td>
@@ -421,7 +421,7 @@ if (!empty($_GET['edit'])) {
                 <div style="font-size: 0.76rem; color: var(--adm-muted);">Temp password</div>
               <?php endif; ?>
             </td>
-            <td class="num-tab"><?= e($adm['last_login_at'] ? format_date($adm['last_login_at'], 'M j, Y H:i') : 'কখনো লগইন করেননি') ?></td>
+            <td class="num-tab"><?= e($adm['last_login_at'] ? format_date($adm['last_login_at'], 'd/m/Y H:i') : 'কখনো লগইন করেননি') ?></td>
             <td>
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 <a href="<?= e(admin_url('admins.php')) ?>?edit=<?= (int) $adm['id'] ?>" class="btn btn-outline btn-sm">অনুমতি সম্পাদনা</a>

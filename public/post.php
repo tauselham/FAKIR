@@ -45,7 +45,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <span aria-hidden="true">·</span>
     <?php endif; ?>
     <time datetime="<?= e((string) ($post['published_at'] ?? $post['created_at'])) ?>">
-      <?= e(format_date($post['published_at'] ?? $post['created_at'], 'F j, Y')) ?>
+      <?= e(format_date($post['published_at'] ?? $post['created_at'], 'd/m/Y')) ?>
     </time>
   </div>
 

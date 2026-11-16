@@ -141,10 +141,10 @@
       if (linkButton) {
         linkButton.addEventListener('mousedown', (event) => event.preventDefault());
         linkButton.addEventListener('click', () => {
-          const url = window.prompt('Enter a link (https://... or /local-page):');
+          const url = window.prompt('লিংক লিখুন (https://... অথবা /পেজের-ঠিকানা):');
           if (!url) return;
           if (!/^(https?:\/\/|\/|#)/i.test(url)) {
-            window.alert('Only https://, http://, local paths beginning with /, or page anchors are allowed.');
+            window.alert('শুধু https://, http://, / দিয়ে শুরু হওয়া স্থানীয় ঠিকানা অথবা পেজের নির্দিষ্ট অংশের লিংক ব্যবহার করা যাবে।');
             return;
           }
           restoreSelection();
@@ -173,7 +173,7 @@
               headers: { 'Accept': 'application/json' }
             });
             const result = await response.json();
-            if (!response.ok || !result.ok || !result.url) throw new Error(result.error || 'Image upload failed.');
+            if (!response.ok || !result.ok || !result.url) throw new Error(result.error || 'ছবি upload failed.');
             const image = document.createElement('img');
             image.src = result.url;
             image.alt = file.name;
@@ -181,10 +181,10 @@
             image.style.maxWidth = '100%';
             insertNodeAtSelection(image);
           } catch (error) {
-            window.alert(error instanceof Error ? error.message : 'Image upload failed.');
+            window.alert(error instanceof Error ? error.message : 'ছবি upload failed.');
           } finally {
             imageButton.disabled = false;
-            imageButton.textContent = '▧ Image';
+            imageButton.textContent = '▧ ছবি';
             imagePicker.value = '';
           }
         });
@@ -225,7 +225,7 @@
         ];
         const score = checks.filter(Boolean).length;
         const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
-        pwHint.textContent = v.length === 0 ? '' : `Strength: ${labels[score]} (${score}/5 requirements met)`;
+        pwHint.textContent = v.length === 0 ? '' : `পাসওয়ার্ডের শক্তি: ${labels[score]} (${score}/5 requirements met)`;
       });
     }
 
@@ -271,7 +271,7 @@
         if (files.length > 8) {
           const note = document.createElement('span');
           note.className = 'form-hint';
-          note.textContent = `+ ${files.length - 8} more file(s) selected for upload.`;
+          note.textContent = `+ ${files.length - 8}টি অতিরিক্ত ফাইল আপলোডের জন্য নির্বাচন করা হয়েছে।`;
           container.appendChild(note);
         }
       });

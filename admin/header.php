@@ -158,7 +158,7 @@ if (!empty($_GET['edit'])) {
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Header Branding &amp; Colors</h2>
+  <h2 class="adm-panel-title">হেডারের পরিচিতি ও রং</h2>
   <form method="post" action="<?= e(admin_url('header.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save_header_brand">
@@ -174,7 +174,7 @@ if (!empty($_GET['edit'])) {
         <div class="adm-media-preview" id="header_logo_preview">
           <?php if (!empty($settings['logo_url'])): ?>
             <img src="<?= e(safe_url($settings['logo_url'])) ?>" alt="Current header logo" class="adm-preview-media adm-preview-logo">
-            <span class="form-hint">Current logo active. Upload a new file to replace it.</span>
+            <span class="form-hint">বর্তমান লোগো চালু আছে। পরিবর্তন করতে নতুন ফাইল আপলোড করুন।</span>
           <?php endif; ?>
         </div>
       </div>
@@ -196,7 +196,7 @@ if (!empty($_GET['edit'])) {
 </section>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title"><?= $editItem ? 'Edit Navigation Item' : 'Add Navigation Menu Item' ?></h2>
+  <h2 class="adm-panel-title"><?= $editItem ? 'মেনুর আইটেম সম্পাদনা' : 'নতুন মেনু আইটেম যোগ করুন' ?></h2>
   <form method="post" action="<?= e(admin_url('header.php')) ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="<?= $editItem ? 'update_nav_item' : 'add_nav_item' ?>">
@@ -211,7 +211,7 @@ if (!empty($_GET['edit'])) {
       </div>
       <div class="form-row">
         <label class="form-label" for="url">লিংক (ওয়েবসাইটের ভেতরের বা বাইরের)</label>
-        <input class="form-control" type="text" id="url" name="url" value="<?= e($editItem['url'] ?? '/') ?>" required placeholder="/gallery.php or https://...">
+        <input class="form-control" type="text" id="url" name="url" value="<?= e($editItem['url'] ?? '/') ?>" required placeholder="/gallery.php অথবা https://...">
       </div>
     </div>
 
@@ -227,7 +227,7 @@ if (!empty($_GET['edit'])) {
       </div>
 
       <div class="form-row">
-        <label class="form-label" for="parent_id">Parent Menu (Optional for Sub-items)</label>
+        <label class="form-label" for="parent_id">মূল মেনু (সাব-মেনুর জন্য ঐচ্ছিক)</label>
         <select class="form-control" name="parent_id" id="parent_id">
           <option value="">প্রধান মেনু আইটেম</option>
           <?php foreach ($navItems as $ni): ?>
@@ -264,7 +264,7 @@ if (!empty($_GET['edit'])) {
     </div>
 
     <div style="display: flex; gap: 10px;">
-      <button type="submit" class="btn btn-green"><?= $editItem ? 'Update Menu Item' : 'Add Menu Item' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editItem ? 'মেনুর আইটেম হালনাগাদ করুন' : 'মেনুর আইটেম যোগ করুন' ?></button>
       <?php if ($editItem): ?>
         <a href="<?= e(admin_url('header.php')) ?>" class="btn btn-outline">Cancel</a>
       <?php endif; ?>
@@ -291,7 +291,7 @@ if (!empty($_GET['edit'])) {
           <tr>
             <td><?= $ni['parent_id'] ? '↳ ' : '' ?><strong><?= e($ni['label']) ?></strong></td>
             <td><?= e($ni['url']) ?></td>
-            <td><?= e(ucfirst($ni['item_type'])) ?></td>
+            <td><?= e(['link' => 'লিংক', 'dropdown' => 'ড্রপডাউন মেনু', 'mega' => 'মেগা মেনু'][$ni['item_type']] ?? $ni['item_type']) ?></td>
             <td class="num-tab"><?= (int) $ni['sort_order'] ?></td>
             <td><?= !empty($ni['is_visible']) ? 'দৃশ্যমান' : 'লুকানো' ?></td>
             <td>

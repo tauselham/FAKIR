@@ -38,10 +38,10 @@
     dialog.className = 'site-popup-dialog';
     dialog.setAttribute('role', 'dialog');
     dialog.setAttribute('aria-modal', 'true');
-    dialog.setAttribute('aria-label', chosen.title || 'Website announcement');
+    dialog.setAttribute('aria-label', chosen.title || 'ওয়েবসাইটের ঘোষণা');
     const close = document.createElement('button');
     close.type = 'button'; close.className = 'site-popup-close';
-    close.setAttribute('aria-label', 'Close popup'); close.textContent = '×';
+    close.setAttribute('aria-label', 'পপআপ বন্ধ করুন'); close.textContent = '×';
     close.addEventListener('click', dismiss);
     dialog.append(close);
 
@@ -54,7 +54,7 @@
     if (chosen.popup_type === 'image') {
       const img = document.createElement('img');
       img.className = 'site-popup-image'; img.src = chosen.image_url;
-      img.alt = chosen.title || 'Announcement';
+      img.alt = chosen.title || 'ঘোষণা';
       if (chosen.image_link_url) {
         const link = document.createElement('a');
         link.href = chosen.image_link_url;
