@@ -94,6 +94,7 @@ $allowedEndpoints = [
     'pages.php',
     'gallery.php',
     'banners.php',
+    'popups.php',
     'categories.php',
     'header.php',
     'footer.php',
