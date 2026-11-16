@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$সক্রিয়Page = 'security';
+$activePage = 'security';
 $adminPageTitle = 'নিরাপত্তা ও পাসওয়ার্ড';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 

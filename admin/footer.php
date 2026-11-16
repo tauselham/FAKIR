@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$সক্রিয়Page = 'footer';
+$activePage = 'footer';
 $adminPageTitle = 'ফুটার সেটিংস';
 $requiredPermission = 'manage_navigation';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -210,7 +210,7 @@ $footerLinks = $linksStmt->fetchAll();
       <label class="form-check"><input type="checkbox" name="show_social_links" value="1" <?= !empty($footer['show_social_links']) ? 'checked' : '' ?>> <span>সামাজিক যোগাযোগের লিংক দেখাবে</span></label>
     </div>
 
-    <button type="submit" class="btn btn-green">সংরক্ষণ ফুটার সেটিংস</button>
+    <button type="submit" class="btn btn-green">Save ফুটার সেটিংস</button>
   </form>
 </section>
 
@@ -239,7 +239,7 @@ $footerLinks = $linksStmt->fetchAll();
                 <input class="form-control" type="text" name="label" value="<?= e($fl['label']) ?>" style="max-width: 180px;">
                 <input class="form-control" type="text" name="url" value="<?= e($fl['url']) ?>" style="max-width: 220px;">
                 <input class="form-control" type="number" name="sort_order" value="<?= (int) $fl['sort_order'] ?>" style="width: 74px;">
-                <button type="submit" class="btn btn-outline btn-sm">সংরক্ষণ</button>
+                <button type="submit" class="btn btn-outline btn-sm">Save</button>
               </form>
             </td>
             <td>

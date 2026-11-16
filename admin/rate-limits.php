@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$সক্রিয়Page = 'rate_limits';
+$activePage = 'rate_limits';
 $adminPageTitle = 'অনুরোধ সীমা সেটিংস';
 $requiredSuperAdmin = true;
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -173,10 +173,10 @@ $rules = $limiter->getAllRulesWithStats();
               </label>
             </td>
             <td class="num-tab">
-              <?= (int) ($rule['সক্রিয়_buckets'] ?? 0) ?> সক্রিয়
-              <?php if ((int) ($rule['অবরুদ্ধ_buckets'] ?? 0) > 0): ?>
+              <?= (int) ($rule['active_buckets'] ?? 0) ?> সক্রিয়
+              <?php if ((int) ($rule['blocked_buckets'] ?? 0) > 0): ?>
                 <div style="font-size: 0.78rem; color: var(--adm-danger); font-weight: 600;">
-                  <?= (int) $rule['অবরুদ্ধ_buckets'] ?> অবরুদ্ধ
+                  <?= (int) $rule['blocked_buckets'] ?> অবরুদ্ধ
                 </div>
               <?php endif; ?>
             </td>

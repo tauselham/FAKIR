@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$সক্রিয়Page = 'popups';
+$activePage = 'popups';
 $adminPageTitle = 'পপআপ ব্যবস্থাপনা';
 $requiredPermission = 'manage_popups';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = trim((string) ($_POST['title'] ?? ''));
             $body = trim((string) ($_POST['body_text'] ?? ''));
             $imageLink = trim((string) ($_POST['image_link_url'] ?? ''));
-            $buttonলেখা = trim((string) ($_POST['button_text'] ?? ''));
+            $buttonText = trim((string) ($_POST['button_text'] ?? ''));
             $buttonUrl = trim((string) ($_POST['button_url'] ?? ''));
             $imageTarget = ($_POST['image_link_target'] ?? '_self') === '_blank' ? '_blank' : '_self';
             $buttonTarget = ($_POST['button_target'] ?? '_self') === '_blank' ? '_blank' : '_self';
@@ -44,13 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $priority = max(-1000, min(1000, (int) ($_POST['priority'] ?? 0)));
             $starts = popup_local_datetime($_POST['starts_at'] ?? null);
             $ends = popup_local_datetime($_POST['ends_at'] ?? null);
-            $সক্রিয় = !empty($_POST['is_সক্রিয়']);
+            $active = !empty($_POST['is_active']);
 
             if ($title !== '' && mb_strlen($title) > 180) throw new RuntimeException('শিরোনাম সর্বোচ্চ ১৮০ অক্ষরের হতে পারবে।');
             if ($type === 'text' && $body === '') throw new RuntimeException('পপআপের লেখা লিখুন।');
             if (mb_strlen($body) > 10000) throw new RuntimeException('পপআপের লেখা অনেক বড় (সর্বোচ্চ ১০,০০০ অক্ষর)।');
             if ($starts && $ends && strtotime($ends) <= strtotime($starts)) throw new RuntimeException('শেষের সময় শুরুর সময়ের পরে হতে হবে।');
-            if ($buttonলেখা !== '' && $buttonUrl === '') throw new RuntimeException('বাটনের লেখা দিলে তার লিংকও দিন, নতুবা লেখাটি ফাঁকা রাখুন।');
+            if ($buttonText !== '' && $buttonUrl === '') throw new RuntimeException('বাটনের লেখা দিলে তার লিংকও দিন, নতুবা লেখাটি ফাঁকা রাখুন।');
 
             if ($imageLink !== '' && safe_url($imageLink, '') === '') throw new RuntimeException('ছবির জন্য নিরাপদ আপেক্ষিক অথবা http/https লিংক দিন।');
             if ($buttonUrl !== '' && safe_url($buttonUrl, '') === '') throw new RuntimeException('বাটনের জন্য নিরাপদ আপেক্ষিক অথবা http/https লিংক দিন।');
@@ -92,22 +92,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':bucket' => $bucket, ':path' => $path, ':url' => $url,
                     ':image_link' => $type === 'image' && $imageLink !== '' ? $imageLink : null,
                     ':image_target' => $imageTarget,
-                    ':button_text' => $buttonলেখা !== '' ? $buttonলেখা : null,
+                    ':button_text' => $buttonText !== '' ? $buttonText : null,
                     ':button_url' => $buttonUrl !== '' ? $buttonUrl : null,
                     ':button_target' => $buttonTarget,
                     ':starts' => $starts, ':ends' => $ends,
                     ':delay' => $delay, ':frequency' => $frequency,
                     ':scope' => $scope, ':device' => $device,
-                    ':priority' => $priority, ':সক্রিয়' => $সক্রিয়,
+                    ':priority' => $priority, ':active' => $active,
                 ];
                 if ($existing) {
                     $params[':id'] = $id;
-                    $st = $pdo->prepare('UPDATE public.site_popups SET title=:title,popup_type=:type,body_text=:body,image_bucket=:bucket,image_path=:path,image_url=:url,image_link_url=:image_link,image_link_target=:image_target,button_text=:button_text,button_url=:button_url,button_target=:button_target,starts_at=:starts,ends_at=:ends,delay_seconds=:delay,frequency=:frequency,display_scope=:scope,device_target=:device,priority=:priority,is_সক্রিয়=:সক্রিয় WHERE id=:id');
+                    $st = $pdo->prepare('UPDATE public.site_popups SET title=:title,popup_type=:type,body_text=:body,image_bucket=:bucket,image_path=:path,image_url=:url,image_link_url=:image_link,image_link_target=:image_target,button_text=:button_text,button_url=:button_url,button_target=:button_target,starts_at=:starts,ends_at=:ends,delay_seconds=:delay,frequency=:frequency,display_scope=:scope,device_target=:device,priority=:priority,is_active=:active WHERE id=:id');
                     $st->execute($params);
                     log_admin_activity((int) $currentAdmin['id'], 'popup_updated', 'site_popup', $id);
                 } else {
                     $params[':aid'] = (int) $currentAdmin['id'];
-                    $st = $pdo->prepare('INSERT INTO public.site_popups (title,popup_type,body_text,image_bucket,image_path,image_url,image_link_url,image_link_target,button_text,button_url,button_target,starts_at,ends_at,delay_seconds,frequency,display_scope,device_target,priority,is_সক্রিয়,admin_id) VALUES (:title,:type,:body,:bucket,:path,:url,:image_link,:image_target,:button_text,:button_url,:button_target,:starts,:ends,:delay,:frequency,:scope,:device,:priority,:সক্রিয়,:aid) RETURNING id');
+                    $st = $pdo->prepare('INSERT INTO public.site_popups (title,popup_type,body_text,image_bucket,image_path,image_url,image_link_url,image_link_target,button_text,button_url,button_target,starts_at,ends_at,delay_seconds,frequency,display_scope,device_target,priority,is_active,admin_id) VALUES (:title,:type,:body,:bucket,:path,:url,:image_link,:image_target,:button_text,:button_url,:button_target,:starts,:ends,:delay,:frequency,:scope,:device,:priority,:active,:aid) RETURNING id');
                     $st->execute($params);
                     $id = (int) $st->fetchColumn();
                     log_admin_activity((int) $currentAdmin['id'], 'popup_created', 'site_popup', $id);
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'toggle') {
             $id = (int) ($_POST['popup_id'] ?? 0);
-            $pdo->prepare('UPDATE public.site_popups SET is_সক্রিয় = NOT is_সক্রিয় WHERE id = :id')->execute([':id' => $id]);
+            $pdo->prepare('UPDATE public.site_popups SET is_active = NOT is_active WHERE id = :id')->execute([':id' => $id]);
             log_admin_activity((int) $currentAdmin['id'], 'popup_toggled', 'site_popup', $id);
             set_flash('success', 'পপআপের অবস্থা হালনাগাদ হয়েছে।');
             redirect_to(admin_url('popups.php'));
@@ -262,7 +262,7 @@ $fmtLocal = static function (?string $value): string {
         <input class="form-control" type="number" min="-1000" max="1000" id="priority" name="priority" value="<?= (int) ($edit['priority'] ?? 0) ?>">
       </div>
       <div class="form-row">
-        <label class="form-check"><input type="checkbox" name="is_সক্রিয়" value="1" <?= (!$edit || !empty($edit['is_সক্রিয়'])) ? 'checked' : '' ?>><span>এই পপআপ চালু করুন</span></label>
+        <label class="form-check"><input type="checkbox" name="is_active" value="1" <?= (!$edit || !empty($edit['is_active'])) ? 'checked' : '' ?>><span>এই পপআপ চালু করুন</span></label>
       </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -285,12 +285,12 @@ $fmtLocal = static function (?string $value): string {
           <td><?= e($fmtLocal($p['starts_at']) ?: 'সঙ্গে সঙ্গে') ?><br><span class="form-hint"><?= e($fmtLocal($p['ends_at']) ?: 'শেষের সময় নির্ধারিত নয়') ?></span></td>
           <td><?= e($p['display_scope'] === 'home' ? 'শুধু মূল পাতা' : 'সব পাবলিক পেজ') ?> / <?= e($p['device_target'] === 'desktop' ? 'শুধু কম্পিউটার' : ($p['device_target'] === 'mobile' ? 'শুধু মোবাইল' : 'সব ডিভাইস')) ?></td>
           <td><?= e($p['frequency'] === 'once_day' ? 'প্রতিদিন একবার' : ($p['frequency'] === 'every_page' ? 'প্রতিটি পেজে' : 'প্রতি সেশনে একবার')) ?></td>
-          <td><span class="popup-status <?= !empty($p['is_সক্রিয়']) ? 'is-সক্রিয়' : 'is-off' ?>"><?= !empty($p['is_সক্রিয়']) ? 'চালু' : 'বন্ধ' ?></span></td>
+          <td><span class="popup-status <?= !empty($p['is_active']) ? 'is-active' : 'is-off' ?>"><?= !empty($p['is_active']) ? 'Active' : 'বন্ধ করুনd' ?></span></td>
           <td><div style="display:flex;gap:6px;flex-wrap:wrap">
             <a class="btn btn-outline btn-sm" href="<?= e(admin_url('popups.php')) ?>?edit=<?= (int) $p['id'] ?>">সম্পাদনা</a>
             <form method="post" action="<?= e(admin_url('popups.php')) ?>">
               <?= csrf_field() ?><input type="hidden" name="action" value="toggle"><input type="hidden" name="popup_id" value="<?= (int) $p['id'] ?>">
-              <button class="btn btn-outline btn-sm" type="submit"><?= !empty($p['is_সক্রিয়']) ? 'বন্ধ করুন' : 'চালু করুন' ?></button>
+              <button class="btn btn-outline btn-sm" type="submit"><?= !empty($p['is_active']) ? 'বন্ধ করুন' : 'চালু করুন' ?></button>
             </form>
             <form method="post" action="<?= e(admin_url('popups.php')) ?>" data-confirm="এই পপআপটি স্থায়ীভাবে মুছে ফেলবেন?">
               <?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="popup_id" value="<?= (int) $p['id'] ?>">

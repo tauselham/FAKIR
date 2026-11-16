@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$সক্রিয়Page = 'header';
+$activePage = 'header';
 $adminPageTitle = 'হেডার ও নেভিগেশন';
 $requiredPermission = 'manage_navigation';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -174,7 +174,7 @@ if (!empty($_GET['edit'])) {
         <div class="adm-media-preview" id="header_logo_preview">
           <?php if (!empty($settings['logo_url'])): ?>
             <img src="<?= e(safe_url($settings['logo_url'])) ?>" alt="Current header logo" class="adm-preview-media adm-preview-logo">
-            <span class="form-hint">Current logo সক্রিয়. Upload a new file to replace it.</span>
+            <span class="form-hint">Current logo active. Upload a new file to replace it.</span>
           <?php endif; ?>
         </div>
       </div>

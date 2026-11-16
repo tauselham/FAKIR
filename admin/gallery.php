@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$সক্রিয়Page = 'gallery';
+$activePage = 'gallery';
 $adminPageTitle = 'ছবির গ্যালারি';
 $requiredPermission = 'manage_gallery';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$সক্রিয়Page = 'pages';
+$activePage = 'pages';
 $adminPageTitle = 'পেজ ব্যবস্থাপনা & আমাদের পরিচিতি';
 $requiredPermission = 'manage_pages';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Throwable $e) {
         if ($e instanceof PDOException) {
             $message = str_contains(strtolower($e->getMessage()), 'unique')
-                ? 'That লিংক Slug is already in use, or an আমাদের পরিচিতি page আগেই তৈরি আছে.'
+                ? 'That লিংক Slug is already in use, or an আমাদের পরিচিতি page already exists.'
                 : 'The page could not be saved because of a database error. Check the server log for details.';
             error_log('Content page save failed: ' . $e->getMessage());
         } else {
@@ -210,7 +210,7 @@ foreach ($pages as $pageRow) {
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button type="submit" class="btn btn-green"><?= $editPage ? 'সংরক্ষণ Changes' : 'Create Page' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editPage ? 'Save Changes' : 'Create Page' ?></button>
       <?php if ($editPage): ?><a href="<?= e(admin_url('pages.php')) ?>" class="btn btn-outline">Cancel</a><?php endif; ?>
     </div>
   </form>

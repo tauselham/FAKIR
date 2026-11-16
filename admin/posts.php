@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$সক্রিয়Page = 'posts';
+$activePage = 'posts';
 $adminPageTitle = 'গ্রামের খবর ও পোস্ট';
 $requiredPermission = 'manage_posts';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -232,7 +232,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
         <label class="form-label" for="post_type_select">পোস্টের ধরন</label>
         <select class="form-control" name="post_type" id="post_type_select">
           <?php $curType = $editPost['post_type'] ?? 'text'; ?>
-          <option value="text" <?= $curType === 'text' ? 'selected' : '' ?>>Rich লেখা Post (WordPress-style)</option>
+          <option value="text" <?= $curType === 'text' ? 'selected' : '' ?>>Rich Text Post (WordPress-style)</option>
           <option value="image" <?= $curType === 'image' ? 'selected' : '' ?>>ছবিসহ লেখা পোস্ট</option>
           <option value="video" <?= $curType === 'video' ? 'selected' : '' ?>>ভিডিওসহ লেখা পোস্ট</option>
           <option value="custom" <?= $curType === 'custom' ? 'selected' : '' ?>>সম্পূর্ণ HTML + CSS + JavaScript ডকুমেন্ট</option>
@@ -264,7 +264,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
     </div>
 
     <div class="form-row" id="post_media_group">
-      <label class="form-label" for="media_file">Featured Image or ভিডিও (Required for Image/ভিডিও format)</label>
+      <label class="form-label" for="media_file">Featured Image or Video (Required for Image/Video format)</label>
       <input class="form-control" type="file" id="media_file" name="media_file" data-preview-target="post_media_preview" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">
       <span class="form-hint">Image up to 10 MB; video up to 50 MB. The rich editor below can also contain multiple inline images.</span>
       <div class="adm-media-preview" id="post_media_preview">
@@ -313,7 +313,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button type="submit" class="btn btn-green"><?= $editPost ? 'সংরক্ষণ Changes' : 'Publish Post' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editPost ? 'Save Changes' : 'Publish Post' ?></button>
       <a href="<?= e(admin_url('posts.php')) ?>" class="btn btn-outline">Cancel</a>
     </div>
   </form>
@@ -332,7 +332,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
           <td><?php if ($p['post_type'] === 'image' && !empty($p['media_url'])): ?><img src="<?= e(safe_url($p['media_url'])) ?>" alt="" class="adm-thumb">
               <?php elseif ($p['post_type'] === 'video'): ?><span>ভিডিও</span><?php elseif ($p['post_type'] === 'custom'): ?><span>কাস্টম কোড</span><?php else: ?><span>লেখা</span><?php endif; ?></td>
           <td><strong><?= e($p['title'] ?: '(শিরোনামহীন)') ?></strong><div class="post-admin-excerpt"><?= e($p['description']) ?></div></td>
-          <td><?= e(ucfirst($p['post_type'])) ?></td><td><?= e($p['category_name'] ?? '—') ?></td><td><?= e($p['status'] === 'published' ? 'প্রকাশিত' : 'খসড়া') ?></td>
+          <td><?= e($p['post_type'] === 'video' ? 'ভিডিও' : ($p['post_type'] === 'custom' ? 'কাস্টম কোড' : ($p['post_type'] === 'image' ? 'ছবি' : 'লেখা'))) ?></td><td><?= e($p['category_name'] ?? '—') ?></td><td><?= e($p['status'] === 'published' ? 'প্রকাশিত' : 'খসড়া') ?></td>
           <td class="num-tab"><?= e(format_date($p['published_at'] ?? $p['created_at'])) ?></td>
           <td><div style="display:flex;gap:6px;flex-wrap:wrap;">
             <a href="<?= e(admin_url('posts.php')) ?>?edit=<?= (int) $p['id'] ?>" class="btn btn-outline btn-sm">Edit</a>

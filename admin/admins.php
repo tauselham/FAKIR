@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$সক্রিয়Page = 'admins';
+$activePage = 'admins';
 $adminPageTitle = 'অ্যাডমিন ব্যবহারকারী ও অনুমতি';
 $requiredSuperAdmin = true;
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username   = trim((string) ($_POST['username'] ?? ''));
             $email      = trim((string) ($_POST['email'] ?? ''));
             $role       = in_array($_POST['role'] ?? '', $validRoles, true) ? (string) $_POST['role'] : 'admin';
-            $isচালু   = !empty($_POST['is_সক্রিয়']);
+            $isActive   = !empty($_POST['is_active']);
             $mustChange = !empty($_POST['must_change_password']);
             $password   = (string) ($_POST['password'] ?? '');
 
@@ -58,10 +58,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $hash = hash_admin_password($password);
                 $permJson = json_encode($permissions, JSON_THROW_ON_ERROR);
 
-                $newId = db_transaction(function (PDO $pdo) use ($username, $email, $hash, $fullName, $role, $permJson, $mustChange, $isচালু, $currentAdmin, $permissions): int {
+                $newId = db_transaction(function (PDO $pdo) use ($username, $email, $hash, $fullName, $role, $permJson, $mustChange, $isActive, $currentAdmin, $permissions): int {
                     $ins = $pdo->prepare(
                         'INSERT INTO public.admins
-                         (username, email, password_hash, full_name, role, permissions, must_change_password, is_সক্রিয়, created_by)
+                         (username, email, password_hash, full_name, role, permissions, must_change_password, is_active, created_by)
                          VALUES (:u, :e, :h, :fn, :r, CAST(:p AS jsonb), :mc, :act, :cb)
                          RETURNING id'
                     );
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':r'   => $role,
                         ':p'   => $permJson,
                         ':mc'  => $mustChange ? 'true' : 'false',
-                        ':act' => $isচালু ? 'true' : 'false',
+                        ':act' => $isActive ? 'true' : 'false',
                         ':cb'  => (int) $currentAdmin['id'],
                     ]);
                     $id = (int) $ins->fetchColumn();
@@ -100,15 +100,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($role !== 'super_admin') {
                         throw new RuntimeException('নিজের সুপার অ্যাডমিন ভূমিকা কমাতে পারবেন না।');
                     }
-                    if (!$isচালু) {
+                    if (!$isActive) {
                         throw new RuntimeException('নিজের সক্রিয় অ্যাকাউন্ট বন্ধ করতে পারবেন না।');
                     }
                 }
 
-                // Ensure at least one সক্রিয় super_admin always exists
-                if ($existing['role'] === 'super_admin' && ($role !== 'super_admin' || !$isচালু)) {
+                // Ensure at least one active super_admin always exists
+                if ($existing['role'] === 'super_admin' && ($role !== 'super_admin' || !$isActive)) {
                     $otherSuperCount = (int) $pdo->query(
-                        "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_সক্রিয় = TRUE AND id <> " . (int) $adminId
+                        "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_active = TRUE AND id <> " . (int) $adminId
                     )->fetchColumn();
                     if ($otherSuperCount < 1) {
                         throw new RuntimeException('অন্তত একজন সক্রিয় সুপার অ্যাডমিন থাকতে হবে।');
@@ -136,12 +136,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $permJson = json_encode($permissions, JSON_THROW_ON_ERROR);
 
-                db_transaction(function (PDO $pdo) use ($adminId, $fullName, $email, $role, $permJson, $isচালু, $newHash, $mustChange, $currentAdmin, $permissions): void {
+                db_transaction(function (PDO $pdo) use ($adminId, $fullName, $email, $role, $permJson, $isActive, $newHash, $mustChange, $currentAdmin, $permissions): void {
                     if ($newHash !== null) {
                         $upd = $pdo->prepare(
                             'UPDATE public.admins
                              SET full_name = :fn, email = :e, role = :r, permissions = CAST(:p AS jsonb),
-                                 is_সক্রিয় = :act, password_hash = :h, must_change_password = :mc
+                                 is_active = :act, password_hash = :h, must_change_password = :mc
                              WHERE id = :id'
                         );
                         $upd->execute([
@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ':e'   => $email,
                             ':r'   => $role,
                             ':p'   => $permJson,
-                            ':act' => $isচালু ? 'true' : 'false',
+                            ':act' => $isActive ? 'true' : 'false',
                             ':h'   => $newHash,
                             ':mc'  => $mustChange ? 'true' : 'false',
                             ':id'  => $adminId,
@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         $upd = $pdo->prepare(
                             'UPDATE public.admins
-                             SET full_name = :fn, email = :e, role = :r, permissions = CAST(:p AS jsonb), is_সক্রিয় = :act
+                             SET full_name = :fn, email = :e, role = :r, permissions = CAST(:p AS jsonb), is_active = :act
                              WHERE id = :id'
                         );
                         $upd->execute([
@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ':e'   => $email,
                             ':r'   => $role,
                             ':p'   => $permJson,
-                            ':act' => $isচালু ? 'true' : 'false',
+                            ':act' => $isActive ? 'true' : 'false',
                             ':id'  => $adminId,
                         ]);
                     }
@@ -180,30 +180,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 set_flash('success', "অ্যাডমিন অ্যাকাউন্ট '@{$existing['username']}' হালনাগাদ হয়েছে।");
                 redirect_to(admin_url('admins.php'));
             }
-        } elseif ($action === 'toggle_সক্রিয়') {
+        } elseif ($action === 'toggle_active') {
             $adminId = (int) ($_POST['admin_id'] ?? 0);
             if ($adminId === (int) $currentAdmin['id']) {
                 throw new RuntimeException('নিজের অ্যাকাউন্ট বন্ধ করতে পারবেন না।');
             }
-            $st = $pdo->prepare('SELECT id, username, role, is_সক্রিয় FROM public.admins WHERE id = :id LIMIT 1');
+            $st = $pdo->prepare('SELECT id, username, role, is_active FROM public.admins WHERE id = :id LIMIT 1');
             $st->execute([':id' => $adminId]);
             $target = $st->fetch();
             if (!$target) {
                 throw new RuntimeException('অ্যাডমিন অ্যাকাউন্ট পাওয়া যায়নি।');
             }
-            $newচালু = empty($target['is_সক্রিয়']);
-            if (!$newচালু && $target['role'] === 'super_admin') {
+            $newActive = empty($target['is_active']);
+            if (!$newActive && $target['role'] === 'super_admin') {
                 $otherSuperCount = (int) $pdo->query(
-                    "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_সক্রিয় = TRUE AND id <> " . (int) $adminId
+                    "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_active = TRUE AND id <> " . (int) $adminId
                 )->fetchColumn();
                 if ($otherSuperCount < 1) {
                     throw new RuntimeException('শেষ সক্রিয় সুপার অ্যাডমিনকে বন্ধ করা যাবে না।');
                 }
             }
-            $pdo->prepare('UPDATE public.admins SET is_সক্রিয় = :act WHERE id = :id')
-                ->execute([':act' => $newচালু ? 'true' : 'false', ':id' => $adminId]);
-            log_admin_activity((int) $currentAdmin['id'], $newচালু ? 'admin_enabled' : 'admin_disabled', 'admin', $adminId);
-            set_flash('success', "অ্যাডমিন '@{$target['username']}' " . ($newচালু ? 'চালু করা হয়েছে।' : 'বন্ধ করা হয়েছে।'));
+            $pdo->prepare('UPDATE public.admins SET is_active = :act WHERE id = :id')
+                ->execute([':act' => $newActive ? 'true' : 'false', ':id' => $adminId]);
+            log_admin_activity((int) $currentAdmin['id'], $newActive ? 'admin_enabled' : 'admin_disabled', 'admin', $adminId);
+            set_flash('success', "অ্যাডমিন '@{$target['username']}' " . ($newActive ? 'চালু করা হয়েছে।' : 'বন্ধ করা হয়েছে।'));
             redirect_to(admin_url('admins.php'));
         } elseif ($action === 'delete') {
             $adminId = (int) ($_POST['admin_id'] ?? 0);
@@ -216,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($target) {
                 if ($target['role'] === 'super_admin') {
                     $otherSuperCount = (int) $pdo->query(
-                        "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_সক্রিয় = TRUE AND id <> " . (int) $adminId
+                        "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_active = TRUE AND id <> " . (int) $adminId
                     )->fetchColumn();
                     if ($otherSuperCount < 1) {
                         throw new RuntimeException('শেষ সক্রিয় সুপার অ্যাডমিনকে মুছে ফেলা যাবে না।');
@@ -238,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $admins = $pdo->query(
-    'SELECT id, username, email, full_name, role, permissions, must_change_password, is_সক্রিয়, last_login_at, created_at
+    'SELECT id, username, email, full_name, role, permissions, must_change_password, is_active, last_login_at, created_at
      FROM public.admins
      ORDER BY CASE role WHEN \'super_admin\' THEN 0 WHEN \'admin\' THEN 1 ELSE 2 END, id ASC'
 )->fetchAll();
@@ -275,7 +275,7 @@ if (!empty($_GET['edit'])) {
     <div class="adm-grid-2">
       <div class="form-row">
         <label class="form-label" for="admin_full_name">পুরো নাম</label>
-        <input class="form-control" type="text" id="admin_full_name" name="full_name" value="<?= e($editAdmin['full_name'] ?? '') ?>" required placeholder="যেমন: রহিম উদ্দিন">
+        <input class="form-control" type="text" id="admin_full_name" name="full_name" value="<?= e($editAdmin['full_name'] ?? '') ?>" required placeholder="e.g., Rahim Uddin">
       </div>
 
       <div class="form-row">
@@ -288,10 +288,10 @@ if (!empty($_GET['edit'])) {
           value="<?= e($editAdmin['username'] ?? '') ?>"
           <?= $editAdmin ? 'readonly' : 'required' ?>
           pattern="[a-zA-Z0-9_.-]{3,}"
-          placeholder="যেমন: rahim_editor"
+          placeholder="e.g., rahim_editor"
         >
         <?php if ($editAdmin): ?>
-          <span class="form-hint">তৈরি করার পর ব্যবহারকারীর নাম পরিবর্তন করা যাবে না।</span>
+          <span class="form-hint">ব্যবহারকারীর নাম cannot be changed after creation.</span>
         <?php endif; ?>
       </div>
     </div>
@@ -326,16 +326,16 @@ if (!empty($_GET['edit'])) {
           <?= $editAdmin ? '' : 'required' ?>
           minlength="10"
           style="flex: 1; min-width: 240px;"
-          placeholder="<?= $editAdmin ? 'পাসওয়ার্ড পরিবর্তন না করতে চাইলে ফাঁকা রাখুন' : 'কমপক্ষে ১০ অক্ষর; বড় হাতের, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ চিহ্ন দিন' ?>"
+          placeholder="<?= $editAdmin ? 'Leave blank unless resetting password' : 'Minimum 10 characters with upper, lower, number, symbol' ?>"
         >
-        <button type="button" class="btn btn-outline" data-generate-password="admin_password_input">এলোমেলো পাসওয়ার্ড তৈরি করুন</button>
+        <button type="button" class="btn btn-outline" data-generate-password="admin_password_input">Generate Random পাসওয়ার্ড</button>
       </div>
-      <span class="form-hint">প্রত্যেক অ্যাডমিন নিরাপত্তা ও পাসওয়ার্ড বিভাগ থেকে যেকোনো সময় নিজের পাসওয়ার্ড পরিবর্তন করতে পারবেন।</span>
+      <span class="form-hint">Each admin can update their own password anytime inside Security &amp; পাসওয়ার্ড.</span>
     </div>
 
     <div class="form-row" id="admin_permissions_box">
       <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-        <label class="form-label" style="margin: 0;">অ্যাডমিন প্যানেলে অনুমোদিত কাজ</label>
+        <label class="form-label" style="margin: 0;">Allowed অ্যাডমিন প্যানেল Permissions</label>
         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
           <button type="button" class="btn btn-outline btn-sm" data-perm-preset="posts">শুধু পোস্ট</button>
           <button type="button" class="btn btn-outline btn-sm" data-perm-preset="gallery">শুধু ছবি</button>
@@ -367,7 +367,7 @@ if (!empty($_GET['edit'])) {
 
     <div class="form-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
       <label class="form-check">
-        <input type="checkbox" name="is_সক্রিয়" value="1" <?= (!$editAdmin || !empty($editAdmin['is_সক্রিয়'])) ? 'checked' : '' ?>>
+        <input type="checkbox" name="is_active" value="1" <?= (!$editAdmin || !empty($editAdmin['is_active'])) ? 'checked' : '' ?>>
         <span>অ্যাকাউন্ট চালু (লগইন করতে পারবে)</span>
       </label>
       <label class="form-check">
@@ -416,9 +416,9 @@ if (!empty($_GET['edit'])) {
               <?= $isSuper ? 'সম্পূর্ণ প্রবেশাধিকার (সব বিভাগ ও ব্যবহারকারী)' : e($permLabels ? implode(', ', $permLabels) : 'শুধু ড্যাশবোর্ড ও পাসওয়ার্ড') ?>
             </td>
             <td>
-              <?= !empty($adm['is_সক্রিয়']) ? 'চালু' : 'বন্ধ' ?>
+              <?= !empty($adm['is_active']) ? 'চালু' : 'বন্ধ' ?>
               <?php if (!empty($adm['must_change_password'])): ?>
-                <div style="font-size: 0.76rem; color: var(--adm-muted);">অস্থায়ী পাসওয়ার্ড</div>
+                <div style="font-size: 0.76rem; color: var(--adm-muted);">Temp password</div>
               <?php endif; ?>
             </td>
             <td class="num-tab"><?= e($adm['last_login_at'] ? format_date($adm['last_login_at'], 'M j, Y H:i') : 'কখনো লগইন করেননি') ?></td>
@@ -428,10 +428,10 @@ if (!empty($_GET['edit'])) {
                 <?php if ((int) $adm['id'] !== (int) $currentAdmin['id']): ?>
                   <form method="post" action="<?= e(admin_url('admins.php')) ?>">
                     <?= csrf_field() ?>
-                    <input type="hidden" name="action" value="toggle_সক্রিয়">
+                    <input type="hidden" name="action" value="toggle_active">
                     <input type="hidden" name="admin_id" value="<?= (int) $adm['id'] ?>">
                     <button type="submit" class="btn btn-outline btn-sm">
-                      <?= !empty($adm['is_সক্রিয়']) ? 'বন্ধ করুন' : 'চালু করুন' ?>
+                      <?= !empty($adm['is_active']) ? 'বন্ধ করুন' : 'চালু করুন' ?>
                     </button>
                   </form>
                   <form method="post" action="<?= e(admin_url('admins.php')) ?>" data-confirm="অ্যাডমিন অ্যাকাউন্ট '@<?= e($adm['username']) ?>' স্থায়ীভাবে মুছে ফেলবেন?">
