@@ -182,19 +182,34 @@ final class SupabaseStorage
         $endpoint = sprintf('%s/storage/v1/object/%s', $this->baseUrl, rawurlencode($bucket));
         $payload = json_encode(['prefixes' => [$objectPath]], JSON_THROW_ON_ERROR);
 
+        // Supabase secret API keys are not JWTs: send them as apikey only.
+        // Legacy service_role JWTs require both apikey and Bearer authorization.
+        if (str_starts_with($this->apiKey, 'sb_publishable_')) {
+            error_log('Supabase Storage delete blocked: a publishable key cannot be used for server-side deletion.');
+            return false;
+        }
+
+        $headers = [
+            'apikey: ' . $this->apiKey,
+            'Content-Type: application/json',
+        ];
+        if (!str_starts_with($this->apiKey, 'sb_secret_')) {
+            $headers[] = 'Authorization: Bearer ' . $this->apiKey;
+        }
+
         $ch = curl_init($endpoint);
+        if ($ch === false) {
+            return false;
+        }
         curl_setopt_array($ch, [
             CURLOPT_CUSTOMREQUEST  => 'DELETE',
             CURLOPT_POSTFIELDS     => $payload,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_TIMEOUT        => 20,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_HTTPHEADER     => [
-                'Authorization: Bearer ' . $this->apiKey,
-                'apikey: ' . $this->apiKey,
-                'Content-Type: application/json',
-            ],
+            CURLOPT_HTTPHEADER     => $headers,
         ]);
 
         $response = curl_exec($ch);
