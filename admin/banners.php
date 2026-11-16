@@ -1,0 +1,265 @@
+<?php
+declare(strict_types=1);
+
+$activePage = 'banners';
+$adminPageTitle = 'Hero Banners';
+$requiredPermission = 'manage_banners';
+require_once dirname(__DIR__) . '/includes/admin-layout.php';
+require_once dirname(__DIR__) . '/includes/storage.php';
+
+$pdo = db();
+$storage = new SupabaseStorage();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_valid_csrf();
+    $action = (string) ($_POST['action'] ?? '');
+
+    try {
+        if ($action === 'save_interval') {
+            $interval = max(2000, min(20000, (int) ($_POST['hero_interval_ms'] ?? 5500)));
+            $upd = $pdo->prepare('UPDATE public.website_settings SET hero_interval_ms = :ms WHERE id = 1');
+            $upd->execute([':ms' => $interval]);
+            log_admin_activity((int) $currentAdmin['id'], 'hero_interval_updated', 'website_settings', 1);
+            set_flash('success', 'Slideshow interval updated.');
+            redirect_to(admin_url('banners.php'));
+        } elseif ($action === 'create' || $action === 'update') {
+            $bannerId   = (int) ($_POST['banner_id'] ?? 0);
+            $title      = trim((string) ($_POST['title'] ?? ''));
+            $subtitle   = trim((string) ($_POST['subtitle'] ?? ''));
+            $buttonText = trim((string) ($_POST['button_text'] ?? ''));
+            $buttonUrl  = trim((string) ($_POST['button_url'] ?? ''));
+            $sortOrder  = (int) ($_POST['sort_order'] ?? 0);
+            $isActive   = !empty($_POST['is_active']);
+
+            if ($action === 'create') {
+                if (empty($_FILES['banner_image']['name'])) {
+                    throw new RuntimeException('Banner image file is required.');
+                }
+                $res = $storage->upload($_FILES['banner_image'], BUCKET_HERO_BANNERS, ALLOWED_BANNER_MIMES, MAX_IMAGE_UPLOAD_BYTES, 'banners');
+                try {
+                    $ins = $pdo->prepare(
+                        'INSERT INTO public.hero_banners (title, subtitle, button_text, button_url, storage_bucket, storage_path, image_url, sort_order, is_active)
+                         VALUES (:title, :sub, :bt, :bu, :bucket, :path, :url, :ord, :act)
+                         RETURNING id'
+                    );
+                    $ins->execute([
+                        ':title'  => $title !== '' ? $title : null,
+                        ':sub'    => $subtitle !== '' ? $subtitle : null,
+                        ':bt'     => $buttonText !== '' ? $buttonText : null,
+                        ':bu'     => $buttonUrl !== '' ? $buttonUrl : null,
+                        ':bucket' => $res['bucket'],
+                        ':path'   => $res['path'],
+                        ':url'    => $res['url'],
+                        ':ord'    => $sortOrder,
+                        ':act'    => $isActive ? 'true' : 'false',
+                    ]);
+                    log_admin_activity((int) $currentAdmin['id'], 'banner_created', 'hero_banner', (int) $ins->fetchColumn());
+                } catch (Throwable $dbErr) {
+                    $storage->delete($res['bucket'], $res['path']);
+                    throw $dbErr;
+                }
+                set_flash('success', 'Hero banner added.');
+            } else {
+                $st = $pdo->prepare('SELECT * FROM public.hero_banners WHERE id = :id LIMIT 1');
+                $st->execute([':id' => $bannerId]);
+                $existing = $st->fetch();
+                if (!$existing) {
+                    throw new RuntimeException('Hero banner not found.');
+                }
+
+                $bucket = $existing['storage_bucket'];
+                $path   = $existing['storage_path'];
+                $url    = $existing['image_url'];
+                $oldBucket = null;
+                $oldPath   = null;
+                $newUpload = null;
+
+                if (!empty($_FILES['banner_image']['name'])) {
+                    $newUpload = $storage->upload($_FILES['banner_image'], BUCKET_HERO_BANNERS, ALLOWED_BANNER_MIMES, MAX_IMAGE_UPLOAD_BYTES, 'banners');
+                    $oldBucket = (string) $bucket;
+                    $oldPath   = (string) $path;
+                    $bucket = $newUpload['bucket'];
+                    $path   = $newUpload['path'];
+                    $url    = $newUpload['url'];
+                }
+
+                try {
+                    $upd = $pdo->prepare(
+                        'UPDATE public.hero_banners
+                         SET title = :title, subtitle = :sub, button_text = :bt, button_url = :bu,
+                             sort_order = :ord, is_active = :act,
+                             storage_bucket = :bucket, storage_path = :path, image_url = :url
+                         WHERE id = :id'
+                    );
+                    $upd->execute([
+                        ':title'  => $title !== '' ? $title : null,
+                        ':sub'    => $subtitle !== '' ? $subtitle : null,
+                        ':bt'     => $buttonText !== '' ? $buttonText : null,
+                        ':bu'     => $buttonUrl !== '' ? $buttonUrl : null,
+                        ':ord'    => $sortOrder,
+                        ':act'    => $isActive ? 'true' : 'false',
+                        ':bucket' => $bucket,
+                        ':path'   => $path,
+                        ':url'    => $url,
+                        ':id'     => $bannerId,
+                    ]);
+                    log_admin_activity((int) $currentAdmin['id'], 'banner_updated', 'hero_banner', $bannerId);
+                } catch (Throwable $dbErr) {
+                    if ($newUpload !== null) {
+                        $storage->delete($newUpload['bucket'], $newUpload['path']);
+                    }
+                    throw $dbErr;
+                }
+
+                if ($oldBucket !== null && $oldPath !== null) {
+                    $storage->delete($oldBucket, $oldPath);
+                }
+                set_flash('success', 'Hero banner updated.');
+            }
+            redirect_to(admin_url('banners.php'));
+        } elseif ($action === 'delete') {
+            $bannerId = (int) ($_POST['banner_id'] ?? 0);
+            $st = $pdo->prepare('SELECT storage_bucket, storage_path FROM public.hero_banners WHERE id = :id LIMIT 1');
+            $st->execute([':id' => $bannerId]);
+            $row = $st->fetch();
+            if ($row) {
+                $storage->delete((string) $row['storage_bucket'], (string) $row['storage_path']);
+                $pdo->prepare('DELETE FROM public.hero_banners WHERE id = :id')->execute([':id' => $bannerId]);
+                log_admin_activity((int) $currentAdmin['id'], 'banner_deleted', 'hero_banner', $bannerId);
+            }
+            set_flash('success', 'Hero banner deleted.');
+            redirect_to(admin_url('banners.php'));
+        }
+    } catch (Throwable $e) {
+        set_flash('error', $e->getMessage());
+        redirect_to(admin_url('banners.php'));
+    }
+}
+
+$banners = $pdo->query('SELECT * FROM public.hero_banners ORDER BY sort_order ASC, id ASC')->fetchAll();
+$editBanner = null;
+if (!empty($_GET['edit'])) {
+    $st = $pdo->prepare('SELECT * FROM public.hero_banners WHERE id = :id LIMIT 1');
+    $st->execute([':id' => (int) $_GET['edit']]);
+    $editBanner = $st->fetch() ?: null;
+}
+?>
+
+<section class="adm-panel">
+  <h2 class="adm-panel-title">Slideshow Timing</h2>
+  <form method="post" action="<?= e(admin_url('banners.php')) ?>" style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+    <?= csrf_field() ?>
+    <input type="hidden" name="action" value="save_interval">
+    <div>
+      <label class="form-label" for="hero_interval_ms">Auto-Slide Interval (milliseconds)</label>
+      <input class="form-control" type="number" id="hero_interval_ms" name="hero_interval_ms" min="2000" max="20000" step="500" value="<?= (int) ($siteSettings['hero_interval_ms'] ?? 5500) ?>">
+    </div>
+    <button type="submit" class="btn btn-green">Save Interval</button>
+  </form>
+</section>
+
+<section class="adm-panel">
+  <h2 class="adm-panel-title"><?= $editBanner ? 'Edit Hero Banner #' . (int) $editBanner['id'] : 'Add Hero Banner' ?></h2>
+  <form method="post" action="<?= e(admin_url('banners.php')) ?>" enctype="multipart/form-data">
+    <?= csrf_field() ?>
+    <input type="hidden" name="action" value="<?= $editBanner ? 'update' : 'create' ?>">
+    <?php if ($editBanner): ?>
+      <input type="hidden" name="banner_id" value="<?= (int) $editBanner['id'] ?>">
+    <?php endif; ?>
+
+    <div class="adm-grid-2">
+      <div class="form-row">
+        <label class="form-label" for="banner_image"><?= $editBanner ? 'Replace Image (Optional)' : 'Banner Image (Required)' ?></label>
+        <input class="form-control" type="file" id="banner_image" name="banner_image" data-preview-target="banner_image_preview" <?= $editBanner ? '' : 'required' ?> accept="image/jpeg,image/png,image/webp">
+        <span class="form-hint">Recommended landscape 16:9 image (JPG/PNG/WebP). Stored in Supabase Storage (hero-banners).</span>
+        <div class="adm-media-preview" id="banner_image_preview">
+          <?php if ($editBanner && !empty($editBanner['image_url'])): ?>
+            <img src="<?= e(safe_url($editBanner['image_url'])) ?>" alt="Current banner" class="adm-preview-media">
+          <?php endif; ?>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="sort_order">Display Order</label>
+        <input class="form-control" type="number" id="sort_order" name="sort_order" value="<?= (int) ($editBanner['sort_order'] ?? 0) ?>">
+      </div>
+    </div>
+
+    <div class="adm-grid-2">
+      <div class="form-row">
+        <label class="form-label" for="title">Banner Title (Optional)</label>
+        <input class="form-control" type="text" id="title" name="title" value="<?= e($editBanner['title'] ?? '') ?>">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="subtitle">Banner Subtitle (Optional)</label>
+        <input class="form-control" type="text" id="subtitle" name="subtitle" value="<?= e($editBanner['subtitle'] ?? '') ?>">
+      </div>
+    </div>
+
+    <div class="adm-grid-2">
+      <div class="form-row">
+        <label class="form-label" for="button_text">Button Text (Optional)</label>
+        <input class="form-control" type="text" id="button_text" name="button_text" value="<?= e($editBanner['button_text'] ?? '') ?>">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="button_url">Button URL (Optional)</label>
+        <input class="form-control" type="text" id="button_url" name="button_url" value="<?= e($editBanner['button_url'] ?? '') ?>" placeholder="/gallery.php or #posts-section">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-check">
+        <input type="checkbox" name="is_active" value="1" <?= (!$editBanner || !empty($editBanner['is_active'])) ? 'checked' : '' ?>>
+        <span>Enable banner on public homepage</span>
+      </label>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+      <button type="submit" class="btn btn-green"><?= $editBanner ? 'Save Banner' : 'Add Banner' ?></button>
+      <?php if ($editBanner): ?>
+        <a href="<?= e(admin_url('banners.php')) ?>" class="btn btn-outline">Cancel</a>
+      <?php endif; ?>
+    </div>
+  </form>
+</section>
+
+<section class="adm-panel">
+  <h2 class="adm-panel-title">Configured Banners</h2>
+  <div class="table-wrap">
+    <table class="adm-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Title</th>
+          <th>Button</th>
+          <th>Order</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($banners as $b): ?>
+          <tr>
+            <td><img src="<?= e(safe_url($b['image_url'])) ?>" alt="" class="adm-thumb"></td>
+            <td><?= e($b['title'] ?: '(Image-only banner)') ?></td>
+            <td><?= e($b['button_text'] ?: '—') ?></td>
+            <td class="num-tab"><?= (int) $b['sort_order'] ?></td>
+            <td><?= !empty($b['is_active']) ? 'Active' : 'Disabled' ?></td>
+            <td>
+              <div style="display: flex; gap: 6px;">
+                <a href="<?= e(admin_url('banners.php')) ?>?edit=<?= (int) $b['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
+                <form method="post" action="<?= e(admin_url('banners.php')) ?>" data-confirm="Delete this banner?">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="action" value="delete">
+                  <input type="hidden" name="banner_id" value="<?= (int) $b['id'] ?>">
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<?php require_once dirname(__DIR__) . '/includes/admin-footer.php'; ?>

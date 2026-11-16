@@ -1,0 +1,20 @@
+# Security headers & sensitive file/directory protection
+Options -Indexes
+
+<FilesMatch "^(\.env.*|\.gitignore|composer\.(json|lock)|package(-lock)?\.json|router\.php|.*\.sql|.*\.md)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Block direct access to internal backend, Admin source files, and sensitive directories
+  RewriteRule ^(admin|includes|database|scripts|tests|storage)(/|$) - [R=404,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

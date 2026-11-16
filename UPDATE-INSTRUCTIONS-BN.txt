@@ -1,0 +1,24 @@
+GREENFIELD VILLAGE COMMUNITY — UPDATE INSTRUCTIONS (BANGLA)
+
+এই ZIP-এ Community Posts-এর নতুন Add Post workflow, WordPress-style Rich Text Editor,
+ইনলাইন ছবি আপলোড, Edit/Delete/Publish controls এবং Landing Pages ও Posts-এর জন্য
+একটি সম্পূর্ণ HTML ফাইলে HTML + CSS + JavaScript লেখার সুবিধা যোগ করা হয়েছে।
+
+১) আগে বর্তমান প্রজেক্টের Backup রাখবে।
+২) চলমান PHP Server থাকলে CMD-তে Ctrl+C চাপবে।
+৩) ZIP Extract করে আগের project folder-এর ফাইলগুলো replace করবে। নিজের .env ফাইলটি
+   আলাদাভাবে রেখে দেবে; ZIP-এর .env.example দিয়ে .env overwrite করবে না।
+৪) Supabase Dashboard > SQL Editor-এ database/migrations/20261115_rich_editor_upgrade.sql
+   ফাইলের SQL একবার চালাবে। এটি IF NOT EXISTS ব্যবহার করে; আগের পোস্ট/পেজ মুছে ফেলে না।
+৫) PHP Server আবার চালু করে Admin Panel-এ লগইন করবে।
+৬) Community Posts-এ গেলে আগে পোস্টের তালিকা দেখাবে। Add Post চাপলে নতুন Post form খুলবে।
+৭) Rich Text Editor-এর Image বাটন Supabase Storage-এর post-media bucket-এ ছবি আপলোড করে।
+   তাই SUPABASE_URL এবং server-side Supabase Secret API Key (sb_secret_...) ঠিক থাকতে হবে।
+   নতুন Key SUPABASE_SECRET_KEY-তে রাখবে; পুরোনো SUPABASE_STORAGE_KEY variable-ও fallback হিসেবে সমর্থিত।
+   sb_secret_ Key শুধু apikey header-এ পাঠানো হয়; legacy service_role JWT হলে Bearer header-ও পাঠানো হয়।
+৮) Custom Code mode-এ একটি complete HTML document লিখবে; CSS <style> এবং JavaScript
+   <script> ট্যাগের মধ্যে একই document-এ থাকবে। এটি sandboxed iframe-এ চলে।
+
+নোট: Custom Code sandbox-এ inline script/style এবং HTTPS images অনুমোদিত। Fetch/XHR,
+WebSocket, forms, popups এবং parent-page DOM access বন্ধ রাখা হয়েছে।
+Live Supabase/Production-এ চালানোর আগে staging/backup-এ পরীক্ষা করবে।

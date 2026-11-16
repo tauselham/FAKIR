@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purbo Nijmaona Fakir Bari</title>
+    <meta name="description" content="Purbo Nijmaona Fakir Bari local village community platform with neighborhood posts, announcements, seasonal stories, and an Instagram-style photo gallery." />
+    <meta property="og:title" content="Purbo Nijmaona Fakir Bari" />
+    <meta property="og:description" content="Purbo Nijmaona Fakir Bari local village community platform with neighborhood posts, announcements, seasonal stories, and an Instagram-style photo gallery." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <!-- Green Header with Dropdown & Mega Menu -->
+    <header class="site-header" id="site-header">
+      <div class="container header-inner">
+        <a href="/" class="brand-link">
+          <span class="brand-monogram" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+            </svg>
+          </span>
+          <span class="brand-name">Purbo Nijmaona Fakir Bari</span>
+        </a>
+
+        <nav class="primary-nav" aria-label="Primary Navigation">
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="/" class="nav-link">Home</a>
+            </li>
+            <li class="nav-item has-mega">
+              <button type="button" class="nav-link nav-link-btn" aria-haspopup="true">
+                <span>Explore</span>
+                <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="mega-menu" role="region" aria-label="Explore menu">
+                <div class="mega-menu-grid">
+                  <div class="mega-intro">
+                    <h3 class="mega-heading">Village Archives</h3>
+                    <p class="mega-desc">Browse community photography and local stories organized by seasonal themes.</p>
+                  </div>
+                  <div class="mega-links">
+                    <a href="#gallery-section" class="mega-link-card">
+                      <span class="mega-link-title">Village Life</span>
+                      <span class="mega-link-sub">Everyday cottages &amp; lanes</span>
+                    </a>
+                    <a href="#gallery-section" class="mega-link-card">
+                      <span class="mega-link-title">Local Events</span>
+                      <span class="mega-link-sub">Farmers markets &amp; gatherings</span>
+                    </a>
+                    <a href="#gallery-section" class="mega-link-card">
+                      <span class="mega-link-title">Nature &amp; Trails</span>
+                      <span class="mega-link-sub">Willow Brook &amp; stone bridges</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="nav-item has-dropdown">
+              <button type="button" class="nav-link nav-link-btn" aria-haspopup="true">
+                <span>Community</span>
+                <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#posts-section" class="dropdown-link">Recent Posts</a></li>
+                <li><a href="#featured-section" class="dropdown-link">Featured Memories</a></li>
+                <li><a href="#gallery-section" class="dropdown-link">Photo Gallery</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="#gallery-section" class="nav-link">Gallery</a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="header-actions">
+          <a href="#gallery-section" class="header-cta">Gallery</a>
+          <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" aria-expanded="false" aria-controls="mobile-nav-drawer" aria-label="Open navigation menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="mobile-drawer" id="mobile-nav-drawer" hidden>
+        <nav aria-label="Mobile Navigation">
+          <ul class="mobile-nav-list">
+            <li class="mobile-nav-item"><div class="mobile-nav-row"><a href="/" class="mobile-nav-link">Home</a></div></li>
+            <li class="mobile-nav-item"><div class="mobile-nav-row"><a href="#posts-section" class="mobile-nav-link">Community Posts</a></div></li>
+            <li class="mobile-nav-item"><div class="mobile-nav-row"><a href="#gallery-section" class="mobile-nav-link">Photo Gallery</a></div></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+      <!-- Hero Banner Slideshow -->
+      <section class="hero-section" id="hero-slider" data-interval="5500" aria-label="Featured Community Highlights">
+        <div class="hero-track">
+          <div class="hero-slide">
+            <img src="/assets/images/hero-meadow.jpg" alt="Purbo Nijmaona Fakir Bari village landscape" class="hero-img" referrerpolicy="no-referrer">
+            <div class="hero-scrim" aria-hidden="true"></div>
+            <div class="hero-content">
+              <div class="container">
+                <div class="hero-copy">
+                  <h1 class="hero-title">Welcome to Purbo Nijmaona Fakir Bari</h1>
+                  <p class="hero-subtitle">Neighbors, shared harvests, and quiet countryside lanes captured through the seasons.</p>
+                  <a href="#gallery-section" class="hero-btn">Explore Photo Gallery</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-slide">
+            <img src="/assets/images/hero-festival.jpg" alt="Village autumn harvest festival" class="hero-img" referrerpolicy="no-referrer">
+            <div class="hero-scrim" aria-hidden="true"></div>
+            <div class="hero-content">
+              <div class="container">
+                <div class="hero-copy">
+                  <h2 class="hero-title">Autumn Harvest &amp; Market Fair</h2>
+                  <p class="hero-subtitle">Join us on the village green every Saturday morning for fresh produce and handmade crafts.</p>
+                  <a href="#posts-section" class="hero-btn">Read Community Posts</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="hero-nav-btn hero-prev" aria-label="Previous banner">‹</button>
+        <button type="button" class="hero-nav-btn hero-next" aria-label="Next banner">›</button>
+        <div class="hero-dots" aria-label="Banner slide selector">
+          <button type="button" class="hero-dot is-active" aria-label="Go to slide 1"></button>
+          <button type="button" class="hero-dot" aria-label="Go to slide 2"></button>
+        </div>
+      </section>
+
+      <!-- Horizontal Auto-Scrolling Slider -->
+      <section class="slider-section" aria-label="Village Themes and Highlights">
+        <div class="container">
+          <div class="slider-header">
+            <h2 class="slider-heading">Across the Village</h2>
+            <div class="slider-controls">
+              <button type="button" class="slider-arrow" id="hscroll-prev" aria-label="Scroll left">‹</button>
+              <button type="button" class="slider-arrow" id="hscroll-next" aria-label="Scroll right">›</button>
+            </div>
+          </div>
+
+          <div class="hscroll-viewport" id="hscroll-viewport">
+            <div class="hscroll-track">
+              <a href="#gallery-section" class="hscroll-card">
+                <div class="hscroll-thumb"><img src="/assets/images/hero-meadow.jpg" alt="Valley cottages" loading="lazy"></div>
+                <div class="hscroll-body"><p class="hscroll-title">Morning Valley Light</p><span class="hscroll-cat">Village Life</span></div>
+              </a>
+              <a href="#gallery-section" class="hscroll-card">
+                <div class="hscroll-thumb"><img src="/assets/images/market-morning.jpg" alt="Farmers market" loading="lazy"></div>
+                <div class="hscroll-body"><p class="hscroll-title">Saturday Farmers Market</p><span class="hscroll-cat">Local Events</span></div>
+              </a>
+              <a href="#gallery-section" class="hscroll-card">
+                <div class="hscroll-thumb"><img src="/assets/images/community-garden.jpg" alt="Community garden" loading="lazy"></div>
+                <div class="hscroll-body"><p class="hscroll-title">Allotment Raised Beds</p><span class="hscroll-cat">Community Activities</span></div>
+              </a>
+              <a href="#gallery-section" class="hscroll-card">
+                <div class="hscroll-thumb"><img src="/assets/images/stone-bridge.jpg" alt="Stone footbridge" loading="lazy"></div>
+                <div class="hscroll-body"><p class="hscroll-title">Willow Brook Bridge</p><span class="hscroll-cat">Nature</span></div>
+              </a>
+              <a href="#gallery-section" class="hscroll-card">
+                <div class="hscroll-thumb"><img src="/assets/images/hero-festival.jpg" alt="Harvest festival" loading="lazy"></div>
+                <div class="hscroll-body"><p class="hscroll-title">Harvest Gathering</p><span class="hscroll-cat">Festivals</span></div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent Community Posts -->
+      <section class="section" id="posts-section">
+        <div class="container">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Community Posts</h2>
+              <p class="section-subtitle">Local announcements, gatherings, stories, and neighborhood updates.</p>
+            </div>
+          </div>
+
+          <div class="posts-grid">
+            <article class="post-card">
+              <button type="button" class="post-media" data-preview-post="1">
+                <img src="/assets/images/market-morning.jpg" alt="Farmers market baskets" loading="lazy">
+              </button>
+              <div class="post-body">
+                <div class="post-meta"><span>Local Events</span><span aria-hidden="true">·</span><time>Nov 12, 2026</time></div>
+                <h3 class="post-title"><button type="button" class="post-title-btn" data-preview-post="1">Autumn Farmers Market &amp; Craft Fair Schedule</button></h3>
+                <p class="post-excerpt">Every Saturday from 8:00 AM to 1:00 PM, local growers, bakers, and weavers gather on the Village Green for fresh produce and crafts.</p>
+                <button type="button" class="post-read-link" data-preview-post="1">Read update →</button>
+              </div>
+            </article>
+
+            <article class="post-card">
+              <button type="button" class="post-media" data-preview-post="2">
+                <img src="/assets/images/community-garden.jpg" alt="Neighbors tending garden beds" loading="lazy">
+              </button>
+              <div class="post-body">
+                <div class="post-meta"><span>Community Activities</span><span aria-hidden="true">·</span><time>Nov 9, 2026</time></div>
+                <h3 class="post-title"><button type="button" class="post-title-btn" data-preview-post="2">Community Garden Winter Mulching Day</button></h3>
+                <p class="post-excerpt">Thank you to the twenty-four neighbors who joined us at the shared allotment beds this morning to prepare twelve cedar beds for winter.</p>
+                <button type="button" class="post-read-link" data-preview-post="2">Read update →</button>
+              </div>
+            </article>
+
+            <article class="post-card">
+              <div class="post-body">
+                <div class="post-meta"><span>Village Announcements</span><span aria-hidden="true">·</span><time>Nov 5, 2026</time></div>
+                <p class="post-excerpt">Footpath maintenance along the Willow Brook stone bridge has been completed ahead of schedule. The trail is now dry, clear of fallen branches, and open for morning walkers and cyclists.</p>
+                <button type="button" class="post-read-link" data-preview-post="3">Read update →</button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Instagram-Style Photo Gallery -->
+      <section class="section section-tinted" id="gallery-section">
+        <div class="container">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Village Photo Gallery</h2>
+              <p class="section-subtitle">Click any photograph to open fullscreen view with zoom, keyboard, and swipe navigation.</p>
+            </div>
+          </div>
+
+          <div class="category-bar" id="gallery-category-bar" data-active-category="all" role="tablist" aria-label="Filter gallery by category">
+            <button type="button" class="cat-tab is-active" data-category="all">All Photos</button>
+            <button type="button" class="cat-tab" data-category="village-life">Village Life</button>
+            <button type="button" class="cat-tab" data-category="nature">Nature</button>
+            <button type="button" class="cat-tab" data-category="local-events">Local Events</button>
+            <button type="button" class="cat-tab" data-category="festivals">Festivals</button>
+            <button type="button" class="cat-tab" data-category="community-activities">Community Activities</button>
+            <button type="button" class="cat-tab" data-category="memories">Memories</button>
+          </div>
+
+          <div class="ig-gallery-grid" id="ig-gallery-grid" data-static-preview="true"></div>
+        </div>
+      </section>
+
+      <!-- Featured Images with Optional Titles -->
+      <section class="section" id="featured-section">
+        <div class="container">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Featured Memories</h2>
+              <p class="section-subtitle">Selected photographs highlighting village heritage and neighborhood life.</p>
+            </div>
+          </div>
+
+          <div class="featured-grid">
+            <figure class="featured-card" style="margin: 0;">
+              <button type="button" class="featured-frame" data-lightbox-item data-src="/assets/images/hero-meadow.jpg" data-title="Morning Light Across the Valley" data-category="Village Life" data-date="Nov 12, 2026">
+                <img src="/assets/images/hero-meadow.jpg" alt="Morning Light Across the Valley" loading="lazy">
+              </button>
+              <figcaption><p class="featured-title">Morning Light Across the Valley</p><span class="featured-cat">Village Life</span></figcaption>
+            </figure>
+
+            <figure class="featured-card" style="margin: 0;">
+              <button type="button" class="featured-frame" data-lightbox-item data-src="/assets/images/market-morning.jpg" data-title="Saturday Morning Market" data-category="Local Events" data-date="Nov 10, 2026">
+                <img src="/assets/images/market-morning.jpg" alt="Saturday Morning Market" loading="lazy">
+              </button>
+              <figcaption><p class="featured-title">Saturday Morning Market</p><span class="featured-cat">Local Events</span></figcaption>
+            </figure>
+
+            <figure class="featured-card" style="margin: 0;">
+              <button type="button" class="featured-frame" data-lightbox-item data-src="/assets/images/community-garden.jpg" data-title="Raised Beds in Full Bloom" data-category="Community Activities" data-date="Nov 8, 2026">
+                <img src="/assets/images/community-garden.jpg" alt="Raised Beds in Full Bloom" loading="lazy">
+              </button>
+              <figcaption><p class="featured-title">Raised Beds in Full Bloom</p><span class="featured-cat">Community Activities</span></figcaption>
+            </figure>
+
+            <figure class="featured-card" style="margin: 0;">
+              <button type="button" class="featured-frame" data-lightbox-item data-src="/assets/images/stone-bridge.jpg" data-title="Old Mossy Footbridge" data-category="Nature" data-date="Nov 6, 2026">
+                <img src="/assets/images/stone-bridge.jpg" alt="Old Mossy Footbridge" loading="lazy">
+              </button>
+              <figcaption><p class="featured-title">Old Mossy Footbridge</p><span class="featured-cat">Nature</span></figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Green Footer -->
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div class="footer-brand-col">
+          <a href="/" class="footer-brand">
+            <span class="brand-monogram" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+              </svg>
+            </span>
+            <span class="footer-site-name">Purbo Nijmaona Fakir Bari</span>
+          </a>
+          <p class="footer-description">Sharing stories, harvests, neighborhood gatherings, and everyday beauty from Purbo Nijmaona Fakir Bari.</p>
+        </div>
+
+        <div class="footer-links-col">
+          <h3 class="footer-heading">Community Links</h3>
+          <ul class="footer-link-list">
+            <li><a href="/">Home</a></li>
+            <li><a href="#posts-section">Community Posts</a></li>
+            <li><a href="#gallery-section">Photo Gallery</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-contact-col">
+          <h3 class="footer-heading">Local Contact</h3>
+          <ul class="footer-contact-list">
+            <li>Purbo Nijmaona Fakir Bari</li>
+            <li>+880 1700-000000</li>
+            <li>contact@purbonijmaonafakirbari.local</li>
+          </ul>
+        </div>
+
+        <div class="footer-social-col">
+          <h3 class="footer-heading">Explore</h3>
+          <ul class="footer-link-list">
+            <li><a href="#featured-section">Featured Memories</a></li>
+            <li><a href="#posts-section">Local Stories</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="container footer-bottom-inner">
+          <p class="footer-copyright">© 2026 Purbo Nijmaona Fakir Bari Community.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Global Lightbox -->
+    <div class="lightbox" id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Image Viewer" hidden>
+      <div class="lightbox-backdrop" data-lb-close></div>
+      <div class="lightbox-topbar">
+        <div class="lightbox-counter" id="lb-counter">1 / 1</div>
+        <div class="lightbox-controls">
+          <button type="button" class="lb-btn" id="lb-zoom-out" aria-label="Zoom out">−</button>
+          <button type="button" class="lb-btn" id="lb-zoom-reset" aria-label="Reset zoom">100%</button>
+          <button type="button" class="lb-btn" id="lb-zoom-in" aria-label="Zoom in">+</button>
+          <button type="button" class="lb-btn lb-close" id="lb-close" data-lb-close aria-label="Close viewer">✕</button>
+        </div>
+      </div>
+      <button type="button" class="lb-nav lb-prev" id="lb-prev" aria-label="Previous image">‹</button>
+      <button type="button" class="lb-nav lb-next" id="lb-next" aria-label="Next image">›</button>
+      <div class="lightbox-stage" id="lb-stage">
+        <img src="" alt="" id="lb-image" class="lightbox-image" draggable="false">
+      </div>
+      <div class="lightbox-caption" id="lb-caption">
+        <h4 class="lb-title" id="lb-title"></h4>
+        <p class="lb-desc" id="lb-desc"></p>
+        <div class="lb-meta" id="lb-meta"></div>
+      </div>
+    </div>
+
+    <!-- Preview Post Detail Modal -->
+    <div class="lightbox" id="preview-post-modal" role="dialog" aria-modal="true" aria-label="Post Details" hidden>
+      <div class="lightbox-backdrop" data-close-post-modal></div>
+      <div style="position: relative; z-index: 6; background: #fff; color: #141e16; width: min(760px, 92vw); max-height: 86vh; overflow-y: auto; border-radius: 12px; padding: 28px;">
+        <button type="button" data-close-post-modal aria-label="Close" style="float: right; border: 1px solid #dce4dc; background: #fff; border-radius: 6px; padding: 6px 12px; font-weight: 600;">✕ Close</button>
+        <div id="preview-post-body"></div>
+      </div>
+    </div>
+
+    <script src="/assets/js/lightbox.js" defer></script>
+    <script src="/assets/js/app.js" defer></script>
+    <script src="/assets/js/preview-demo.js" defer></script>
+  </body>
+</html>

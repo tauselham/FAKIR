@@ -1,0 +1,35 @@
+# Public document root security & Admin route rewrite rules
+Options -Indexes
+
+<FilesMatch "^\.">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Block legacy /admin paths and direct external requests to the internal front-controller filename
+  RewriteRule ^admin(/.*)?$ - [R=404,L,NC]
+  RewriteCond %{THE_REQUEST} \s/+448662\.php(?:[\s/?#]|$) [NC]
+  RewriteRule ^448662\.php(/.*)?$ - [R=404,L]
+
+  # Redirect direct external /index.php requests to canonical '/'
+  RewriteCond %{THE_REQUEST} \s/+index\.php(?:[\s?]|$) [NC]
+  RewriteRule ^index\.php$ / [R=301,L]
+
+  # Route /448662 and /448662/* to the secure server-side PHP Admin dispatcher
+  RewriteRule ^448662(/.*)?$ /448662.php [QSA,L]
+
+  # Resolve published custom page slugs (for example /summer-festival).
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^([a-z0-9]+(?:-[a-z0-9]+)*)/?$ page.php?slug=$1 [QSA,L,NC]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

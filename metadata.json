@@ -1,0 +1,6 @@
+{
+  "name": "Greenfield Village Community",
+  "description": "Local village and community platform with dynamic posts, Instagram-style photo gallery, hero slider, and secure PHP + Supabase Admin Panel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
