@@ -164,7 +164,7 @@
           formData.append('image', file);
           if (token) formData.append('csrf_token', token.value);
           imageButton.disabled = true;
-          imageButton.textContent = 'Uploading…';
+          imageButton.textContent = 'আপলোড হচ্ছে…';
           try {
             const response = await fetch('/448662/editor-image-upload.php', {
               method: 'POST',
@@ -173,7 +173,7 @@
               headers: { 'Accept': 'application/json' }
             });
             const result = await response.json();
-            if (!response.ok || !result.ok || !result.url) throw new Error(result.error || 'ছবি upload failed.');
+            if (!response.ok || !result.ok || !result.url) throw new Error(result.error || 'ছবি আপলোড করা যায়নি।');
             const image = document.createElement('img');
             image.src = result.url;
             image.alt = file.name;
@@ -181,7 +181,7 @@
             image.style.maxWidth = '100%';
             insertNodeAtSelection(image);
           } catch (error) {
-            window.alert(error instanceof Error ? error.message : 'ছবি upload failed.');
+            window.alert(error instanceof Error ? error.message : 'ছবি আপলোড করা যায়নি।');
           } finally {
             imageButton.disabled = false;
             imageButton.textContent = '▧ ছবি';
@@ -193,20 +193,20 @@
     });
 
     // Landing-page editor mode: separate fields or one complete HTML document.
-    const pageসম্পাদনাorMode = document.getElementById('page_editor_mode');
+    const pageEditorMode = document.getElementById('page_editor_mode');
     const pageSeparateFields = document.getElementById('page_separate_code_fields');
     const pageSingleField = document.getElementById('page_single_code_field');
     const pageHtmlField = document.getElementById('html_content');
-    if (pageসম্পাদনাorMode && pageSeparateFields && pageSingleField) {
+    if (pageEditorMode && pageSeparateFields && pageSingleField) {
       const syncPageMode = () => {
-        const single = pageসম্পাদনাorMode.value === 'single';
+        const single = pageEditorMode.value === 'single';
         pageSeparateFields.style.display = single ? 'none' : '';
         pageSingleField.style.display = single ? '' : 'none';
         if (pageHtmlField) pageHtmlField.required = !single;
         const singleCode = document.getElementById('code_document');
         if (singleCode) singleCode.required = single;
       };
-      pageসম্পাদনাorMode.addEventListener('change', syncPageMode);
+      pageEditorMode.addEventListener('change', syncPageMode);
       syncPageMode();
     }
 
@@ -224,7 +224,7 @@
           /[^a-zA-Z0-9]/.test(v),
         ];
         const score = checks.filter(Boolean).length;
-        const labels = ['খুব দুর্বল', 'দুর্বল', 'মোটামুটি', 'ভালো', 'শক্তিশালী', 'Very শক্তিশালী'];
+        const labels = ['খুব দুর্বল', 'দুর্বল', 'মোটামুটি', 'ভালো', 'শক্তিশালী', 'অত্যন্ত শক্তিশালী'];
         pwHint.textContent = v.length === 0 ? '' : `পাসওয়ার্ডের শক্তি: ${labels[score]} (${score}/5 শর্ত পূরণ হয়েছে)`;
       });
     }
