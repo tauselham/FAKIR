@@ -480,7 +480,7 @@ final class RateLimiter
         }
 
         $safeMsg = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        echo "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\"><title>অতিরিক্ত অনুরোধ (HTTP 429)</title><style>body{font-family:system-ui,sans-serif;background:#f4f7f4;color:#141e16;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px}.box{max-width:480px;background:#fff;border:1px solid #dce4dc;border-radius:10px;padding:28px}h1{margin:0 0 10px;font-size:1.35rem;color:#991b1b}p{margin:0 0 16px;line-height:1.6}a{color:#15803d;font-weight:600;text-decoration:none}</style></head><body><div class=\"box\"><h1>অনেক বেশি অনুরোধ করা হয়েছে</h1><p>{$safeMsg}</p><a href=\"/\">← মূল পাতায় ফিরে যান</a></div></body></html>";
+        echo "<!DOCTYPE html><html lang=\"bn\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\"><title>অতিরিক্ত অনুরোধ (HTTP 429)</title><style>body{font-family:system-ui,sans-serif;background:#f4f7f4;color:#141e16;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px}.box{max-width:480px;background:#fff;border:1px solid #dce4dc;border-radius:10px;padding:28px}h1{margin:0 0 10px;font-size:1.35rem;color:#991b1b}p{margin:0 0 16px;line-height:1.6}a{color:#15803d;font-weight:600;text-decoration:none}</style></head><body><div class=\"box\"><h1>অনেক বেশি অনুরোধ করা হয়েছে</h1><p>{$safeMsg}</p><a href=\"/\">← মূল পাতায় ফিরে যান</a></div></body></html>";
         exit;
     }
 
