@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'header';
-$adminPageশিরোনাম = 'Header & Navigation';
+$adminPageTitle = 'হেডার ও নেভিগেশন';
 $requiredPermission = 'manage_navigation';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $bgColor   = sanitize_hex_color($_POST['header_bg_color'] ?? null, '#14532d');
             $textColor = sanitize_hex_color($_POST['header_text_color'] ?? null, '#ffffff');
             if ($siteName === '') {
-                throw new RuntimeException('ওয়েবসাইটের নাম লিখতে হবে।');
+                throw new RuntimeException('Website name is required.');
             }
 
             $current = get_website_settings();
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':lp'   => $logoPath,
                     ':lu'   => $logoUrl,
                 ]);
-                log_admin_activity((int) $currentঅ্যাডমিন['id'], 'header_brand_updated', 'website_settings', 1);
+                log_admin_activity((int) $currentAdmin['id'], 'header_brand_updated', 'website_settings', 1);
             } catch (Throwable $dbErr) {
                 if ($newUpload !== null) {
                     $storage->delete($newUpload['bucket'], $newUpload['path']);
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($oldLogoPath !== null) {
                 $storage->delete(BUCKET_WEBSITE_ASSETS, $oldLogoPath);
             }
-            set_flash('success', 'হেডারের নকশা ও পরিচিতি হালনাগাদ হয়েছে।');
+            set_flash('success', 'Header appearance and branding updated.');
         } elseif ($action === 'add_nav_item' || $action === 'update_nav_item') {
             $itemId   = (int) ($_POST['item_id'] ?? 0);
             $parentId = (int) ($_POST['parent_id'] ?? 0) ?: null;
@@ -75,14 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($url === '' || $url === '#') {
                 $url = '/';
             }
-            $itemধরন = in_array($_POST['item_type'] ?? '', ['link', 'dropdown', 'mega'], true) ? $_POST['item_type'] : 'link';
+            $itemType = in_array($_POST['item_type'] ?? '', ['link', 'dropdown', 'mega'], true) ? $_POST['item_type'] : 'link';
             $megaDesc = trim((string) ($_POST['mega_description'] ?? ''));
             $newTab   = !empty($_POST['open_in_new_tab']);
             $visible  = !empty($_POST['is_visible']);
             $order    = (int) ($_POST['sort_order'] ?? 0);
 
             if ($label === '') {
-                throw new RuntimeException('মেনুর নাম লিখতে হবে।');
+                throw new RuntimeException('Menu label is required.');
             }
 
             if ($action === 'add_nav_item') {
@@ -95,14 +95,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':pid'  => $parentId,
                     ':lbl'  => $label,
                     ':url'  => $url,
-                    ':type' => $itemধরন,
+                    ':type' => $itemType,
                     ':desc' => $megaDesc !== '' ? $megaDesc : null,
                     ':tab'  => $newTab ? 'true' : 'false',
                     ':ord'  => $order,
                     ':vis'  => $visible ? 'true' : 'false',
                 ]);
-                log_admin_activity((int) $currentঅ্যাডমিন['id'], 'nav_item_created', 'navigation_items', (int) $ins->fetchColumn());
-                set_flash('success', 'মেনুর আইটেম যোগ করা হয়েছে।');
+                log_admin_activity((int) $currentAdmin['id'], 'nav_item_created', 'navigation_items', (int) $ins->fetchColumn());
+                set_flash('success', 'Navigation item added.');
             } else {
                 if ($parentId === $itemId) {
                     $parentId = null;
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':pid'  => $parentId,
                     ':lbl'  => $label,
                     ':url'  => $url,
-                    ':type' => $itemধরন,
+                    ':type' => $itemType,
                     ':desc' => $megaDesc !== '' ? $megaDesc : null,
                     ':tab'  => $newTab ? 'true' : 'false',
                     ':ord'  => $order,
@@ -125,15 +125,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':id'   => $itemId,
                     ':mid'  => $headerMenuId,
                 ]);
-                log_admin_activity((int) $currentঅ্যাডমিন['id'], 'nav_item_updated', 'navigation_items', $itemId);
-                set_flash('success', 'মেনুর আইটেম হালনাগাদ হয়েছে।');
+                log_admin_activity((int) $currentAdmin['id'], 'nav_item_updated', 'navigation_items', $itemId);
+                set_flash('success', 'Navigation item updated.');
             }
         } elseif ($action === 'delete_nav_item') {
             $itemId = (int) ($_POST['item_id'] ?? 0);
             $pdo->prepare('DELETE FROM public.navigation_items WHERE id = :id AND menu_id = :mid')
                 ->execute([':id' => $itemId, ':mid' => $headerMenuId]);
-            log_admin_activity((int) $currentঅ্যাডমিন['id'], 'nav_item_deleted', 'navigation_items', $itemId);
-            set_flash('success', 'মেনুর আইটেম মুছে ফেলা হয়েছে।');
+            log_admin_activity((int) $currentAdmin['id'], 'nav_item_deleted', 'navigation_items', $itemId);
+            set_flash('success', 'Menu item deleted.');
         }
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $settings = get_website_settings();
 $navStmt = $pdo->prepare('SELECT * FROM public.navigation_items WHERE menu_id = :mid ORDER BY sort_order ASC, id ASC');
 $navStmt->execute([':mid' => $headerMenuId]);
-$navItems = $navStmt->fetchসব();
+$navItems = $navStmt->fetchAll();
 
 $editItem = null;
 if (!empty($_GET['edit'])) {
@@ -158,7 +158,7 @@ if (!empty($_GET['edit'])) {
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">হেডারের পরিচিতি ও রং</h2>
+  <h2 class="adm-panel-title">Header Branding &amp; Colors</h2>
   <form method="post" action="<?= e(admin_url('header.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save_header_brand">
@@ -169,12 +169,12 @@ if (!empty($_GET['edit'])) {
         <input class="form-control" type="text" id="site_name" name="site_name" value="<?= e($settings['site_name']) ?>" required>
       </div>
       <div class="form-row">
-        <label class="form-label" for="logo_file">ওয়েবসাইটের লোগো আপলোড / পরিবর্তন</label>
+        <label class="form-label" for="logo_file">Upload / Replace ওয়েবসাইটের লোগো</label>
         <input class="form-control" type="file" id="logo_file" name="logo_file" data-preview-target="header_logo_preview" accept="image/jpeg,image/png,image/webp">
         <div class="adm-media-preview" id="header_logo_preview">
           <?php if (!empty($settings['logo_url'])): ?>
             <img src="<?= e(safe_url($settings['logo_url'])) ?>" alt="Current header logo" class="adm-preview-media adm-preview-logo">
-            <span class="form-hint">বর্তমান লোগো চালু আছে। পরিবর্তন করতে নতুন ফাইল আপলোড করুন।</span>
+            <span class="form-hint">Current logo active. Upload a new file to replace it.</span>
           <?php endif; ?>
         </div>
       </div>
@@ -196,7 +196,7 @@ if (!empty($_GET['edit'])) {
 </section>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title"><?= $editItem ? 'সম্পাদনা Navigation Item' : 'যোগ করুন Navigation Menu Item' ?></h2>
+  <h2 class="adm-panel-title"><?= $editItem ? 'Edit Navigation Item' : 'Add Navigation Menu Item' ?></h2>
   <form method="post" action="<?= e(admin_url('header.php')) ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="<?= $editItem ? 'update_nav_item' : 'add_nav_item' ?>">
@@ -210,7 +210,7 @@ if (!empty($_GET['edit'])) {
         <input class="form-control" type="text" id="label" name="label" value="<?= e($editItem['label'] ?? '') ?>" required>
       </div>
       <div class="form-row">
-        <label class="form-label" for="url">লিংক (ওয়েবসাইটের ভেতরের বা বাইরের)</label>
+        <label class="form-label" for="url">লিংক (Internal or External)</label>
         <input class="form-control" type="text" id="url" name="url" value="<?= e($editItem['url'] ?? '/') ?>" required placeholder="/gallery.php or https://...">
       </div>
     </div>
@@ -227,7 +227,7 @@ if (!empty($_GET['edit'])) {
       </div>
 
       <div class="form-row">
-        <label class="form-label" for="parent_id">মূল মেনু (সাব-মেনুর জন্য ঐচ্ছিক)</label>
+        <label class="form-label" for="parent_id">Parent Menu (Optional for Sub-items)</label>
         <select class="form-control" name="parent_id" id="parent_id">
           <option value="">প্রধান মেনু আইটেম</option>
           <?php foreach ($navItems as $ni): ?>
@@ -243,7 +243,7 @@ if (!empty($_GET['edit'])) {
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="mega_description">মেগা মেনু / সাব-মেনুর বিবরণ (ঐচ্ছিক)</label>
+        <label class="form-label" for="mega_description">মেগা মেনু / Sub-item Description (Optional)</label>
         <input class="form-control" type="text" id="mega_description" name="mega_description" value="<?= e($editItem['mega_description'] ?? '') ?>">
       </div>
       <div class="form-row">
@@ -264,9 +264,9 @@ if (!empty($_GET['edit'])) {
     </div>
 
     <div style="display: flex; gap: 10px;">
-      <button type="submit" class="btn btn-green"><?= $editItem ? 'Update Menu Item' : 'যোগ করুন Menu Item' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editItem ? 'Update Menu Item' : 'Add Menu Item' ?></button>
       <?php if ($editItem): ?>
-        <a href="<?= e(admin_url('header.php')) ?>" class="btn btn-outline">বাতিল</a>
+        <a href="<?= e(admin_url('header.php')) ?>" class="btn btn-outline">Cancel</a>
       <?php endif; ?>
     </div>
   </form>
@@ -283,7 +283,7 @@ if (!empty($_GET['edit'])) {
           <th>ধরন</th>
           <th>ক্রম</th>
           <th>দৃশ্যমান</th>
-          <th>কার্যক্রম</th>
+          <th>করণীয়</th>
         </tr>
       </thead>
       <tbody>
@@ -296,12 +296,12 @@ if (!empty($_GET['edit'])) {
             <td><?= !empty($ni['is_visible']) ? 'দৃশ্যমান' : 'লুকানো' ?></td>
             <td>
               <div style="display: flex; gap: 6px;">
-                <a href="<?= e(admin_url('header.php')) ?>?edit=<?= (int) $ni['id'] ?>" class="btn btn-outline btn-sm">সম্পাদনা</a>
-                <form method="post" action="<?= e(admin_url('header.php')) ?>" data-confirm="মুছুন this navigation item?">
+                <a href="<?= e(admin_url('header.php')) ?>?edit=<?= (int) $ni['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
+                <form method="post" action="<?= e(admin_url('header.php')) ?>" data-confirm="Delete this navigation item?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete_nav_item">
                   <input type="hidden" name="item_id" value="<?= (int) $ni['id'] ?>">
-                  <button type="submit" class="btn btn-danger btn-sm">মুছুন</button>
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
               </div>
             </td>

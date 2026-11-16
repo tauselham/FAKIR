@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $confirmPw = (string) ($_POST['confirm_password'] ?? '');
         $logoutAfter = !empty($_POST['logout_after_change']);
 
-        $res = change_admin_password((int) $currentঅ্যাডমিন['id'], $currentPw, $newPw, $confirmPw);
+        $res = change_admin_password((int) $currentAdmin['id'], $currentPw, $newPw, $confirmPw);
         if ($res['ok']) {
             if ($logoutAfter) {
                 logout_admin(false);
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 redirect_to(admin_url('login.php'));
             }
             session_regenerate_id(true);
-            set_flash('success', 'অ্যাডমিনistrator password updated successfully.');
+            set_flash('success', 'Administrator password updated successfully.');
             redirect_to(admin_url('security.php'));
         } else {
             $errors = $res['errors'];
@@ -39,17 +39,17 @@ $securityLogs = db()->prepare(
      WHERE admin_id = :aid AND action IN ('admin_login', 'admin_logout', 'password_changed', 'password_reset_completed')
      ORDER BY created_at DESC LIMIT 12"
 );
-$securityLogs->execute([':aid' => (int) $currentঅ্যাডমিন['id']]);
+$securityLogs->execute([':aid' => (int) $currentAdmin['id']]);
 $logs = $securityLogs->fetchAll();
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Change অ্যাডমিনistrator পাসওয়ার্ড</h2>
+  <h2 class="adm-panel-title">Change Administrator পাসওয়ার্ড</h2>
   <p style="color: var(--adm-muted); margin-top: 0; font-size: 0.9rem;">
-    পাসওয়ার্ডs are hashed using PHP <code>password_hash()</code> (Argon2id / bcrypt) and never stored in plain text.
+    পাসওয়ার্ড PHP দিয়ে নিরাপদভাবে হ্যাশ করা হয় <code>password_hash()</code> (Argon2id / bcrypt) and never stored in plain text.
   </p>
 
-  <?php if (!empty($currentঅ্যাডমিন['must_change_password'])): ?>
+  <?php if (!empty($currentAdmin['must_change_password'])): ?>
     <div class="alert alert-error" role="status">
       Your account is currently using an initial or temporary password. Enter it below as your Current পাসওয়ার্ড and choose a new permanent password.
     </div>
@@ -75,7 +75,7 @@ $logs = $securityLogs->fetchAll();
     <div class="form-row">
       <label class="form-label" for="new_password_input">New পাসওয়ার্ড</label>
       <input class="form-control" type="password" id="new_password_input" name="new_password" required minlength="10" autocomplete="new-password">
-      <span class="form-hint" id="pw_strength_feedback">কমপক্ষে ১০ অক্ষর দিন; বড় হাতের অক্ষর, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ চিহ্ন থাকতে হবে।</span>
+      <span class="form-hint" id="pw_strength_feedback">Minimum 10 characters with uppercase, lowercase, number, and symbol.</span>
     </div>
 
     <div class="form-row">
@@ -86,7 +86,7 @@ $logs = $securityLogs->fetchAll();
     <div class="form-row">
       <label class="form-check">
         <input type="checkbox" name="logout_after_change" value="1" checked>
-        <span>পাসওয়ার্ড পরিবর্তনের পর লগআউট করুন (সুপারিশকৃত)</span>
+        <span>Sign out after changing password (recommended)</span>
       </label>
     </div>
 
@@ -98,7 +98,7 @@ $logs = $securityLogs->fetchAll();
   <h2 class="adm-panel-title">সাম্প্রতিক নিরাপত্তা কার্যক্রম</h2>
   <div class="table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Event</th><th>আইপি ঠিকানা</th><th>সময়stamp</th></tr></thead>
+      <thead><tr><th>Event</th><th>আইপি ঠিকানা</th><th>সময়</th></tr></thead>
       <tbody>
         <?php foreach ($logs as $log): ?>
           <tr>

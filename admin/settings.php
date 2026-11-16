@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $faviconPath = $current['favicon_path'] ?? null;
         $faviconUrl  = $current['favicon_url'] ?? null;
 
-        $oldAssetsToমুছুন = [];
+        $oldAssetsToDelete = [];
         $newAssetsUploaded = [];
 
         try {
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $res = $storage->upload($_FILES['logo_file'], BUCKET_WEBSITE_ASSETS, ALLOWED_LOGO_MIMES, MAX_ASSET_UPLOAD_BYTES, 'logo');
                 $newAssetsUploaded[] = $res;
                 if ($logoPath) {
-                    $oldAssetsToমুছুন[] = (string) $logoPath;
+                    $oldAssetsToDelete[] = (string) $logoPath;
                 }
                 $logoPath = $res['path'];
                 $logoUrl  = $res['url'];
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $res = $storage->upload($_FILES['favicon_file'], BUCKET_WEBSITE_ASSETS, ALLOWED_FAVICON_MIMES, MAX_ASSET_UPLOAD_BYTES, 'favicon');
                 $newAssetsUploaded[] = $res;
                 if ($faviconPath) {
-                    $oldAssetsToমুছুন[] = (string) $faviconPath;
+                    $oldAssetsToDelete[] = (string) $faviconPath;
                 }
                 $faviconPath = $res['path'];
                 $faviconUrl  = $res['url'];
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':ig'     => trim((string) ($_POST['social_instagram'] ?? '')),
                 ':yt'     => trim((string) ($_POST['social_youtube'] ?? '')),
             ]);
-            log_admin_activity((int) $currentঅ্যাডমিন['id'], 'website_settings_updated', 'website_settings', 1);
+            log_admin_activity((int) $currentAdmin['id'], 'website_settings_updated', 'website_settings', 1);
         } catch (Throwable $err) {
             foreach ($newAssetsUploaded as $uploaded) {
                 $storage->delete($uploaded['bucket'], $uploaded['path']);
@@ -78,10 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw $err;
         }
 
-        foreach ($oldAssetsToমুছুন as $oldPath) {
+        foreach ($oldAssetsToDelete as $oldPath) {
             $storage->delete(BUCKET_WEBSITE_ASSETS, $oldPath);
         }
-        set_flash('success', 'ওয়েবসাইটের সেটিংস সংরক্ষণ করা হয়েছে।');
+        set_flash('success', 'Website settings saved.');
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
     }
@@ -92,7 +92,7 @@ $settings = get_website_settings();
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">সাধারণ, পরিচিতি ও সার্চ ইঞ্জিন সেটিংস</h2>
+  <h2 class="adm-panel-title">General, Branding &amp; SEO Settings</h2>
   <form method="post" action="<?= e(admin_url('settings.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
 
@@ -123,7 +123,7 @@ $settings = get_website_settings();
         </div>
       </div>
       <div class="form-row">
-        <label class="form-label" for="favicon_file">ফেভিকন (.ico / .png / .webp)</label>
+        <label class="form-label" for="favicon_file">Favicon (.ico / .png / .webp)</label>
         <input class="form-control" type="file" id="favicon_file" name="favicon_file" data-preview-target="settings_favicon_preview" accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/webp">
         <div class="adm-media-preview" id="settings_favicon_preview">
           <?php if (!empty($settings['favicon_url'])): ?>
@@ -160,7 +160,7 @@ $settings = get_website_settings();
       <input class="form-control" type="url" id="social_youtube" name="social_youtube" value="<?= e($settings['social_youtube'] ?? '') ?>">
     </div>
 
-    <button type="submit" class="btn btn-green">সংরক্ষণ ওয়েবসাইট সেটিংস</button>
+    <button type="submit" class="btn btn-green">Save ওয়েবসাইট সেটিংস</button>
   </form>
 </section>
 

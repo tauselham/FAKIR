@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'footer';
-$adminPageশিরোনাম = 'ফুটার সেটিংস';
+$adminPageTitle = 'ফুটার সেটিংস';
 $requiredPermission = 'manage_navigation';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                db_transaction(function (PDO $pdo) use ($logoPath, $logoUrl, $currentঅ্যাডমিন): void {
+                db_transaction(function (PDO $pdo) use ($logoPath, $logoUrl, $currentAdmin): void {
                     $upd = $pdo->prepare(
                         'UPDATE public.footer_settings
                          SET logo_path = :lp, logo_url = :lu, site_name = :name, description = :desc,
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pdo->prepare('UPDATE public.website_settings SET footer_bg_color = :bg, footer_text_color = :fg WHERE id = 1')
                         ->execute([':bg' => $footerBg, ':fg' => $footerFg]);
 
-                    log_admin_activity((int) $currentঅ্যাডমিন['id'], 'footer_settings_updated', 'footer_settings', 1);
+                    log_admin_activity((int) $currentAdmin['id'], 'footer_settings_updated', 'footer_settings', 1);
                 });
             } catch (Throwable $dbErr) {
                 if ($newUpload !== null) {
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($oldLogoPath !== null) {
                 $storage->delete(BUCKET_WEBSITE_ASSETS, $oldLogoPath);
             }
-            set_flash('success', 'ফুটারের সেটিংস হালনাগাদ হয়েছে।');
+            set_flash('success', 'Footer settings updated.');
         } elseif ($action === 'add_link' || $action === 'update_link') {
             $id    = (int) ($_POST['item_id'] ?? 0);
             $label = trim((string) ($_POST['label'] ?? ''));
@@ -95,19 +95,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "INSERT INTO public.navigation_items (menu_id, label, url, item_type, sort_order, is_visible)
                      VALUES (:mid, :lbl, :url, 'link', :ord, TRUE)"
                 )->execute([':mid' => $footerMenuId, ':lbl' => $label, ':url' => $url, ':ord' => $order]);
-                set_flash('success', 'ফুটারের লিংক যোগ করা হয়েছে।');
+                set_flash('success', 'Footer link added.');
             } else {
                 $pdo->prepare(
                     'UPDATE public.navigation_items SET label = :lbl, url = :url, sort_order = :ord WHERE id = :id AND menu_id = :mid'
                 )->execute([':lbl' => $label, ':url' => $url, ':ord' => $order, ':id' => $id, ':mid' => $footerMenuId]);
-                set_flash('success', 'ফুটারের লিংক হালনাগাদ হয়েছে।');
+                set_flash('success', 'Footer link updated.');
             }
-            log_admin_activity((int) $currentঅ্যাডমিন['id'], 'footer_links_updated', 'navigation_items', $id ?: null);
+            log_admin_activity((int) $currentAdmin['id'], 'footer_links_updated', 'navigation_items', $id ?: null);
         } elseif ($action === 'delete_link') {
             $id = (int) ($_POST['item_id'] ?? 0);
             $pdo->prepare('DELETE FROM public.navigation_items WHERE id = :id AND menu_id = :mid')
                 ->execute([':id' => $id, ':mid' => $footerMenuId]);
-            set_flash('success', 'ফুটারের লিংক মুছে ফেলা হয়েছে।');
+            set_flash('success', 'Footer link deleted.');
         }
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
@@ -119,22 +119,22 @@ $footer = get_footer_settings();
 $site   = get_website_settings();
 $linksStmt = $pdo->prepare('SELECT * FROM public.navigation_items WHERE menu_id = :mid ORDER BY sort_order ASC, id ASC');
 $linksStmt->execute([':mid' => $footerMenuId]);
-$footerলিংকs = $linksStmt->fetchসব();
+$footerLinks = $linksStmt->fetchAll();
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">ফুটারের লেখা, রং ও প্রদর্শন</h2>
+  <h2 class="adm-panel-title">Footer Content, Colors &amp; দৃশ্যমানতা</h2>
   <form method="post" action="<?= e(admin_url('footer.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save_footer">
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="site_name">ফুটারে ওয়েবসাইটের নাম</label>
+        <label class="form-label" for="site_name">Footer ওয়েবসাইটের নাম</label>
         <input class="form-control" type="text" id="site_name" name="site_name" value="<?= e($footer['site_name']) ?>" required>
       </div>
       <div class="form-row">
-        <label class="form-label" for="footer_logo">ফুটারের লোগো (ঐচ্ছিক)</label>
+        <label class="form-label" for="footer_logo">Footer Logo (Optional)</label>
         <input class="form-control" type="file" id="footer_logo" name="footer_logo" data-preview-target="footer_logo_preview" accept="image/jpeg,image/png,image/webp">
         <div class="adm-media-preview" id="footer_logo_preview">
           <?php if (!empty($footer['logo_url'])): ?>
@@ -210,7 +210,7 @@ $footerলিংকs = $linksStmt->fetchসব();
       <label class="form-check"><input type="checkbox" name="show_social_links" value="1" <?= !empty($footer['show_social_links']) ? 'checked' : '' ?>> <span>সামাজিক যোগাযোগের লিংক দেখাবে</span></label>
     </div>
 
-    <button type="submit" class="btn btn-green">সংরক্ষণ ফুটার সেটিংস</button>
+    <button type="submit" class="btn btn-green">Save ফুটার সেটিংস</button>
   </form>
 </section>
 
@@ -227,9 +227,9 @@ $footerলিংকs = $linksStmt->fetchসব();
 
   <div class="table-wrap">
     <table class="adm-table">
-      <thead><tr><th>নাম ও লিংক</th><th>কার্যক্রম</th></tr></thead>
+      <thead><tr><th>নাম &amp; লিংক</th><th>করণীয়</th></tr></thead>
       <tbody>
-        <?php foreach ($footerলিংকs as $fl): ?>
+        <?php foreach ($footerLinks as $fl): ?>
           <tr>
             <td>
               <form method="post" action="<?= e(admin_url('footer.php')) ?>" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -239,7 +239,7 @@ $footerলিংকs = $linksStmt->fetchসব();
                 <input class="form-control" type="text" name="label" value="<?= e($fl['label']) ?>" style="max-width: 180px;">
                 <input class="form-control" type="text" name="url" value="<?= e($fl['url']) ?>" style="max-width: 220px;">
                 <input class="form-control" type="number" name="sort_order" value="<?= (int) $fl['sort_order'] ?>" style="width: 74px;">
-                <button type="submit" class="btn btn-outline btn-sm">সংরক্ষণ</button>
+                <button type="submit" class="btn btn-outline btn-sm">Save</button>
               </form>
             </td>
             <td>
@@ -247,7 +247,7 @@ $footerলিংকs = $linksStmt->fetchসব();
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="delete_link">
                 <input type="hidden" name="item_id" value="<?= (int) $fl['id'] ?>">
-                <button type="submit" class="btn btn-danger btn-sm">মুছুন</button>
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
               </form>
             </td>
           </tr>

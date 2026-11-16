@@ -15,25 +15,25 @@ if (!defined('ADMIN_ROUTED_ENTRY')) {
 }
 
 send_admin_nocache_headers();
-$currentঅ্যাডমিন = require_admin();
+$currentAdmin = require_admin();
 
-if (!empty($requiredSuperঅ্যাডমিন) && !is_super_admin($currentঅ্যাডমিন)) {
-    log_admin_activity((int) $currentঅ্যাডমিন['id'], 'unauthorized_access_attempt', 'admin_module', null, [
+if (!empty($requiredSuperAdmin) && !is_super_admin($currentAdmin)) {
+    log_admin_activity((int) $currentAdmin['id'], 'unauthorized_access_attempt', 'admin_module', null, [
         'module' => $activePage ?? '',
         'reason' => 'super_admin_required',
     ]);
     http_response_code(403);
-    set_flash('error', 'শুধুমাত্র সুপার অ্যাডমিন এই বিভাগে প্রবেশ করতে পারবেন।');
+    set_flash('error', 'Only a সুপার অ্যাডমিন can access this section.');
     redirect_to(admin_url('dashboard.php'));
 }
 
-if (!empty($requiredPermission) && !admin_has_permission((string) $requiredPermission, $currentঅ্যাডমিন)) {
-    log_admin_activity((int) $currentঅ্যাডমিন['id'], 'unauthorized_access_attempt', 'admin_module', null, [
+if (!empty($requiredPermission) && !admin_has_permission((string) $requiredPermission, $currentAdmin)) {
+    log_admin_activity((int) $currentAdmin['id'], 'unauthorized_access_attempt', 'admin_module', null, [
         'module'     => $activePage ?? '',
         'permission' => $requiredPermission,
     ]);
     http_response_code(403);
-    set_flash('error', 'এই বিভাগে প্রবেশের অনুমতি আপনার নেই।');
+    set_flash('error', 'You do not have permission to access that section.');
     redirect_to(admin_url('dashboard.php'));
 }
 
@@ -41,14 +41,14 @@ if (!empty($requiredPermission) && !admin_has_permission((string) $requiredPermi
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     enforce_rate_limit('admin_api', [
         'ip'      => client_ip(),
-        'account' => 'admin:' . (int) $currentঅ্যাডমিন['id'],
+        'account' => 'admin:' . (int) $currentAdmin['id'],
     ]);
 }
 
 $siteSettings = get_website_settings();
 $flash        = get_flash();
 $activePage   = $activePage ?? 'dashboard';
-$pageশিরোনাম    = $adminPageশিরোনাম ?? 'ড্যাশবোর্ড';
+$pageTitle    = $adminPageTitle ?? 'ড্যাশবোর্ড';
 
 $allNavItems = [
     ['id' => 'dashboard',   'label' => 'ড্যাশবোর্ড',           'href' => admin_url('dashboard.php'),   'perm' => null,                 'super' => false],
@@ -66,12 +66,12 @@ $allNavItems = [
     ['id' => 'security',    'label' => 'নিরাপত্তা ও পাসওয়ার্ড', 'href' => admin_url('security.php'),    'perm' => null,                 'super' => false],
 ];
 
-$navItems = array_values(array_filter($allNavItems, static function (array $item) use ($currentঅ্যাডমিন): bool {
+$navItems = array_values(array_filter($allNavItems, static function (array $item) use ($currentAdmin): bool {
     if (!empty($item['super'])) {
-        return is_super_admin($currentঅ্যাডমিন);
+        return is_super_admin($currentAdmin);
     }
     if (!empty($item['perm'])) {
-        return admin_has_permission((string) $item['perm'], $currentঅ্যাডমিন);
+        return admin_has_permission((string) $item['perm'], $currentAdmin);
     }
     return true;
 }));
@@ -81,7 +81,7 @@ $navItems = array_values(array_filter($allNavItems, static function (array $item
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= e($pageশিরোনাম) ?> — অ্যাডমিন প্যানেল</title>
+  <title><?= e($pageTitle) ?> — অ্যাডমিন প্যানেল</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -103,11 +103,11 @@ $navItems = array_values(array_filter($allNavItems, static function (array $item
     </nav>
 
     <div class="adm-sidebar-foot">
-      <a href="/" target="_blank" rel="noopener noreferrer" class="adm-nav-link">ওয়েবসাইট দেখুন ↗</a>
+      <a href="/" target="_blank" rel="noopener noreferrer" class="adm-nav-link">View Public Site ↗</a>
       <form method="post" action="<?= e(admin_url('logout.php')) ?>">
         <?= csrf_field() ?>
         <button type="submit" class="btn btn-outline btn-sm" style="width: 100%; background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2);">
-          লগআউট (<?= e($currentঅ্যাডমিন['username']) ?>)
+          লগআউট (<?= e($currentAdmin['username']) ?>)
         </button>
       </form>
     </div>
@@ -117,18 +117,18 @@ $navItems = array_values(array_filter($allNavItems, static function (array $item
     <header class="adm-topbar">
       <div class="adm-topbar-left">
         <button type="button" class="adm-menu-btn" id="adm-menu-btn" aria-label="সাইডবার খুলুন বা বন্ধ করুন">☰</button>
-        <h1 class="adm-page-title"><?= e($pageশিরোনাম) ?></h1>
+        <h1 class="adm-page-title"><?= e($pageTitle) ?></h1>
       </div>
       <div style="font-size: 0.85rem; color: var(--adm-muted);">
-        লগইন করেছেন <strong><?= e($currentঅ্যাডমিন['full_name']) ?></strong>
-        (<?= e(is_super_admin($currentঅ্যাডমিন) ? 'সুপার অ্যাডমিন' : ucfirst((string) $currentঅ্যাডমিন['role'])) ?>)
+        লগইন করেছেন <strong><?= e($currentAdmin['full_name']) ?></strong>
+        (<?= e(is_super_admin($currentAdmin) ? 'সুপার অ্যাডমিন' : ucfirst((string) $currentAdmin['role'])) ?>)
       </div>
     </header>
 
     <main class="adm-content">
-      <?php if (!empty($currentঅ্যাডমিন['must_change_password']) && $activePage !== 'security'): ?>
+      <?php if (!empty($currentAdmin['must_change_password']) && $activePage !== 'security'): ?>
         <div class="alert alert-error" role="status" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-          <span>আপনি প্রাথমিক অথবা অস্থায়ী পাসওয়ার্ড ব্যবহার করছেন। অনুগ্রহ করে এখনই নিজের স্থায়ী পাসওয়ার্ড নির্ধারণ করুন।</span>
+          <span>You are using an initial or temporary password. Please set your own permanent password now.</span>
           <a href="<?= e(admin_url('security.php')) ?>" class="btn btn-green btn-sm">পাসওয়ার্ড পরিবর্তন করুন</a>
         </div>
       <?php endif; ?>

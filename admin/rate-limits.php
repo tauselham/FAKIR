@@ -3,18 +3,18 @@ declare(strict_types=1);
 
 $activePage = 'rate_limits';
 $adminPageTitle = 'Rate Limiting Settings';
-$requiredSuperঅ্যাডমিন = true;
+$requiredSuperAdmin = true;
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 
 $limiter = rate_limiter();
-$isSuperঅ্যাডমিন = (($currentঅ্যাডমিন['role'] ?? '') === 'super_admin');
+$isSuperAdmin = (($currentAdmin['role'] ?? '') === 'super_admin');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_valid_csrf();
 
-    if (!$isSuperঅ্যাডমিন) {
+    if (!$isSuperAdmin) {
         http_response_code(403);
-        set_flash('error', 'শুধুমাত্র একজন সুপার অ্যাডমিন can modify rate limiting rules or reset active buckets.');
+        set_flash('error', 'Only a সুপার অ্যাডমিন can modify rate limiting rules or reset active buckets.');
         redirect_to(admin_url('rate-limits.php'));
     }
 
@@ -26,34 +26,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $maxRequests = (int) ($_POST['max_requests'] ?? 1);
             $windowValue = (int) ($_POST['window_value'] ?? 1);
             $windowUnit  = trim((string) ($_POST['window_unit'] ?? 'minutes'));
-            $isচালু   = !empty($_POST['is_enabled']);
+            $isEnabled   = !empty($_POST['is_enabled']);
 
             $limiter->updateRule(
                 $scope,
                 $maxRequests,
                 $windowValue,
                 $windowUnit,
-                $isচালু,
-                (int) $currentঅ্যাডমিন['id']
+                $isEnabled,
+                (int) $currentAdmin['id']
             );
 
-            log_admin_activity((int) $currentঅ্যাডমিন['id'], 'rate_limit_rule_updated', 'rate_limit_rules', null, [
+            log_admin_activity((int) $currentAdmin['id'], 'rate_limit_rule_updated', 'rate_limit_rules', null, [
                 'scope'        => $scope,
                 'max_requests' => $maxRequests,
                 'window_value' => $windowValue,
                 'window_unit'  => $windowUnit,
-                'is_enabled'   => $isচালু,
+                'is_enabled'   => $isEnabled,
             ]);
 
             set_flash('success', "Rate limit for '{$scope}' updated ({$maxRequests} requests per {$windowValue} {$windowUnit}).");
         } elseif ($action === 'reset_scope') {
             $scope = trim((string) ($_POST['scope'] ?? ''));
             $cleared = $limiter->resetScope($scope);
-            log_admin_activity((int) $currentঅ্যাডমিন['id'], 'rate_limit_buckets_reset', 'rate_limit_buckets', null, [
+            log_admin_activity((int) $currentAdmin['id'], 'rate_limit_buckets_reset', 'rate_limit_buckets', null, [
                 'scope'   => $scope,
                 'cleared' => $cleared,
             ]);
-            set_flash('success', "মুছে ফেলুনed {$cleared} active rate-limit bucket(s) for '{$scope}'.");
+            set_flash('success', "Cleared {$cleared} active rate-limit bucket(s) for '{$scope}'.");
         } elseif ($action === 'purge_expired') {
             $purged = $limiter->purgeExpired();
             set_flash('success', "Purged {$purged} expired rate-limit record(s).");
@@ -76,7 +76,7 @@ $rules = $limiter->getAllRulesWithStats();
         Enforced in PostgreSQL by IP address and account identifier (independent of browser sessions). Expired windows reset automatically.
       </p>
     </div>
-    <?php if ($isSuperঅ্যাডমিন): ?>
+    <?php if ($isSuperAdmin): ?>
       <form method="post" action="<?= e(admin_url('rate-limits.php')) ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="purge_expired">
@@ -85,9 +85,9 @@ $rules = $limiter->getAllRulesWithStats();
     <?php endif; ?>
   </div>
 
-  <?php if (!$isSuperঅ্যাডমিন): ?>
+  <?php if (!$isSuperAdmin): ?>
     <div class="alert alert-error" style="margin-top: 16px; margin-bottom: 0;">
-      আপনার অ্যাকাউন্টের ভূমিকা <strong><?= e($currentঅ্যাডমিন['role']) ?></strong>. শুধুমাত্র একজন <strong>সুপার অ্যাডমিন</strong> অনুরোধ সীমা পরিবর্তন বা সক্রিয় বাধা পুনরায় সেট করতে পারবেন।
+      Your account role is <strong><?= e($currentAdmin['role']) ?></strong>. Only a <strong>সুপার অ্যাডমিন</strong> can edit rate-limit thresholds or reset active blocks.
     </div>
   <?php endif; ?>
 </section>
@@ -101,9 +101,9 @@ $rules = $limiter->getAllRulesWithStats();
           <th>সর্বোচ্চ অনুরোধ</th>
           <th>সময় Window</th>
           <th>সময় Unit</th>
-          <th>অবস্থা</th>
-          <th>চালু / Blocked</th>
-          <th>কার্যক্রমs</th>
+          <th>Status</th>
+          <th>সক্রিয় / অবরুদ্ধ</th>
+          <th>করণীয়</th>
         </tr>
       </thead>
       <tbody>
@@ -128,7 +128,7 @@ $rules = $limiter->getAllRulesWithStats();
                 max="100000"
                 value="<?= (int) $rule['max_requests'] ?>"
                 style="width: 96px;"
-                <?= $isSuperঅ্যাডমিন ? '' : 'disabled' ?>
+                <?= $isSuperAdmin ? '' : 'disabled' ?>
               >
             </td>
             <td>
@@ -141,7 +141,7 @@ $rules = $limiter->getAllRulesWithStats();
                 max="100000"
                 value="<?= (int) $rule['window_value'] ?>"
                 style="width: 90px;"
-                <?= $isSuperঅ্যাডমিন ? '' : 'disabled' ?>
+                <?= $isSuperAdmin ? '' : 'disabled' ?>
               >
             </td>
             <td>
@@ -150,7 +150,7 @@ $rules = $limiter->getAllRulesWithStats();
                 name="window_unit"
                 form="rl-form-<?= e($rule['scope']) ?>"
                 style="width: 120px;"
-                <?= $isSuperঅ্যাডমিন ? '' : 'disabled' ?>
+                <?= $isSuperAdmin ? '' : 'disabled' ?>
               >
                 <?php foreach (RateLimiter::VALID_UNITS as $unit): ?>
                   <option value="<?= e($unit) ?>" <?= $rule['window_unit'] === $unit ? 'selected' : '' ?>>
@@ -167,7 +167,7 @@ $rules = $limiter->getAllRulesWithStats();
                   value="1"
                   form="rl-form-<?= e($rule['scope']) ?>"
                   <?= !empty($rule['is_enabled']) ? 'checked' : '' ?>
-                  <?= $isSuperঅ্যাডমিন ? '' : 'disabled' ?>
+                  <?= $isSuperAdmin ? '' : 'disabled' ?>
                 >
                 <span>চালু</span>
               </label>
@@ -181,14 +181,14 @@ $rules = $limiter->getAllRulesWithStats();
               <?php endif; ?>
             </td>
             <td>
-              <?php if ($isSuperঅ্যাডমিন): ?>
+              <?php if ($isSuperAdmin): ?>
                 <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                  <button type="submit" form="rl-form-<?= e($rule['scope']) ?>" class="btn btn-green btn-sm">সংরক্ষণ</button>
-                  <form method="post" action="<?= e(admin_url('rate-limits.php')) ?>" data-confirm="পুনরায় সেট all active rate-limit counters for <?= e($rule['label']) ?>?">
+                  <button type="submit" form="rl-form-<?= e($rule['scope']) ?>" class="btn btn-green btn-sm">Save</button>
+                  <form method="post" action="<?= e(admin_url('rate-limits.php')) ?>" data-confirm="সব সক্রিয় অনুরোধ সীমার হিসাব পুনরায় সেট করুন for <?= e($rule['label']) ?>?">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="reset_scope">
                     <input type="hidden" name="scope" value="<?= e($rule['scope']) ?>">
-                    <button type="submit" class="btn btn-outline btn-sm">পুনরায় সেট</button>
+                    <button type="submit" class="btn btn-outline btn-sm">Reset</button>
                   </form>
                 </div>
               <?php else: ?>

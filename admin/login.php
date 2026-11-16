@@ -51,7 +51,7 @@ $siteSettings = get_website_settings();
   <div class="auth-card">
     <div class="auth-brand"><?= e($siteSettings['site_name']) ?></div>
     <h1 class="auth-title">অ্যাডমিন লগইন করুন</h1>
-    <p class="auth-subtitle">আপনার অ্যাডমিন ব্যবহারকারীর নাম অথবা ইমেইল ঠিকানা দিয়ে লগইন করুন।</p>
+    <p class="auth-subtitle">Sign in with your administrator username or email address.</p>
 
     <?php if ($flash): ?>
       <div class="alert <?= $flash['type'] === 'success' ? 'alert-success' : 'alert-error' ?>"><?= e($flash['message']) ?></div>
@@ -77,7 +77,7 @@ $siteSettings = get_website_settings();
     </form>
 
     <div style="display: flex; justify-content: space-between; margin-top: 18px; font-size: 0.85rem;">
-      <a href="<?= e(admin_url('forgot-password.php')) ?>" style="color: var(--adm-green); font-weight: 600;">পাসওয়ার্ড ভুলে গেছেন?</a>
+      <a href="<?= e(admin_url('forgot-password.php')) ?>" style="color: var(--adm-green); font-weight: 600;">Forgot password?</a>
       <a href="/" style="color: var(--adm-muted);">← মূল ওয়েবসাইট</a>
     </div>
   </div>

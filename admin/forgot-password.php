@@ -49,13 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'reset') {
         if ($token === '') {
-            $errors[] = 'পুনরায় সেট token is missing or invalid.';
+            $errors[] = 'Reset token is missing or invalid.';
         } else {
             $newPw = (string) ($_POST['new_password'] ?? '');
             $confirmPw = (string) ($_POST['confirm_password'] ?? '');
             $res = reset_password_with_token($token, $newPw, $confirmPw);
             if ($res['ok']) {
-                set_flash('success', 'আপনার পাসওয়ার্ড পরিবর্তন করা হয়েছে। অনুগ্রহ করে লগইন করুন।');
+                set_flash('success', 'Your password has been updated. Please sign in.');
                 redirect_to(admin_url('login.php'));
             }
             $errors = $res['errors'];
@@ -78,7 +78,7 @@ $siteSettings = get_website_settings();
     <div class="auth-brand"><?= e($siteSettings['site_name']) ?></div>
     <h1 class="auth-title"><?= $token !== '' ? 'Set New পাসওয়ার্ড' : 'Recover পাসওয়ার্ড' ?></h1>
     <p class="auth-subtitle">
-      <?= $token !== '' ? 'নিরাপত্তার সব শর্ত পূরণ করে এমন শক্তিশালী পাসওয়ার্ড দিন।' : 'নির্দিষ্ট সময়ের জন্য পাসওয়ার্ড পুনরুদ্ধার টোকেন পেতে আপনার অ্যাডমিন ইমেইল ঠিকানা লিখুন।' ?>
+      <?= $token !== '' ? 'Choose a strong password meeting all security requirements.' : 'Enter your administrator email address to generate a time-limited recovery token.' ?>
     </p>
 
     <?php if ($message): ?>
@@ -101,20 +101,20 @@ $siteSettings = get_website_settings();
         <div class="form-row">
           <label class="form-label" for="new_password">New পাসওয়ার্ড</label>
           <input class="form-control" type="password" id="new_password" name="new_password" required minlength="10">
-          <span class="form-hint">কমপক্ষে ১০ অক্ষর দিন; বড় হাতের অক্ষর, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ চিহ্ন থাকতে হবে।</span>
+          <span class="form-hint">Minimum 10 characters with uppercase, lowercase, number, and symbol.</span>
         </div>
         <div class="form-row">
           <label class="form-label" for="confirm_password">Confirm পাসওয়ার্ড</label>
           <input class="form-control" type="password" id="confirm_password" name="confirm_password" required minlength="10">
         </div>
-        <button type="submit" class="btn btn-green" style="width: 100%;">পুনরায় সেট পাসওয়ার্ড</button>
+        <button type="submit" class="btn btn-green" style="width: 100%;">Reset পাসওয়ার্ড</button>
       </form>
     <?php else: ?>
       <form method="post" action="<?= e(admin_url('forgot-password.php')) ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="request">
         <div class="form-row">
-          <label class="form-label" for="email">অ্যাডমিনistrator Email</label>
+          <label class="form-label" for="email">অ্যাডমিনের ইমেইল</label>
           <input class="form-control" type="email" id="email" name="email" required>
         </div>
         <button type="submit" class="btn btn-green" style="width: 100%;">পুনরুদ্ধার টোকেনের অনুরোধ করুন</button>
