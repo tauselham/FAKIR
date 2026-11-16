@@ -111,7 +111,7 @@ $footerText = sanitize_hex_color($siteSettings['footer_text_color'] ?? null, '#e
         <button type="button" class="lb-btn" id="lb-zoom-out" aria-label="ছোট করুন" title="ছোট করুন (-)">−</button>
         <button type="button" class="lb-btn" id="lb-zoom-reset" aria-label="আকার আগের মতো করুন" title="আকার আগের মতো করুন (0)">100%</button>
         <button type="button" class="lb-btn" id="lb-zoom-in" aria-label="বড় করুন" title="বড় করুন (+)">+</button>
-        <button type="button" class="lb-btn lb-close" id="lb-close" data-lb-close aria-label="ছবি বন্ধ করুন" title="Close (Esc)">✕</button>
+        <button type="button" class="lb-btn lb-close" id="lb-close" data-lb-close aria-label="ছবি বন্ধ করুন" title="বন্ধ করুন (Esc)">✕</button>
       </div>
     </div>
 
