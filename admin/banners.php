@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $buttonText = trim((string) ($_POST['button_text'] ?? ''));
             $buttonUrl  = trim((string) ($_POST['button_url'] ?? ''));
             $sortOrder  = (int) ($_POST['sort_order'] ?? 0);
-            $isচালু   = !empty($_POST['is_active']);
+            $isActive   = !empty($_POST['is_active']);
 
             if ($action === 'create') {
                 if (empty($_FILES['banner_image']['name'])) {
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':path'   => $res['path'],
                         ':url'    => $res['url'],
                         ':ord'    => $sortOrder,
-                        ':act'    => $isচালু ? 'true' : 'false',
+                        ':act'    => $isActive ? 'true' : 'false',
                     ]);
                     log_admin_activity((int) $currentAdmin['id'], 'banner_created', 'hero_banner', (int) $ins->fetchColumn());
                 } catch (Throwable $dbErr) {
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':bt'     => $buttonText !== '' ? $buttonText : null,
                         ':bu'     => $buttonUrl !== '' ? $buttonUrl : null,
                         ':ord'    => $sortOrder,
-                        ':act'    => $isচালু ? 'true' : 'false',
+                        ':act'    => $isActive ? 'true' : 'false',
                         ':bucket' => $bucket,
                         ':path'   => $path,
                         ':url'    => $url,

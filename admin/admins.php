@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username   = trim((string) ($_POST['username'] ?? ''));
             $email      = trim((string) ($_POST['email'] ?? ''));
             $role       = in_array($_POST['role'] ?? '', $validRoles, true) ? (string) $_POST['role'] : 'admin';
-            $isচালু   = !empty($_POST['is_active']);
+            $isActive   = !empty($_POST['is_active']);
             $mustChange = !empty($_POST['must_change_password']);
             $password   = (string) ($_POST['password'] ?? '');
 
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $hash = hash_admin_password($password);
                 $permJson = json_encode($permissions, JSON_THROW_ON_ERROR);
 
-                $newId = db_transaction(function (PDO $pdo) use ($username, $email, $hash, $fullName, $role, $permJson, $mustChange, $isচালু, $currentAdmin, $permissions): int {
+                $newId = db_transaction(function (PDO $pdo) use ($username, $email, $hash, $fullName, $role, $permJson, $mustChange, $isActive, $currentAdmin, $permissions): int {
                     $ins = $pdo->prepare(
                         'INSERT INTO public.admins
                          (username, email, password_hash, full_name, role, permissions, must_change_password, is_active, created_by)
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':r'   => $role,
                         ':p'   => $permJson,
                         ':mc'  => $mustChange ? 'true' : 'false',
-                        ':act' => $isচালু ? 'true' : 'false',
+                        ':act' => $isActive ? 'true' : 'false',
                         ':cb'  => (int) $currentAdmin['id'],
                     ]);
                     $id = (int) $ins->fetchColumn();
@@ -100,13 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($role !== 'super_admin') {
                         throw new RuntimeException('নিজের সুপার অ্যাডমিন ভূমিকা কমাতে পারবেন না।');
                     }
-                    if (!$isচালু) {
+                    if (!$isActive) {
                         throw new RuntimeException('নিজের সক্রিয় অ্যাকাউন্ট বন্ধ করতে পারবেন না।');
                     }
                 }
 
                 // Ensure at least one active super_admin always exists
-                if ($existing['role'] === 'super_admin' && ($role !== 'super_admin' || !$isচালু)) {
+                if ($existing['role'] === 'super_admin' && ($role !== 'super_admin' || !$isActive)) {
                     $otherSuperCount = (int) $pdo->query(
                         "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_active = TRUE AND id <> " . (int) $adminId
                     )->fetchColumn();
@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $permJson = json_encode($permissions, JSON_THROW_ON_ERROR);
 
-                db_transaction(function (PDO $pdo) use ($adminId, $fullName, $email, $role, $permJson, $isচালু, $newHash, $mustChange, $currentAdmin, $permissions): void {
+                db_transaction(function (PDO $pdo) use ($adminId, $fullName, $email, $role, $permJson, $isActive, $newHash, $mustChange, $currentAdmin, $permissions): void {
                     if ($newHash !== null) {
                         $upd = $pdo->prepare(
                             'UPDATE public.admins
@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ':e'   => $email,
                             ':r'   => $role,
                             ':p'   => $permJson,
-                            ':act' => $isচালু ? 'true' : 'false',
+                            ':act' => $isActive ? 'true' : 'false',
                             ':h'   => $newHash,
                             ':mc'  => $mustChange ? 'true' : 'false',
                             ':id'  => $adminId,
@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ':e'   => $email,
                             ':r'   => $role,
                             ':p'   => $permJson,
-                            ':act' => $isচালু ? 'true' : 'false',
+                            ':act' => $isActive ? 'true' : 'false',
                             ':id'  => $adminId,
                         ]);
                     }
@@ -191,8 +191,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$target) {
                 throw new RuntimeException('অ্যাডমিন অ্যাকাউন্ট পাওয়া যায়নি।');
             }
-            $newচালু = empty($target['is_active']);
-            if (!$newচালু && $target['role'] === 'super_admin') {
+            $newActive = empty($target['is_active']);
+            if (!$newActive && $target['role'] === 'super_admin') {
                 $otherSuperCount = (int) $pdo->query(
                     "SELECT COUNT(*) FROM public.admins WHERE role = 'super_admin' AND is_active = TRUE AND id <> " . (int) $adminId
                 )->fetchColumn();
@@ -201,9 +201,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             $pdo->prepare('UPDATE public.admins SET is_active = :act WHERE id = :id')
-                ->execute([':act' => $newচালু ? 'true' : 'false', ':id' => $adminId]);
-            log_admin_activity((int) $currentAdmin['id'], $newচালু ? 'admin_enabled' : 'admin_disabled', 'admin', $adminId);
-            set_flash('success', "অ্যাডমিন '@{$target['username']}' " . ($newচালু ? 'enabled.' : 'disabled.'));
+                ->execute([':act' => $newActive ? 'true' : 'false', ':id' => $adminId]);
+            log_admin_activity((int) $currentAdmin['id'], $newActive ? 'admin_enabled' : 'admin_disabled', 'admin', $adminId);
+            set_flash('success', "অ্যাডমিন '@{$target['username']}' " . ($newActive ? 'enabled.' : 'disabled.'));
             redirect_to(admin_url('admins.php'));
         } elseif ($action === 'delete') {
             $adminId = (int) ($_POST['admin_id'] ?? 0);

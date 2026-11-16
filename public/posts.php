@@ -77,7 +77,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     </div>
 
     <div class="category-bar" aria-label="পোস্টের ধরন অনুযায়ী বাছাই করুন" style="margin-top: -12px;">
-      <?php foreach (['all' => 'সব ধরন', 'text' => 'লেখা', 'image' => 'ছবি', 'video' => 'ভিডিওs', 'custom' => 'কাস্টম কোড'] as $key => $label): ?>
+      <?php foreach (['all' => 'সব ধরন', 'text' => 'লেখা', 'image' => 'ছবি', 'video' => 'ভিডিও', 'custom' => 'কাস্টম কোড'] as $key => $label): ?>
         <a href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e($key) ?>" class="cat-tab <?= $postType === $key ? 'is-active' : '' ?>">
           <?= e($label) ?>
         </a>

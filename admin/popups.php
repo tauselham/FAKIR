@@ -35,8 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $imageLink = trim((string) ($_POST['image_link_url'] ?? ''));
             $buttonText = trim((string) ($_POST['button_text'] ?? ''));
             $buttonUrl = trim((string) ($_POST['button_url'] ?? ''));
-            $imageলক্ষ্য = ($_POST['image_link_target'] ?? '_self') === '_blank' ? '_blank' : '_self';
-            $buttonলক্ষ্য = ($_POST['button_target'] ?? '_self') === '_blank' ? '_blank' : '_self';
+            $imageTarget = ($_POST['image_link_target'] ?? '_self') === '_blank' ? '_blank' : '_self';
+            $buttonTarget = ($_POST['button_target'] ?? '_self') === '_blank' ? '_blank' : '_self';
             $frequency = in_array($_POST['frequency'] ?? '', ['every_page', 'once_session', 'once_day'], true) ? $_POST['frequency'] : 'once_session';
             $scope = ($_POST['display_scope'] ?? 'all') === 'home' ? 'home' : 'all';
             $device = in_array($_POST['device_target'] ?? '', ['all', 'desktop', 'mobile'], true) ? $_POST['device_target'] : 'all';
@@ -91,10 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':body' => $type === 'text' ? $body : null,
                     ':bucket' => $bucket, ':path' => $path, ':url' => $url,
                     ':image_link' => $type === 'image' && $imageLink !== '' ? $imageLink : null,
-                    ':image_target' => $imageলক্ষ্য,
+                    ':image_target' => $imageTarget,
                     ':button_text' => $buttonText !== '' ? $buttonText : null,
                     ':button_url' => $buttonUrl !== '' ? $buttonUrl : null,
-                    ':button_target' => $buttonলক্ষ্য,
+                    ':button_target' => $buttonTarget,
                     ':starts' => $starts, ':ends' => $ends,
                     ':delay' => $delay, ':frequency' => $frequency,
                     ':scope' => $scope, ':device' => $device,

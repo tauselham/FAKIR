@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id        = (int) ($_POST['id'] ?? 0);
             $name      = trim((string) ($_POST['name'] ?? ''));
             $sortOrder = (int) ($_POST['sort_order'] ?? 0);
-            $isচালু  = !empty($_POST['is_active']);
+            $isActive  = !empty($_POST['is_active']);
             if ($name === '') {
                 throw new RuntimeException('বিভাগের নাম ফাঁকা রাখা যাবে না।');
             }
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':name' => $name,
                 ':slug' => slugify($name),
                 ':ord'  => $sortOrder,
-                ':act'  => $isচালু ? 'true' : 'false',
+                ':act'  => $isActive ? 'true' : 'false',
                 ':id'   => $id,
             ]);
             log_admin_activity((int) $currentAdmin['id'], $scope . '_category_updated', $table, $id);

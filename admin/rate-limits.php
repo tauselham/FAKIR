@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'scope'   => $scope,
                 'cleared' => $cleared,
             ]);
-            set_flash('success', "মুছে ফেলুনed {$cleared} active rate-limit bucket(s) for '{$scope}'.");
+            set_flash('success', "{$cleared}টি সক্রিয় অনুরোধ সীমার হিসাব '{$scope}' ক্ষেত্র থেকে মুছে ফেলা হয়েছে।");
         } elseif ($action === 'purge_expired') {
             $purged = $limiter->purgeExpired();
             set_flash('success', "{$purged}টি মেয়াদোত্তীর্ণ অনুরোধ সীমার তথ্য মুছে ফেলা হয়েছে।");
@@ -87,7 +87,7 @@ $rules = $limiter->getAllRulesWithStats();
 
   <?php if (!$isSuperAdmin): ?>
     <div class="alert alert-error" style="margin-top: 16px; margin-bottom: 0;">
-      Your account role is <strong><?= e($currentAdmin['role']) ?></strong>. Only a <strong>সুপার অ্যাডমিন</strong> can edit rate-limit thresholds or reset active blocks.
+      আপনার অ্যাকাউন্টের ভূমিকা <strong><?= e($currentAdmin['role']) ?></strong>। শুধু <strong>সুপার অ্যাডমিন</strong> অনুরোধ সীমার মান পরিবর্তন বা সক্রিয় বাধা পুনরায় সেট করতে পারবেন।
     </div>
   <?php endif; ?>
 </section>
