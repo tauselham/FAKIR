@@ -55,5 +55,5 @@ try {
     ], JSON_THROW_ON_ERROR);
 } catch (Throwable $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Unable to load gallery images.']);
+    echo json_encode(['error' => 'গ্যালারির ছবি লোড করা যায়নি।']);
 }

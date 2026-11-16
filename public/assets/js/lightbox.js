@@ -193,7 +193,7 @@
       const date = item.dataset.date || '';
 
       this.img.src = src;
-      this.img.alt = title || 'Community photograph';
+      this.img.alt = title || 'গ্রামের ছবি';
 
       if (this.counter) {
         this.counter.textContent = `${this.currentIndex + 1} / ${this.items.length}`;

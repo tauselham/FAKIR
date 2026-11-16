@@ -17,7 +17,7 @@
     // Confirm destructive actions without window.alert
     document.querySelectorAll('form[data-confirm]').forEach((form) => {
       form.addEventListener('submit', (e) => {
-        const msg = form.getAttribute('data-confirm') || 'Are you sure you want to delete this item?';
+        const msg = form.getAttribute('data-confirm') || 'আপনি কি এই আইটেমটি মুছে ফেলতে চান?';
         if (!window.confirm(msg)) {
           e.preventDefault();
         }
@@ -31,7 +31,7 @@
     const postCustomGroup = document.getElementById('post_custom_code_group');
     const postRichGroup = document.getElementById('post_rich_editor_group');
     if (postTypeSelect) {
-      const syncPostসম্পাদনাor = () => {
+      const syncPostEditor = () => {
         const type = postTypeSelect.value;
         if (postMediaGroup) postMediaGroup.style.display = (type === 'image' || type === 'video') ? '' : 'none';
         if (postCustomGroup) postCustomGroup.style.display = type === 'custom' ? '' : 'none';
@@ -39,8 +39,8 @@
         const codeField = document.getElementById('post_code_document');
         if (codeField) codeField.required = type === 'custom';
       };
-      postTypeSelect.addEventListener('change', syncPostসম্পাদনাor);
-      syncPostসম্পাদনাor();
+      postTypeSelect.addEventListener('change', syncPostEditor);
+      syncPostEditor();
     }
 
     // Simple WordPress-style rich text editor. The server applies a strict

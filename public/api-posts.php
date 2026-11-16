@@ -61,5 +61,5 @@ try {
     ], JSON_THROW_ON_ERROR);
 } catch (Throwable) {
     http_response_code(500);
-    echo json_encode(['error' => 'Unable to load community posts.']);
+    echo json_encode(['error' => 'গ্রামের পোস্ট লোড করা যায়নি।']);
 }

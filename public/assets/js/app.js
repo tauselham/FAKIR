@@ -240,9 +240,9 @@
           data-desc="${escapeHtml(img.description || '')}"
           data-category="${escapeHtml(img.category_name || '')}"
           data-date="${escapeHtml(img.formatted_date || '')}"
-          aria-label="${escapeHtml(img.title || 'View community photograph')}"
+          aria-label="${escapeHtml(img.title || 'গ্রামের ছবি দেখুন')}"
         >
-          <img src="${escapeHtml(img.image_url)}" alt="${escapeHtml(img.title || 'Community photograph')}" loading="lazy" referrerpolicy="no-referrer">
+          <img src="${escapeHtml(img.image_url)}" alt="${escapeHtml(img.title || 'গ্রামের ছবি')}" loading="lazy" referrerpolicy="no-referrer">
           ${title ? `<span class="ig-photo-overlay">${title}</span>` : '<span class="ig-photo-overlay"></span>'}
         </button>
       `;
@@ -257,7 +257,7 @@
         if (!res.ok) {
           const msg = res.status === 429 && data.error
             ? data.error
-            : 'Unable to load photos right now. Please try again shortly.';
+            : 'এই মুহূর্তে ছবি লোড করা যাচ্ছে না। কিছুক্ষণ পর আবার চেষ্টা করুন।';
           if (!append) {
             grid.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;">${escapeHtml(msg)}</div>`;
           } else if (loadMoreBtn) {
@@ -271,11 +271,11 @@
         if (append) {
           grid.insertAdjacentHTML('beforeend', html);
         } else {
-          grid.innerHTML = html || '<div class="empty-state" style="grid-column: 1 / -1;">No photos found in this category yet.</div>';
+          grid.innerHTML = html || '<div class="empty-state" style="grid-column: 1 / -1;">এই বিভাগে এখনো কোনো ছবি পাওয়া যায়নি।</div>';
         }
 
         if (loadMoreBtn) {
-          loadMoreBtn.textContent = 'Load More Photos';
+          loadMoreBtn.textContent = 'আরও ছবি দেখুন';
           loadMoreBtn.hidden = !data.has_more;
           loadMoreBtn.disabled = false;
         }
