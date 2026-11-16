@@ -16,7 +16,8 @@
       if (item.frequency === 'once_session') return !sessionStorage.getItem(key);
       if (item.frequency === 'once_day') {
         const shown = localStorage.getItem(key);
-        return shown !== new Date().toISOString().slice(0, 10);
+        const todayDhaka = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Dhaka' }).format(new Date());
+        return shown !== todayDhaka;
       }
       return true;
     });
@@ -25,7 +26,10 @@
     const key = 'site-popup-' + chosen.id;
     const remember = () => {
       if (chosen.frequency === 'once_session') sessionStorage.setItem(key, '1');
-      if (chosen.frequency === 'once_day') localStorage.setItem(key, new Date().toISOString().slice(0, 10));
+      if (chosen.frequency === 'once_day') {
+        const todayDhaka = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Dhaka' }).format(new Date());
+        localStorage.setItem(key, todayDhaka);
+      }
     };
     const overlay = document.createElement('div');
     overlay.className = 'site-popup-overlay';
@@ -73,6 +77,7 @@
 
     overlay.append(dialog);
     document.body.append(overlay);
+    remember();
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     function dismiss() {
