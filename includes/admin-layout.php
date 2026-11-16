@@ -56,6 +56,7 @@ $allNavItems = [
     ['id' => 'posts',       'label' => 'Community Posts',     'href' => admin_url('posts.php'),       'perm' => 'manage_posts',       'super' => false],
     ['id' => 'gallery',     'label' => 'Photo Gallery',       'href' => admin_url('gallery.php'),     'perm' => 'manage_gallery',     'super' => false],
     ['id' => 'banners',     'label' => 'Hero Banners',        'href' => admin_url('banners.php'),     'perm' => 'manage_banners',     'super' => false],
+    ['id' => 'popups',      'label' => 'Popup Campaigns',     'href' => admin_url('popups.php'),      'perm' => 'manage_popups',      'super' => false],
     ['id' => 'categories',  'label' => 'Categories',          'href' => admin_url('categories.php'),  'perm' => 'manage_categories',  'super' => false],
     ['id' => 'header',      'label' => 'Header & Menus',      'href' => admin_url('header.php'),      'perm' => 'manage_navigation',  'super' => false],
     ['id' => 'footer',      'label' => 'Footer Settings',     'href' => admin_url('footer.php'),      'perm' => 'manage_navigation',  'super' => false],
