@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'footer';
-$adminPageTitle = 'Footer Settings';
+$adminPageTitle = 'ফুটার সেটিংস';
 $requiredPermission = 'manage_navigation';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                db_transaction(function (PDO $pdo) use ($logoPath, $logoUrl, $currentAdmin): void {
+                db_transaction(function (PDO $pdo) use ($logoPath, $logoUrl, $currentঅ্যাডমিন): void {
                     $upd = $pdo->prepare(
                         'UPDATE public.footer_settings
                          SET logo_path = :lp, logo_url = :lu, site_name = :name, description = :desc,
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pdo->prepare('UPDATE public.website_settings SET footer_bg_color = :bg, footer_text_color = :fg WHERE id = 1')
                         ->execute([':bg' => $footerBg, ':fg' => $footerFg]);
 
-                    log_admin_activity((int) $currentAdmin['id'], 'footer_settings_updated', 'footer_settings', 1);
+                    log_admin_activity((int) $currentঅ্যাডমিন['id'], 'footer_settings_updated', 'footer_settings', 1);
                 });
             } catch (Throwable $dbErr) {
                 if ($newUpload !== null) {
@@ -80,14 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($oldLogoPath !== null) {
                 $storage->delete(BUCKET_WEBSITE_ASSETS, $oldLogoPath);
             }
-            set_flash('success', 'Footer settings updated.');
+            set_flash('success', 'ফুটারের সেটিংস হালনাগাদ হয়েছে।');
         } elseif ($action === 'add_link' || $action === 'update_link') {
             $id    = (int) ($_POST['item_id'] ?? 0);
             $label = trim((string) ($_POST['label'] ?? ''));
             $url   = trim((string) ($_POST['url'] ?? '/'));
             $order = (int) ($_POST['sort_order'] ?? 0);
             if ($label === '') {
-                throw new RuntimeException('Link label is required.');
+                throw new RuntimeException('লিংকের নাম is required.');
             }
 
             if ($action === 'add_link') {
@@ -95,19 +95,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "INSERT INTO public.navigation_items (menu_id, label, url, item_type, sort_order, is_visible)
                      VALUES (:mid, :lbl, :url, 'link', :ord, TRUE)"
                 )->execute([':mid' => $footerMenuId, ':lbl' => $label, ':url' => $url, ':ord' => $order]);
-                set_flash('success', 'Footer link added.');
+                set_flash('success', 'ফুটারের লিংক যোগ করা হয়েছে।');
             } else {
                 $pdo->prepare(
                     'UPDATE public.navigation_items SET label = :lbl, url = :url, sort_order = :ord WHERE id = :id AND menu_id = :mid'
                 )->execute([':lbl' => $label, ':url' => $url, ':ord' => $order, ':id' => $id, ':mid' => $footerMenuId]);
-                set_flash('success', 'Footer link updated.');
+                set_flash('success', 'ফুটারের লিংক হালনাগাদ হয়েছে।');
             }
-            log_admin_activity((int) $currentAdmin['id'], 'footer_links_updated', 'navigation_items', $id ?: null);
+            log_admin_activity((int) $currentঅ্যাডমিন['id'], 'footer_links_updated', 'navigation_items', $id ?: null);
         } elseif ($action === 'delete_link') {
             $id = (int) ($_POST['item_id'] ?? 0);
             $pdo->prepare('DELETE FROM public.navigation_items WHERE id = :id AND menu_id = :mid')
                 ->execute([':id' => $id, ':mid' => $footerMenuId]);
-            set_flash('success', 'Footer link deleted.');
+            set_flash('success', 'ফুটারের লিংক মুছে ফেলা হয়েছে।');
         }
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
@@ -119,22 +119,22 @@ $footer = get_footer_settings();
 $site   = get_website_settings();
 $linksStmt = $pdo->prepare('SELECT * FROM public.navigation_items WHERE menu_id = :mid ORDER BY sort_order ASC, id ASC');
 $linksStmt->execute([':mid' => $footerMenuId]);
-$footerLinks = $linksStmt->fetchAll();
+$footerলিংকs = $linksStmt->fetchAll();
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Footer Content, Colors &amp; Visibility</h2>
+  <h2 class="adm-panel-title">ফুটারের লেখা, রং ও প্রদর্শন</h2>
   <form method="post" action="<?= e(admin_url('footer.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save_footer">
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="site_name">Footer Website Name</label>
+        <label class="form-label" for="site_name">Footer ওয়েবসাইটের নাম</label>
         <input class="form-control" type="text" id="site_name" name="site_name" value="<?= e($footer['site_name']) ?>" required>
       </div>
       <div class="form-row">
-        <label class="form-label" for="footer_logo">Footer Logo (Optional)</label>
+        <label class="form-label" for="footer_logo">ফুটারের লোগো (ঐচ্ছিক)</label>
         <input class="form-control" type="file" id="footer_logo" name="footer_logo" data-preview-target="footer_logo_preview" accept="image/jpeg,image/png,image/webp">
         <div class="adm-media-preview" id="footer_logo_preview">
           <?php if (!empty($footer['logo_url'])): ?>
@@ -145,91 +145,91 @@ $footerLinks = $linksStmt->fetchAll();
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="description">Short Footer Description</label>
+      <label class="form-label" for="description">ফুটারের সংক্ষিপ্ত বিবরণ</label>
       <textarea class="form-control" id="description" name="description"><?= e($footer['description'] ?? '') ?></textarea>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="contact_address">Community Address</label>
+        <label class="form-label" for="contact_address">ঠিকানা</label>
         <input class="form-control" type="text" id="contact_address" name="contact_address" value="<?= e($footer['contact_address'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="contact_phone">Contact Phone</label>
+        <label class="form-label" for="contact_phone">যোগাযোগের ফোন</label>
         <input class="form-control" type="text" id="contact_phone" name="contact_phone" value="<?= e($footer['contact_phone'] ?? '') ?>">
       </div>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="contact_email">Contact Email</label>
+        <label class="form-label" for="contact_email">যোগাযোগের ইমেইল</label>
         <input class="form-control" type="email" id="contact_email" name="contact_email" value="<?= e($footer['contact_email'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="copyright_text">Copyright Text</label>
+        <label class="form-label" for="copyright_text">স্বত্ব সংরক্ষণের লেখা</label>
         <input class="form-control" type="text" id="copyright_text" name="copyright_text" value="<?= e($footer['copyright_text']) ?>" required>
       </div>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="facebook_url">Facebook URL</label>
+        <label class="form-label" for="facebook_url">Facebook লিংক</label>
         <input class="form-control" type="url" id="facebook_url" name="facebook_url" value="<?= e($footer['facebook_url'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="instagram_url">Instagram URL</label>
+        <label class="form-label" for="instagram_url">Instagram লিংক</label>
         <input class="form-control" type="url" id="instagram_url" name="instagram_url" value="<?= e($footer['instagram_url'] ?? '') ?>">
       </div>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="youtube_url">YouTube URL</label>
+        <label class="form-label" for="youtube_url">YouTube লিংক</label>
         <input class="form-control" type="url" id="youtube_url" name="youtube_url" value="<?= e($footer['youtube_url'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="x_url">X URL</label>
+        <label class="form-label" for="x_url">X লিংক</label>
         <input class="form-control" type="url" id="x_url" name="x_url" value="<?= e($footer['x_url'] ?? '') ?>">
       </div>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="footer_bg_color">Footer Background Color</label>
+        <label class="form-label" for="footer_bg_color">ফুটারের পেছনের রং</label>
         <input class="form-control" type="color" id="footer_bg_color" name="footer_bg_color" value="<?= e(sanitize_hex_color($site['footer_bg_color'], '#14532d')) ?>" style="height: 44px; padding: 4px;">
       </div>
       <div class="form-row">
-        <label class="form-label" for="footer_text_color">Footer Text Color</label>
+        <label class="form-label" for="footer_text_color">ফুটারের লেখার রং</label>
         <input class="form-control" type="color" id="footer_text_color" name="footer_text_color" value="<?= e(sanitize_hex_color($site['footer_text_color'], '#ecfdf5')) ?>" style="height: 44px; padding: 4px;">
       </div>
     </div>
 
     <div class="form-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
-      <label class="form-check"><input type="checkbox" name="is_visible" value="1" <?= !empty($footer['is_visible']) ? 'checked' : '' ?>> <span>Display Footer</span></label>
-      <label class="form-check"><input type="checkbox" name="show_contact_info" value="1" <?= !empty($footer['show_contact_info']) ? 'checked' : '' ?>> <span>Show Contact Info</span></label>
-      <label class="form-check"><input type="checkbox" name="show_social_links" value="1" <?= !empty($footer['show_social_links']) ? 'checked' : '' ?>> <span>Show Social Links</span></label>
+      <label class="form-check"><input type="checkbox" name="is_visible" value="1" <?= !empty($footer['is_visible']) ? 'checked' : '' ?>> <span>ফুটার দেখাবে</span></label>
+      <label class="form-check"><input type="checkbox" name="show_contact_info" value="1" <?= !empty($footer['show_contact_info']) ? 'checked' : '' ?>> <span>যোগাযোগের তথ্য দেখাবে</span></label>
+      <label class="form-check"><input type="checkbox" name="show_social_links" value="1" <?= !empty($footer['show_social_links']) ? 'checked' : '' ?>> <span>সামাজিক যোগাযোগের লিংক দেখাবে</span></label>
     </div>
 
-    <button type="submit" class="btn btn-green">Save Footer Settings</button>
+    <button type="submit" class="btn btn-green">সংরক্ষণ ফুটার সেটিংস</button>
   </form>
 </section>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Footer Quick Links</h2>
+  <h2 class="adm-panel-title">ফুটারের দ্রুত লিংক</h2>
   <form method="post" action="<?= e(admin_url('footer.php')) ?>" style="display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap;">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="add_link">
-    <input class="form-control" type="text" name="label" placeholder="Link label" required style="flex: 1; min-width: 150px;">
+    <input class="form-control" type="text" name="label" placeholder="লিংকের নাম" required style="flex: 1; min-width: 150px;">
     <input class="form-control" type="text" name="url" placeholder="/posts.php" required style="flex: 1; min-width: 150px;">
     <input class="form-control" type="number" name="sort_order" value="0" style="width: 84px;">
-    <button type="submit" class="btn btn-green">Add Link</button>
+    <button type="submit" class="btn btn-green">লিংক যোগ করুন</button>
   </form>
 
   <div class="table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Label &amp; URL</th><th>Actions</th></tr></thead>
+      <thead><tr><th>নাম &amp; লিংক</th><th>কার্যক্রমs</th></tr></thead>
       <tbody>
-        <?php foreach ($footerLinks as $fl): ?>
+        <?php foreach ($footerলিংকs as $fl): ?>
           <tr>
             <td>
               <form method="post" action="<?= e(admin_url('footer.php')) ?>" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -239,7 +239,7 @@ $footerLinks = $linksStmt->fetchAll();
                 <input class="form-control" type="text" name="label" value="<?= e($fl['label']) ?>" style="max-width: 180px;">
                 <input class="form-control" type="text" name="url" value="<?= e($fl['url']) ?>" style="max-width: 220px;">
                 <input class="form-control" type="number" name="sort_order" value="<?= (int) $fl['sort_order'] ?>" style="width: 74px;">
-                <button type="submit" class="btn btn-outline btn-sm">Save</button>
+                <button type="submit" class="btn btn-outline btn-sm">সংরক্ষণ</button>
               </form>
             </td>
             <td>
@@ -247,7 +247,7 @@ $footerLinks = $linksStmt->fetchAll();
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="delete_link">
                 <input type="hidden" name="item_id" value="<?= (int) $fl['id'] ?>">
-                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                <button type="submit" class="btn btn-danger btn-sm">মুছুন</button>
               </form>
             </td>
           </tr>

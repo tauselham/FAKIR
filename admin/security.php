@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'security';
-$adminPageTitle = 'Security & Password';
+$adminPageTitle = 'নিরাপত্তা ও পাসওয়ার্ড';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 
 $errors = [];
@@ -17,16 +17,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $confirmPw = (string) ($_POST['confirm_password'] ?? '');
         $logoutAfter = !empty($_POST['logout_after_change']);
 
-        $res = change_admin_password((int) $currentAdmin['id'], $currentPw, $newPw, $confirmPw);
+        $res = change_admin_password((int) $currentঅ্যাডমিন['id'], $currentPw, $newPw, $confirmPw);
         if ($res['ok']) {
             if ($logoutAfter) {
                 logout_admin(false);
                 start_secure_session();
-                set_flash('success', 'Password updated securely. Please sign in with your new password.');
+                set_flash('success', 'পাসওয়ার্ড updated securely. Please sign in with your new password.');
                 redirect_to(admin_url('login.php'));
             }
             session_regenerate_id(true);
-            set_flash('success', 'Administrator password updated successfully.');
+            set_flash('success', 'অ্যাডমিনistrator password updated successfully.');
             redirect_to(admin_url('security.php'));
         } else {
             $errors = $res['errors'];
@@ -39,19 +39,19 @@ $securityLogs = db()->prepare(
      WHERE admin_id = :aid AND action IN ('admin_login', 'admin_logout', 'password_changed', 'password_reset_completed')
      ORDER BY created_at DESC LIMIT 12"
 );
-$securityLogs->execute([':aid' => (int) $currentAdmin['id']]);
+$securityLogs->execute([':aid' => (int) $currentঅ্যাডমিন['id']]);
 $logs = $securityLogs->fetchAll();
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Change Administrator Password</h2>
+  <h2 class="adm-panel-title">Change অ্যাডমিনistrator পাসওয়ার্ড</h2>
   <p style="color: var(--adm-muted); margin-top: 0; font-size: 0.9rem;">
-    Passwords are hashed using PHP <code>password_hash()</code> (Argon2id / bcrypt) and never stored in plain text.
+    পাসওয়ার্ডs are hashed using PHP <code>password_hash()</code> (Argon2id / bcrypt) and never stored in plain text.
   </p>
 
-  <?php if (!empty($currentAdmin['must_change_password'])): ?>
+  <?php if (!empty($currentঅ্যাডমিন['must_change_password'])): ?>
     <div class="alert alert-error" role="status">
-      Your account is currently using an initial or temporary password. Enter it below as your Current Password and choose a new permanent password.
+      Your account is currently using an initial or temporary password. Enter it below as your Current পাসওয়ার্ড and choose a new permanent password.
     </div>
   <?php endif; ?>
 
@@ -68,37 +68,37 @@ $logs = $securityLogs->fetchAll();
     <input type="hidden" name="action" value="change_password">
 
     <div class="form-row">
-      <label class="form-label" for="current_password">Current Password</label>
+      <label class="form-label" for="current_password">Current পাসওয়ার্ড</label>
       <input class="form-control" type="password" id="current_password" name="current_password" required autocomplete="current-password">
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="new_password_input">New Password</label>
+      <label class="form-label" for="new_password_input">New পাসওয়ার্ড</label>
       <input class="form-control" type="password" id="new_password_input" name="new_password" required minlength="10" autocomplete="new-password">
-      <span class="form-hint" id="pw_strength_feedback">Minimum 10 characters with uppercase, lowercase, number, and symbol.</span>
+      <span class="form-hint" id="pw_strength_feedback">কমপক্ষে ১০ অক্ষর দিন; বড় হাতের অক্ষর, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ চিহ্ন থাকতে হবে।</span>
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="confirm_password">Confirm New Password</label>
+      <label class="form-label" for="confirm_password">Confirm New পাসওয়ার্ড</label>
       <input class="form-control" type="password" id="confirm_password" name="confirm_password" required minlength="10" autocomplete="new-password">
     </div>
 
     <div class="form-row">
       <label class="form-check">
         <input type="checkbox" name="logout_after_change" value="1" checked>
-        <span>Sign out after changing password (recommended)</span>
+        <span>পাসওয়ার্ড পরিবর্তনের পর লগআউট করুন (সুপারিশকৃত)</span>
       </label>
     </div>
 
-    <button type="submit" class="btn btn-green">Update Password</button>
+    <button type="submit" class="btn btn-green">Update পাসওয়ার্ড</button>
   </form>
 </section>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Recent Security Events</h2>
+  <h2 class="adm-panel-title">সাম্প্রতিক নিরাপত্তা কার্যক্রম</h2>
   <div class="table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Event</th><th>IP Address</th><th>Timestamp</th></tr></thead>
+      <thead><tr><th>Event</th><th>আইপি ঠিকানা</th><th>সময়stamp</th></tr></thead>
       <tbody>
         <?php foreach ($logs as $log): ?>
           <tr>

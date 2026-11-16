@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'banners';
-$adminPageTitle = 'Hero Banners';
+$adminPageTitle = 'প্রধান ব্যানার';
 $requiredPermission = 'manage_banners';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $interval = max(2000, min(20000, (int) ($_POST['hero_interval_ms'] ?? 5500)));
             $upd = $pdo->prepare('UPDATE public.website_settings SET hero_interval_ms = :ms WHERE id = 1');
             $upd->execute([':ms' => $interval]);
-            log_admin_activity((int) $currentAdmin['id'], 'hero_interval_updated', 'website_settings', 1);
+            log_admin_activity((int) $currentঅ্যাডমিন['id'], 'hero_interval_updated', 'website_settings', 1);
             set_flash('success', 'Slideshow interval updated.');
             redirect_to(admin_url('banners.php'));
         } elseif ($action === 'create' || $action === 'update') {
@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $subtitle   = trim((string) ($_POST['subtitle'] ?? ''));
             $buttonText = trim((string) ($_POST['button_text'] ?? ''));
             $buttonUrl  = trim((string) ($_POST['button_url'] ?? ''));
-            $sortOrder  = (int) ($_POST['sort_order'] ?? 0);
-            $isActive   = !empty($_POST['is_active']);
+            $sortক্রম  = (int) ($_POST['sort_order'] ?? 0);
+            $isচালু   = !empty($_POST['is_active']);
 
             if ($action === 'create') {
                 if (empty($_FILES['banner_image']['name'])) {
@@ -50,10 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':bucket' => $res['bucket'],
                         ':path'   => $res['path'],
                         ':url'    => $res['url'],
-                        ':ord'    => $sortOrder,
-                        ':act'    => $isActive ? 'true' : 'false',
+                        ':ord'    => $sortক্রম,
+                        ':act'    => $isচালু ? 'true' : 'false',
                     ]);
-                    log_admin_activity((int) $currentAdmin['id'], 'banner_created', 'hero_banner', (int) $ins->fetchColumn());
+                    log_admin_activity((int) $currentঅ্যাডমিন['id'], 'banner_created', 'hero_banner', (int) $ins->fetchColumn());
                 } catch (Throwable $dbErr) {
                     $storage->delete($res['bucket'], $res['path']);
                     throw $dbErr;
@@ -96,14 +96,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':sub'    => $subtitle !== '' ? $subtitle : null,
                         ':bt'     => $buttonText !== '' ? $buttonText : null,
                         ':bu'     => $buttonUrl !== '' ? $buttonUrl : null,
-                        ':ord'    => $sortOrder,
-                        ':act'    => $isActive ? 'true' : 'false',
+                        ':ord'    => $sortক্রম,
+                        ':act'    => $isচালু ? 'true' : 'false',
                         ':bucket' => $bucket,
                         ':path'   => $path,
                         ':url'    => $url,
                         ':id'     => $bannerId,
                     ]);
-                    log_admin_activity((int) $currentAdmin['id'], 'banner_updated', 'hero_banner', $bannerId);
+                    log_admin_activity((int) $currentঅ্যাডমিন['id'], 'banner_updated', 'hero_banner', $bannerId);
                 } catch (Throwable $dbErr) {
                     if ($newUpload !== null) {
                         $storage->delete($newUpload['bucket'], $newUpload['path']);
@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($row) {
                 $storage->delete((string) $row['storage_bucket'], (string) $row['storage_path']);
                 $pdo->prepare('DELETE FROM public.hero_banners WHERE id = :id')->execute([':id' => $bannerId]);
-                log_admin_activity((int) $currentAdmin['id'], 'banner_deleted', 'hero_banner', $bannerId);
+                log_admin_activity((int) $currentঅ্যাডমিন['id'], 'banner_deleted', 'hero_banner', $bannerId);
             }
             set_flash('success', 'Hero banner deleted.');
             redirect_to(admin_url('banners.php'));
@@ -146,20 +146,20 @@ if (!empty($_GET['edit'])) {
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Slideshow Timing</h2>
+  <h2 class="adm-panel-title">স্লাইডশোর সময় নির্ধারণ</h2>
   <form method="post" action="<?= e(admin_url('banners.php')) ?>" style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save_interval">
     <div>
-      <label class="form-label" for="hero_interval_ms">Auto-Slide Interval (milliseconds)</label>
+      <label class="form-label" for="hero_interval_ms">স্বয়ংক্রিয় স্লাইড পরিবর্তনের সময় (মিলিসেকেন্ড)</label>
       <input class="form-control" type="number" id="hero_interval_ms" name="hero_interval_ms" min="2000" max="20000" step="500" value="<?= (int) ($siteSettings['hero_interval_ms'] ?? 5500) ?>">
     </div>
-    <button type="submit" class="btn btn-green">Save Interval</button>
+    <button type="submit" class="btn btn-green">সময় সংরক্ষণ করুন</button>
   </form>
 </section>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title"><?= $editBanner ? 'Edit Hero Banner #' . (int) $editBanner['id'] : 'Add Hero Banner' ?></h2>
+  <h2 class="adm-panel-title"><?= $editBanner ? 'সম্পাদনা Hero Banner #' . (int) $editBanner['id'] : 'যোগ করুন Hero Banner' ?></h2>
   <form method="post" action="<?= e(admin_url('banners.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="<?= $editBanner ? 'update' : 'create' ?>">
@@ -169,9 +169,9 @@ if (!empty($_GET['edit'])) {
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="banner_image"><?= $editBanner ? 'Replace Image (Optional)' : 'Banner Image (Required)' ?></label>
+        <label class="form-label" for="banner_image"><?= $editBanner ? 'Replace ছবি (Optional)' : 'Banner ছবি (Required)' ?></label>
         <input class="form-control" type="file" id="banner_image" name="banner_image" data-preview-target="banner_image_preview" <?= $editBanner ? '' : 'required' ?> accept="image/jpeg,image/png,image/webp">
-        <span class="form-hint">Recommended landscape 16:9 image (JPG/PNG/WebP). Stored in Supabase Storage (hero-banners).</span>
+        <span class="form-hint">১৬:৯ অনুপাতের আড়াআড়ি ছবি (JPG/PNG/WebP) ব্যবহার করুন। ছবিটি Supabase Storage-এ সংরক্ষিত হবে।</span>
         <div class="adm-media-preview" id="banner_image_preview">
           <?php if ($editBanner && !empty($editBanner['image_url'])): ?>
             <img src="<?= e(safe_url($editBanner['image_url'])) ?>" alt="Current banner" class="adm-preview-media">
@@ -179,29 +179,29 @@ if (!empty($_GET['edit'])) {
         </div>
       </div>
       <div class="form-row">
-        <label class="form-label" for="sort_order">Display Order</label>
+        <label class="form-label" for="sort_order">Display ক্রম</label>
         <input class="form-control" type="number" id="sort_order" name="sort_order" value="<?= (int) ($editBanner['sort_order'] ?? 0) ?>">
       </div>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="title">Banner Title (Optional)</label>
+        <label class="form-label" for="title">ব্যানারের শিরোনাম (ঐচ্ছিক)</label>
         <input class="form-control" type="text" id="title" name="title" value="<?= e($editBanner['title'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="subtitle">Banner Subtitle (Optional)</label>
+        <label class="form-label" for="subtitle">ব্যানারের উপশিরোনাম (ঐচ্ছিক)</label>
         <input class="form-control" type="text" id="subtitle" name="subtitle" value="<?= e($editBanner['subtitle'] ?? '') ?>">
       </div>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="button_text">Button Text (Optional)</label>
+        <label class="form-label" for="button_text">বাটনের লেখা (ঐচ্ছিক)</label>
         <input class="form-control" type="text" id="button_text" name="button_text" value="<?= e($editBanner['button_text'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="button_url">Button URL (Optional)</label>
+        <label class="form-label" for="button_url">বাটন লিংক (Optional)</label>
         <input class="form-control" type="text" id="button_url" name="button_url" value="<?= e($editBanner['button_url'] ?? '') ?>" placeholder="/gallery.php or #posts-section">
       </div>
     </div>
@@ -209,49 +209,49 @@ if (!empty($_GET['edit'])) {
     <div class="form-row">
       <label class="form-check">
         <input type="checkbox" name="is_active" value="1" <?= (!$editBanner || !empty($editBanner['is_active'])) ? 'checked' : '' ?>>
-        <span>Enable banner on public homepage</span>
+        <span>মূল পাতায় ব্যানারটি দেখাবে</span>
       </label>
     </div>
 
     <div style="display: flex; gap: 10px;">
-      <button type="submit" class="btn btn-green"><?= $editBanner ? 'Save Banner' : 'Add Banner' ?></button>
+      <button type="submit" class="btn btn-green"><?= $editBanner ? 'সংরক্ষণ Banner' : 'যোগ করুন Banner' ?></button>
       <?php if ($editBanner): ?>
-        <a href="<?= e(admin_url('banners.php')) ?>" class="btn btn-outline">Cancel</a>
+        <a href="<?= e(admin_url('banners.php')) ?>" class="btn btn-outline">বাতিল</a>
       <?php endif; ?>
     </div>
   </form>
 </section>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Configured Banners</h2>
+  <h2 class="adm-panel-title">সংরক্ষিত ব্যানার</h2>
   <div class="table-wrap">
     <table class="adm-table">
       <thead>
         <tr>
-          <th>Image</th>
+          <th>ছবি</th>
           <th>Title</th>
-          <th>Button</th>
-          <th>Order</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>বাটন</th>
+          <th>ক্রম</th>
+          <th>অবস্থা</th>
+          <th>কার্যক্রমs</th>
         </tr>
       </thead>
       <tbody>
         <?php foreach ($banners as $b): ?>
           <tr>
             <td><img src="<?= e(safe_url($b['image_url'])) ?>" alt="" class="adm-thumb"></td>
-            <td><?= e($b['title'] ?: '(Image-only banner)') ?></td>
+            <td><?= e($b['title'] ?: '(ছবি-only banner)') ?></td>
             <td><?= e($b['button_text'] ?: '—') ?></td>
             <td class="num-tab"><?= (int) $b['sort_order'] ?></td>
-            <td><?= !empty($b['is_active']) ? 'Active' : 'Disabled' ?></td>
+            <td><?= !empty($b['is_active']) ? 'চালু' : 'Disabled' ?></td>
             <td>
               <div style="display: flex; gap: 6px;">
-                <a href="<?= e(admin_url('banners.php')) ?>?edit=<?= (int) $b['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
-                <form method="post" action="<?= e(admin_url('banners.php')) ?>" data-confirm="Delete this banner?">
+                <a href="<?= e(admin_url('banners.php')) ?>?edit=<?= (int) $b['id'] ?>" class="btn btn-outline btn-sm">সম্পাদনা</a>
+                <form method="post" action="<?= e(admin_url('banners.php')) ?>" data-confirm="মুছুন this banner?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="banner_id" value="<?= (int) $b['id'] ?>">
-                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                  <button type="submit" class="btn btn-danger btn-sm">মুছুন</button>
                 </form>
               </div>
             </td>

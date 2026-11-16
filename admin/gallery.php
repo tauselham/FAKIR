@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'gallery';
-$adminPageTitle = 'Photo Gallery';
+$adminPageTitle = 'ছবির গ্যালারি';
 $requiredPermission = 'manage_gallery';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $isSlider    = !empty($_POST['is_slider_item']);
 
             if (empty($_FILES['images']['name'][0])) {
-                throw new RuntimeException('Please choose at least one image to upload.');
+                throw new RuntimeException('আপলোড করার জন্য অন্তত একটি ছবি নির্বাচন করুন।');
             }
 
             $filesToUpload = [];
@@ -44,14 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($filesToUpload === []) {
-                throw new RuntimeException('Please choose at least one valid image to upload.');
+                throw new RuntimeException('আপলোড করার জন্য অন্তত একটি সঠিক ছবি নির্বাচন করুন।');
             }
 
             $uploadedCount = 0;
             foreach ($filesToUpload as $single) {
                 $res = $storage->upload($single, BUCKET_GALLERY_IMAGES, ALLOWED_IMAGE_MIMES, MAX_IMAGE_UPLOAD_BYTES, 'photos');
                 try {
-                    db_transaction(function (PDO $pdo) use ($categoryId, $currentAdmin, $title, $description, $res, $isFeatured, $isSlider): void {
+                    db_transaction(function (PDO $pdo) use ($categoryId, $currentঅ্যাডমিন, $title, $description, $res, $isFeatured, $isSlider): void {
                         $ins = $pdo->prepare(
                             'INSERT INTO public.gallery_images
                              (category_id, admin_id, title, description, storage_bucket, storage_path, image_url, mime_type, file_size_bytes, is_featured, is_slider_item, status)
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         );
                         $ins->execute([
                             ':cat'    => $categoryId,
-                            ':aid'    => (int) $currentAdmin['id'],
+                            ':aid'    => (int) $currentঅ্যাডমিন['id'],
                             ':title'  => $title !== '' ? $title : null,
                             ':desc'   => $description !== '' ? $description : null,
                             ':bucket' => $res['bucket'],
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ':slider' => $isSlider ? 'true' : 'false',
                         ]);
                         $id = (int) $ins->fetchColumn();
-                        log_admin_activity((int) $currentAdmin['id'], 'gallery_image_uploaded', 'gallery_image', $id);
+                        log_admin_activity((int) $currentঅ্যাডমিন['id'], 'gallery_image_uploaded', 'gallery_image', $id);
                     });
                 } catch (Throwable $dbErr) {
                     $storage->delete($res['bucket'], $res['path']);
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $categoryId  = (int) ($_POST['category_id'] ?? 0) ?: null;
             $title       = trim((string) ($_POST['title'] ?? ''));
             $description = trim((string) ($_POST['description'] ?? ''));
-            $sortOrder   = (int) ($_POST['sort_order'] ?? 0);
+            $sortক্রম   = (int) ($_POST['sort_order'] ?? 0);
             $isFeatured  = !empty($_POST['is_featured']);
             $isSlider    = !empty($_POST['is_slider_item']);
             $status      = ($_POST['status'] ?? 'published') === 'hidden' ? 'hidden' : 'published';
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $st->execute([':id' => $imgId]);
             $existing = $st->fetch();
             if (!$existing) {
-                throw new RuntimeException('Image record not found.');
+                throw new RuntimeException('ছবি record not found.');
             }
 
             $bucket = $existing['storage_bucket'];
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':cat'    => $categoryId,
                     ':title'  => $title !== '' ? $title : null,
                     ':desc'   => $description !== '' ? $description : null,
-                    ':ord'    => $sortOrder,
+                    ':ord'    => $sortক্রম,
                     ':feat'   => $isFeatured ? 'true' : 'false',
                     ':slider' => $isSlider ? 'true' : 'false',
                     ':status' => $status,
@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':size'   => $size,
                     ':id'     => $imgId,
                 ]);
-                log_admin_activity((int) $currentAdmin['id'], 'gallery_image_updated', 'gallery_image', $imgId);
+                log_admin_activity((int) $currentঅ্যাডমিন['id'], 'gallery_image_updated', 'gallery_image', $imgId);
             } catch (Throwable $dbErr) {
                 if ($newUpload !== null) {
                     $storage->delete($newUpload['bucket'], $newUpload['path']);
@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $storage->delete((string) $row['storage_bucket'], (string) $row['storage_path']);
                 $del = $pdo->prepare('DELETE FROM public.gallery_images WHERE id = :id');
                 $del->execute([':id' => $imgId]);
-                log_admin_activity((int) $currentAdmin['id'], 'gallery_image_deleted', 'gallery_image', $imgId);
+                log_admin_activity((int) $currentঅ্যাডমিন['id'], 'gallery_image_deleted', 'gallery_image', $imgId);
             }
             set_flash('success', 'Gallery image deleted.');
             redirect_to(admin_url('gallery.php'));
@@ -185,34 +185,34 @@ $images = $pdo->query(
      ORDER BY gi.sort_order ASC, gi.uploaded_at DESC'
 )->fetchAll();
 
-$editImage = null;
+$editছবি = null;
 if (!empty($_GET['edit'])) {
     $st = $pdo->prepare('SELECT * FROM public.gallery_images WHERE id = :id LIMIT 1');
     $st->execute([':id' => (int) $_GET['edit']]);
-    $editImage = $st->fetch() ?: null;
+    $editছবি = $st->fetch() ?: null;
 }
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title"><?= $editImage ? 'Edit Photo #' . (int) $editImage['id'] : 'Upload Gallery Photos (Multiple Supported)' ?></h2>
+  <h2 class="adm-panel-title"><?= $editছবি ? 'সম্পাদনা Photo #' . (int) $editছবি['id'] : 'গ্যালারিতে ছবি আপলোড (Multiple Supported)' ?></h2>
 
-  <?php if ($editImage): ?>
+  <?php if ($editছবি): ?>
     <form method="post" action="<?= e(admin_url('gallery.php')) ?>" enctype="multipart/form-data">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="update">
-      <input type="hidden" name="image_id" value="<?= (int) $editImage['id'] ?>">
+      <input type="hidden" name="image_id" value="<?= (int) $editছবি['id'] ?>">
 
       <div class="adm-grid-2">
         <div class="form-row">
-          <label class="form-label" for="edit_title">Title (Optional)</label>
-          <input class="form-control" type="text" id="edit_title" name="title" value="<?= e($editImage['title'] ?? '') ?>">
+          <label class="form-label" for="edit_title">শিরোনাম (ঐচ্ছিক)</label>
+          <input class="form-control" type="text" id="edit_title" name="title" value="<?= e($editছবি['title'] ?? '') ?>">
         </div>
         <div class="form-row">
-          <label class="form-label" for="edit_cat">Category</label>
+          <label class="form-label" for="edit_cat">বিভাগ</label>
           <select class="form-control" name="category_id" id="edit_cat">
-            <option value="">Uncategorized</option>
+            <option value="">বিভাগবিহীন</option>
             <?php foreach ($categories as $cat): ?>
-              <option value="<?= (int) $cat['id'] ?>" <?= ((int) ($editImage['category_id'] ?? 0) === (int) $cat['id']) ? 'selected' : '' ?>>
+              <option value="<?= (int) $cat['id'] ?>" <?= ((int) ($editছবি['category_id'] ?? 0) === (int) $cat['id']) ? 'selected' : '' ?>>
                 <?= e($cat['name']) ?>
               </option>
             <?php endforeach; ?>
@@ -221,46 +221,46 @@ if (!empty($_GET['edit'])) {
       </div>
 
       <div class="form-row">
-        <label class="form-label" for="edit_desc">Description (Optional)</label>
-        <textarea class="form-control" id="edit_desc" name="description"><?= e($editImage['description'] ?? '') ?></textarea>
+        <label class="form-label" for="edit_desc">বিবরণ (ঐচ্ছিক)</label>
+        <textarea class="form-control" id="edit_desc" name="description"><?= e($editছবি['description'] ?? '') ?></textarea>
       </div>
 
       <div class="adm-grid-2">
         <div class="form-row">
-          <label class="form-label" for="edit_order">Sort Order</label>
-          <input class="form-control" type="number" id="edit_order" name="sort_order" value="<?= (int) $editImage['sort_order'] ?>">
+          <label class="form-label" for="edit_order">ক্রম</label>
+          <input class="form-control" type="number" id="edit_order" name="sort_order" value="<?= (int) $editছবি['sort_order'] ?>">
         </div>
         <div class="form-row">
-          <label class="form-label" for="edit_status">Visibility</label>
+          <label class="form-label" for="edit_status">দৃশ্যমানতা</label>
           <select class="form-control" name="status" id="edit_status">
-            <option value="published" <?= $editImage['status'] === 'published' ? 'selected' : '' ?>>Published</option>
-            <option value="hidden" <?= $editImage['status'] === 'hidden' ? 'selected' : '' ?>>Hidden</option>
+            <option value="published" <?= $editছবি['status'] === 'published' ? 'selected' : '' ?>>প্রকাশিত</option>
+            <option value="hidden" <?= $editছবি['status'] === 'hidden' ? 'selected' : '' ?>>লুকানো</option>
           </select>
         </div>
       </div>
 
       <div class="form-row">
-        <label class="form-label" for="replace_image">Replace Image File (Optional)</label>
+        <label class="form-label" for="replace_image">Replace ছবি File (Optional)</label>
         <input class="form-control" type="file" id="replace_image" name="replace_image" data-preview-target="gallery_edit_preview" accept="image/jpeg,image/png,image/webp,image/gif">
         <div class="adm-media-preview" id="gallery_edit_preview">
-          <img src="<?= e(safe_url($editImage['image_url'])) ?>" alt="Current gallery photo" class="adm-preview-media">
+          <img src="<?= e(safe_url($editছবি['image_url'])) ?>" alt="Current gallery photo" class="adm-preview-media">
         </div>
       </div>
 
       <div class="form-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
         <label class="form-check">
-          <input type="checkbox" name="is_featured" value="1" <?= !empty($editImage['is_featured']) ? 'checked' : '' ?>>
-          <span>Show in Featured Memories</span>
+          <input type="checkbox" name="is_featured" value="1" <?= !empty($editছবি['is_featured']) ? 'checked' : '' ?>>
+          <span>বিশেষ স্মৃতিতে দেখাবে</span>
         </label>
         <label class="form-check">
-          <input type="checkbox" name="is_slider_item" value="1" <?= !empty($editImage['is_slider_item']) ? 'checked' : '' ?>>
-          <span>Show in Horizontal Auto-Slider</span>
+          <input type="checkbox" name="is_slider_item" value="1" <?= !empty($editছবি['is_slider_item']) ? 'checked' : '' ?>>
+          <span>অনুভূমিক স্লাইডারে দেখাবে</span>
         </label>
       </div>
 
       <div style="display: flex; gap: 10px;">
-        <button type="submit" class="btn btn-green">Save Photo Details</button>
-        <a href="<?= e(admin_url('gallery.php')) ?>" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-green">সংরক্ষণ Photo Details</button>
+        <a href="<?= e(admin_url('gallery.php')) ?>" class="btn btn-outline">বাতিল</a>
       </div>
     </form>
   <?php else: ?>
@@ -270,16 +270,16 @@ if (!empty($_GET['edit'])) {
 
       <div class="adm-grid-2">
         <div class="form-row">
-          <label class="form-label" for="images">Select Image(s)</label>
+          <label class="form-label" for="images">Select ছবি(s)</label>
           <input class="form-control" type="file" id="images" name="images[]" multiple required data-preview-target="gallery_multi_preview" accept="image/jpeg,image/png,image/webp,image/gif">
-          <span class="form-hint">You can select multiple photos at once. Uploaded directly to Supabase Storage (gallery-images).</span>
+          <span class="form-hint">একসঙ্গে একাধিক ছবি নির্বাচন করতে পারবেন। ছবিগুলো Supabase Storage-এ আপলোড হবে।</span>
           <div class="adm-media-preview" id="gallery_multi_preview"></div>
         </div>
 
         <div class="form-row">
-          <label class="form-label" for="category_id">Category (Optional)</label>
+          <label class="form-label" for="category_id">বিভাগ (Optional)</label>
           <select class="form-control" name="category_id" id="category_id">
-            <option value="">All Photos / Uncategorized</option>
+            <option value="">All Photos / বিভাগবিহীন</option>
             <?php foreach ($categories as $cat): ?>
               <option value="<?= (int) $cat['id'] ?>"><?= e($cat['name']) ?></option>
             <?php endforeach; ?>
@@ -289,35 +289,35 @@ if (!empty($_GET['edit'])) {
 
       <div class="adm-grid-2">
         <div class="form-row">
-          <label class="form-label" for="title">Title (Optional — leave blank if untitled)</label>
-          <input class="form-control" type="text" id="title" name="title" placeholder="Optional photo title">
+          <label class="form-label" for="title">শিরোনাম (ঐচ্ছিক — না চাইলে ফাঁকা রাখুন)</label>
+          <input class="form-control" type="text" id="title" name="title" placeholder="ছবির শিরোনাম (ঐচ্ছিক)">
         </div>
         <div class="form-row">
-          <label class="form-label" for="description">Description (Optional)</label>
-          <input class="form-control" type="text" id="description" name="description" placeholder="Optional caption">
+          <label class="form-label" for="description">বিবরণ (ঐচ্ছিক)</label>
+          <input class="form-control" type="text" id="description" name="description" placeholder="ছবির ক্যাপশন (ঐচ্ছিক)">
         </div>
       </div>
 
       <div class="form-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
         <label class="form-check">
           <input type="checkbox" name="is_featured" value="1">
-          <span>Feature on Homepage</span>
+          <span>মূল পাতায় দেখাবে</span>
         </label>
         <label class="form-check">
           <input type="checkbox" name="is_slider_item" value="1" checked>
-          <span>Include in Horizontal Slider</span>
+          <span>অনুভূমিক স্লাইডারে রাখুন</span>
         </label>
       </div>
 
-      <button type="submit" class="btn btn-green">Upload to Gallery</button>
+      <button type="submit" class="btn btn-green">গ্যালারিতে আপলোড করুন</button>
     </form>
   <?php endif; ?>
 </section>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Gallery Photos (<?= count($images) ?>)</h2>
+  <h2 class="adm-panel-title">গ্যালারির ছবি (<?= count($images) ?>)</h2>
   <?php if (empty($images)): ?>
-    <p style="color: var(--adm-muted); margin: 0;">No gallery images uploaded yet.</p>
+    <p style="color: var(--adm-muted); margin: 0;">এখনো কোনো ছবি আপলোড করা হয়নি।</p>
   <?php else: ?>
     <div class="table-wrap">
       <table class="adm-table">
@@ -325,11 +325,11 @@ if (!empty($_GET['edit'])) {
           <tr>
             <th>Photo</th>
             <th>Title</th>
-            <th>Category</th>
-            <th>Order</th>
-            <th>Placement</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>বিভাগ</th>
+            <th>ক্রম</th>
+            <th>অবস্থান</th>
+            <th>অবস্থা</th>
+            <th>কার্যক্রমs</th>
           </tr>
         </thead>
         <tbody>
@@ -350,12 +350,12 @@ if (!empty($_GET['edit'])) {
               <td><?= e(ucfirst($img['status'])) ?></td>
               <td>
                 <div style="display: flex; gap: 6px;">
-                  <a href="<?= e(admin_url('gallery.php')) ?>?edit=<?= (int) $img['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
-                  <form method="post" action="<?= e(admin_url('gallery.php')) ?>" data-confirm="Delete this photo from the gallery and Supabase Storage?">
+                  <a href="<?= e(admin_url('gallery.php')) ?>?edit=<?= (int) $img['id'] ?>" class="btn btn-outline btn-sm">সম্পাদনা</a>
+                  <form method="post" action="<?= e(admin_url('gallery.php')) ?>" data-confirm="মুছুন this photo from the gallery and Supabase Storage?">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="image_id" value="<?= (int) $img['id'] ?>">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    <button type="submit" class="btn btn-danger btn-sm">মুছুন</button>
                   </form>
                 </div>
               </td>

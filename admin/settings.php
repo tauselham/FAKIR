@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'settings';
-$adminPageTitle = 'Website Settings';
+$adminPageTitle = 'ওয়েবসাইট সেটিংস';
 $requiredPermission = 'manage_settings';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $faviconPath = $current['favicon_path'] ?? null;
         $faviconUrl  = $current['favicon_url'] ?? null;
 
-        $oldAssetsToDelete = [];
+        $oldAssetsToমুছুন = [];
         $newAssetsUploaded = [];
 
         try {
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $res = $storage->upload($_FILES['logo_file'], BUCKET_WEBSITE_ASSETS, ALLOWED_LOGO_MIMES, MAX_ASSET_UPLOAD_BYTES, 'logo');
                 $newAssetsUploaded[] = $res;
                 if ($logoPath) {
-                    $oldAssetsToDelete[] = (string) $logoPath;
+                    $oldAssetsToমুছুন[] = (string) $logoPath;
                 }
                 $logoPath = $res['path'];
                 $logoUrl  = $res['url'];
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $res = $storage->upload($_FILES['favicon_file'], BUCKET_WEBSITE_ASSETS, ALLOWED_FAVICON_MIMES, MAX_ASSET_UPLOAD_BYTES, 'favicon');
                 $newAssetsUploaded[] = $res;
                 if ($faviconPath) {
-                    $oldAssetsToDelete[] = (string) $faviconPath;
+                    $oldAssetsToমুছুন[] = (string) $faviconPath;
                 }
                 $faviconPath = $res['path'];
                 $faviconUrl  = $res['url'];
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':ig'     => trim((string) ($_POST['social_instagram'] ?? '')),
                 ':yt'     => trim((string) ($_POST['social_youtube'] ?? '')),
             ]);
-            log_admin_activity((int) $currentAdmin['id'], 'website_settings_updated', 'website_settings', 1);
+            log_admin_activity((int) $currentঅ্যাডমিন['id'], 'website_settings_updated', 'website_settings', 1);
         } catch (Throwable $err) {
             foreach ($newAssetsUploaded as $uploaded) {
                 $storage->delete($uploaded['bucket'], $uploaded['path']);
@@ -78,10 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw $err;
         }
 
-        foreach ($oldAssetsToDelete as $oldPath) {
+        foreach ($oldAssetsToমুছুন as $oldPath) {
             $storage->delete(BUCKET_WEBSITE_ASSETS, $oldPath);
         }
-        set_flash('success', 'Website settings saved.');
+        set_flash('success', 'ওয়েবসাইটের সেটিংস সংরক্ষণ করা হয়েছে।');
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
     }
@@ -92,42 +92,42 @@ $settings = get_website_settings();
 ?>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">General, Branding &amp; SEO Settings</h2>
+  <h2 class="adm-panel-title">সাধারণ, পরিচিতি ও সার্চ ইঞ্জিন সেটিংস</h2>
   <form method="post" action="<?= e(admin_url('settings.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="site_name">Website Name</label>
+        <label class="form-label" for="site_name">ওয়েবসাইটের নাম</label>
         <input class="form-control" type="text" id="site_name" name="site_name" value="<?= e($settings['site_name']) ?>" required>
       </div>
       <div class="form-row">
-        <label class="form-label" for="accent_color">Primary Green Accent Color</label>
+        <label class="form-label" for="accent_color">প্রধান সবুজ রং</label>
         <input class="form-control" type="color" id="accent_color" name="accent_color" value="<?= e(sanitize_hex_color($settings['accent_color'], '#15803d')) ?>" style="height: 44px; padding: 4px;">
       </div>
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="site_description">Website Description</label>
+      <label class="form-label" for="site_description">ওয়েবসাইটের বিবরণ</label>
       <textarea class="form-control" id="site_description" name="site_description"><?= e($settings['site_description'] ?? '') ?></textarea>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="logo_file">Website Logo</label>
+        <label class="form-label" for="logo_file">ওয়েবসাইটের লোগো</label>
         <input class="form-control" type="file" id="logo_file" name="logo_file" data-preview-target="settings_logo_preview" accept="image/jpeg,image/png,image/webp">
         <div class="adm-media-preview" id="settings_logo_preview">
           <?php if (!empty($settings['logo_url'])): ?>
-            <img src="<?= e(safe_url($settings['logo_url'])) ?>" alt="Current website logo" class="adm-preview-media adm-preview-logo">
+            <img src="<?= e(safe_url($settings['logo_url'])) ?>" alt="বর্তমান ওয়েবসাইটের লোগো" class="adm-preview-media adm-preview-logo">
           <?php endif; ?>
         </div>
       </div>
       <div class="form-row">
-        <label class="form-label" for="favicon_file">Favicon (.ico / .png / .webp)</label>
+        <label class="form-label" for="favicon_file">ফেভিকন (.ico / .png / .webp)</label>
         <input class="form-control" type="file" id="favicon_file" name="favicon_file" data-preview-target="settings_favicon_preview" accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/webp">
         <div class="adm-media-preview" id="settings_favicon_preview">
           <?php if (!empty($settings['favicon_url'])): ?>
-            <img src="<?= e(safe_url($settings['favicon_url'])) ?>" alt="Current favicon" class="adm-preview-media adm-preview-favicon">
+            <img src="<?= e(safe_url($settings['favicon_url'])) ?>" alt="বর্তমান ফেভিকন" class="adm-preview-media adm-preview-favicon">
           <?php endif; ?>
         </div>
       </div>
@@ -135,32 +135,32 @@ $settings = get_website_settings();
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="seo_title">SEO Title</label>
+        <label class="form-label" for="seo_title">সার্চ ফলাফলের শিরোনাম</label>
         <input class="form-control" type="text" id="seo_title" name="seo_title" value="<?= e($settings['seo_title'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="seo_description">SEO Meta Description</label>
+        <label class="form-label" for="seo_description">সার্চ ফলাফলের বিবরণ</label>
         <input class="form-control" type="text" id="seo_description" name="seo_description" value="<?= e($settings['seo_description'] ?? '') ?>">
       </div>
     </div>
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="social_facebook">Facebook Page URL</label>
+        <label class="form-label" for="social_facebook">ফেসবুক পেজের লিংক</label>
         <input class="form-control" type="url" id="social_facebook" name="social_facebook" value="<?= e($settings['social_facebook'] ?? '') ?>">
       </div>
       <div class="form-row">
-        <label class="form-label" for="social_instagram">Instagram Profile URL</label>
+        <label class="form-label" for="social_instagram">ইনস্টাগ্রাম প্রোফাইলের লিংক</label>
         <input class="form-control" type="url" id="social_instagram" name="social_instagram" value="<?= e($settings['social_instagram'] ?? '') ?>">
       </div>
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="social_youtube">YouTube Channel URL</label>
+      <label class="form-label" for="social_youtube">ইউটিউব চ্যানেলের লিংক</label>
       <input class="form-control" type="url" id="social_youtube" name="social_youtube" value="<?= e($settings['social_youtube'] ?? '') ?>">
     </div>
 
-    <button type="submit" class="btn btn-green">Save Website Settings</button>
+    <button type="submit" class="btn btn-green">সংরক্ষণ ওয়েবসাইট সেটিংস</button>
   </form>
 </section>
 

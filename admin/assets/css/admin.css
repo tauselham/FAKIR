@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Greenfield Village — Secure Admin Panel Stylesheet
+   Greenfield Village — Secure অ্যাডমিন প্যানেল Stylesheet
    ========================================================================== */
 
 :root {
@@ -34,7 +34,7 @@ body {
 a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font-family: inherit; font-size: 0.9375rem; }
 
-/* Auth Pages (Login / Forgot Password) */
+/* Auth Pages (Login / Forgot পাসওয়ার্ড) */
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -285,7 +285,7 @@ textarea.form-control {
   cursor: pointer;
 }
 
-/* Buttons */
+/* বাটনs */
 .btn {
   display: inline-flex;
   align-items: center;

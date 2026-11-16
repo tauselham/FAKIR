@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// Admin modules process POST actions after including this layout. Buffer the
+// অ্যাডমিন modules process POST actions after including this layout. Buffer the
 // layout output so redirects and other response headers remain available.
 if (ob_get_level() === 0) {
     ob_start();
@@ -15,83 +15,83 @@ if (!defined('ADMIN_ROUTED_ENTRY')) {
 }
 
 send_admin_nocache_headers();
-$currentAdmin = require_admin();
+$currentঅ্যাডমিন = require_admin();
 
-if (!empty($requiredSuperAdmin) && !is_super_admin($currentAdmin)) {
-    log_admin_activity((int) $currentAdmin['id'], 'unauthorized_access_attempt', 'admin_module', null, [
+if (!empty($requiredSuperঅ্যাডমিন) && !is_super_admin($currentঅ্যাডমিন)) {
+    log_admin_activity((int) $currentঅ্যাডমিন['id'], 'unauthorized_access_attempt', 'admin_module', null, [
         'module' => $activePage ?? '',
         'reason' => 'super_admin_required',
     ]);
     http_response_code(403);
-    set_flash('error', 'Only a Super Admin can access this section.');
+    set_flash('error', 'শুধুমাত্র একজন সুপার অ্যাডমিন can access this section.');
     redirect_to(admin_url('dashboard.php'));
 }
 
-if (!empty($requiredPermission) && !admin_has_permission((string) $requiredPermission, $currentAdmin)) {
-    log_admin_activity((int) $currentAdmin['id'], 'unauthorized_access_attempt', 'admin_module', null, [
+if (!empty($requiredPermission) && !admin_has_permission((string) $requiredPermission, $currentঅ্যাডমিন)) {
+    log_admin_activity((int) $currentঅ্যাডমিন['id'], 'unauthorized_access_attempt', 'admin_module', null, [
         'module'     => $activePage ?? '',
         'permission' => $requiredPermission,
     ]);
     http_response_code(403);
-    set_flash('error', 'You do not have permission to access that section.');
+    set_flash('error', 'এই বিভাগে প্রবেশের অনুমতি আপনার নেই।');
     redirect_to(admin_url('dashboard.php'));
 }
 
-// Enforce Admin API rate limit on authenticated state-changing requests
+// Enforce অ্যাডমিন API rate limit on authenticated state-changing requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     enforce_rate_limit('admin_api', [
         'ip'      => client_ip(),
-        'account' => 'admin:' . (int) $currentAdmin['id'],
+        'account' => 'admin:' . (int) $currentঅ্যাডমিন['id'],
     ]);
 }
 
 $siteSettings = get_website_settings();
 $flash        = get_flash();
 $activePage   = $activePage ?? 'dashboard';
-$pageTitle    = $adminPageTitle ?? 'Dashboard';
+$pageTitle    = $adminPageTitle ?? 'ড্যাশবোর্ড';
 
 $allNavItems = [
-    ['id' => 'dashboard',   'label' => 'Dashboard',           'href' => admin_url('dashboard.php'),   'perm' => null,                 'super' => false],
-    ['id' => 'pages',       'label' => 'Landing Pages',       'href' => admin_url('pages.php'),       'perm' => 'manage_pages',       'super' => false],
-    ['id' => 'posts',       'label' => 'Community Posts',     'href' => admin_url('posts.php'),       'perm' => 'manage_posts',       'super' => false],
-    ['id' => 'gallery',     'label' => 'Photo Gallery',       'href' => admin_url('gallery.php'),     'perm' => 'manage_gallery',     'super' => false],
-    ['id' => 'banners',     'label' => 'Hero Banners',        'href' => admin_url('banners.php'),     'perm' => 'manage_banners',     'super' => false],
-    ['id' => 'popups',      'label' => 'Popup Campaigns',     'href' => admin_url('popups.php'),      'perm' => 'manage_popups',      'super' => false],
-    ['id' => 'categories',  'label' => 'Categories',          'href' => admin_url('categories.php'),  'perm' => 'manage_categories',  'super' => false],
-    ['id' => 'header',      'label' => 'Header & Menus',      'href' => admin_url('header.php'),      'perm' => 'manage_navigation',  'super' => false],
-    ['id' => 'footer',      'label' => 'Footer Settings',     'href' => admin_url('footer.php'),      'perm' => 'manage_navigation',  'super' => false],
-    ['id' => 'settings',    'label' => 'Website Settings',    'href' => admin_url('settings.php'),    'perm' => 'manage_settings',    'super' => false],
-    ['id' => 'admins',      'label' => 'Admin Users',         'href' => admin_url('admins.php'),      'perm' => null,                 'super' => true],
-    ['id' => 'rate_limits', 'label' => 'Rate Limits',         'href' => admin_url('rate-limits.php'), 'perm' => null,                 'super' => true],
-    ['id' => 'security',    'label' => 'Security & Password', 'href' => admin_url('security.php'),    'perm' => null,                 'super' => false],
+    ['id' => 'dashboard',   'label' => 'ড্যাশবোর্ড',           'href' => admin_url('dashboard.php'),   'perm' => null,                 'super' => false],
+    ['id' => 'pages',       'label' => 'পেজ ব্যবস্থাপনা',       'href' => admin_url('pages.php'),       'perm' => 'manage_pages',       'super' => false],
+    ['id' => 'posts',       'label' => 'গ্রামের খবর ও পোস্ট',     'href' => admin_url('posts.php'),       'perm' => 'manage_posts',       'super' => false],
+    ['id' => 'gallery',     'label' => 'ছবির গ্যালারি',       'href' => admin_url('gallery.php'),     'perm' => 'manage_gallery',     'super' => false],
+    ['id' => 'banners',     'label' => 'প্রধান ব্যানার',        'href' => admin_url('banners.php'),     'perm' => 'manage_banners',     'super' => false],
+    ['id' => 'popups',      'label' => 'পপআপ ব্যবস্থাপনা',     'href' => admin_url('popups.php'),      'perm' => 'manage_popups',      'super' => false],
+    ['id' => 'categories',  'label' => 'বিভাগসমূহ',          'href' => admin_url('categories.php'),  'perm' => 'manage_categories',  'super' => false],
+    ['id' => 'header',      'label' => 'হেডার ও মেনু',      'href' => admin_url('header.php'),      'perm' => 'manage_navigation',  'super' => false],
+    ['id' => 'footer',      'label' => 'ফুটার সেটিংস',     'href' => admin_url('footer.php'),      'perm' => 'manage_navigation',  'super' => false],
+    ['id' => 'settings',    'label' => 'ওয়েবসাইট সেটিংস',    'href' => admin_url('settings.php'),    'perm' => 'manage_settings',    'super' => false],
+    ['id' => 'admins',      'label' => 'অ্যাডমিন ব্যবহারকারী',         'href' => admin_url('admins.php'),      'perm' => null,                 'super' => true],
+    ['id' => 'rate_limits', 'label' => 'অনুরোধ সীমা',         'href' => admin_url('rate-limits.php'), 'perm' => null,                 'super' => true],
+    ['id' => 'security',    'label' => 'নিরাপত্তা ও পাসওয়ার্ড', 'href' => admin_url('security.php'),    'perm' => null,                 'super' => false],
 ];
 
-$navItems = array_values(array_filter($allNavItems, static function (array $item) use ($currentAdmin): bool {
+$navItems = array_values(array_filter($allNavItems, static function (array $item) use ($currentঅ্যাডমিন): bool {
     if (!empty($item['super'])) {
-        return is_super_admin($currentAdmin);
+        return is_super_admin($currentঅ্যাডমিন);
     }
     if (!empty($item['perm'])) {
-        return admin_has_permission((string) $item['perm'], $currentAdmin);
+        return admin_has_permission((string) $item['perm'], $currentঅ্যাডমিন);
     }
     return true;
 }));
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= e($pageTitle) ?> — Admin Panel</title>
+  <title><?= e($pageTitle) ?> — অ্যাডমিন প্যানেল</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="<?= e(admin_url('assets/css/admin.css')) ?>?v=20261115-rich-editor">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="<?= e(admin_url('assets/css/admin.css')) ?>?v=20261116-bengali">
 </head>
 <body>
 <div class="adm-shell">
-  <aside class="adm-sidebar" id="adm-sidebar" aria-label="Admin Navigation">
+  <aside class="adm-sidebar" id="adm-sidebar" aria-label="অ্যাডমিন নেভিগেশন">
     <div class="adm-brand">
-      <span><?= e($siteSettings['site_name']) ?> Admin</span>
+      <span><?= e($siteSettings['site_name']) ?> অ্যাডমিন</span>
     </div>
 
     <nav class="adm-nav">
@@ -103,11 +103,11 @@ $navItems = array_values(array_filter($allNavItems, static function (array $item
     </nav>
 
     <div class="adm-sidebar-foot">
-      <a href="/" target="_blank" rel="noopener noreferrer" class="adm-nav-link">View Public Site ↗</a>
+      <a href="/" target="_blank" rel="noopener noreferrer" class="adm-nav-link">ওয়েবসাইট দেখুন ↗</a>
       <form method="post" action="<?= e(admin_url('logout.php')) ?>">
         <?= csrf_field() ?>
         <button type="submit" class="btn btn-outline btn-sm" style="width: 100%; background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2);">
-          Sign Out (<?= e($currentAdmin['username']) ?>)
+          লগআউট (<?= e($currentঅ্যাডমিন['username']) ?>)
         </button>
       </form>
     </div>
@@ -116,20 +116,20 @@ $navItems = array_values(array_filter($allNavItems, static function (array $item
   <div class="adm-main">
     <header class="adm-topbar">
       <div class="adm-topbar-left">
-        <button type="button" class="adm-menu-btn" id="adm-menu-btn" aria-label="Toggle sidebar">☰</button>
+        <button type="button" class="adm-menu-btn" id="adm-menu-btn" aria-label="সাইডবার খুলুন বা বন্ধ করুন">☰</button>
         <h1 class="adm-page-title"><?= e($pageTitle) ?></h1>
       </div>
       <div style="font-size: 0.85rem; color: var(--adm-muted);">
-        Signed in as <strong><?= e($currentAdmin['full_name']) ?></strong>
-        (<?= e(is_super_admin($currentAdmin) ? 'Super Admin' : ucfirst((string) $currentAdmin['role'])) ?>)
+        লগইন করেছেন <strong><?= e($currentঅ্যাডমিন['full_name']) ?></strong>
+        (<?= e(is_super_admin($currentঅ্যাডমিন) ? 'সুপার অ্যাডমিন' : ucfirst((string) $currentঅ্যাডমিন['role'])) ?>)
       </div>
     </header>
 
     <main class="adm-content">
-      <?php if (!empty($currentAdmin['must_change_password']) && $activePage !== 'security'): ?>
+      <?php if (!empty($currentঅ্যাডমিন['must_change_password']) && $activePage !== 'security'): ?>
         <div class="alert alert-error" role="status" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-          <span>You are using an initial or temporary password. Please set your own permanent password now.</span>
-          <a href="<?= e(admin_url('security.php')) ?>" class="btn btn-green btn-sm">Change Password</a>
+          <span>আপনি প্রাথমিক অথবা অস্থায়ী পাসওয়ার্ড ব্যবহার করছেন। অনুগ্রহ করে এখনই নিজের স্থায়ী পাসওয়ার্ড নির্ধারণ করুন।</span>
+          <a href="<?= e(admin_url('security.php')) ?>" class="btn btn-green btn-sm">পাসওয়ার্ড পরিবর্তন করুন</a>
         </div>
       <?php endif; ?>
 
