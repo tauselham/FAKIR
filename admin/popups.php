@@ -304,30 +304,6 @@ $fmtLocal = static function (?string $value): string {
     </table>
   </div>
 </section>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const type = document.getElementById('popup_type');
-  const text = document.getElementById('popup-text-field');
-  const image = document.getElementById('popup-image-field');
-  const body = document.getElementById('popup_body');
-  const file = document.getElementById('popup_image');
-  const sync = () => {
-    const isImage = type.value === 'image';
-    text.hidden = isImage; image.hidden = !isImage;
-    body.required = !isImage;
-    file.required = isImage && !document.querySelector('#popup-image-preview img');
-  };
-  type.addEventListener('change', sync); sync();
-  file.addEventListener('change', () => {
-    const preview = document.getElementById('popup-image-preview');
-    preview.replaceChildren();
-    if (file.files[0]) {
-      const img = document.createElement('img');
-      img.src = URL.createObjectURL(file.files[0]); img.alt = 'Selected popup image preview';
-      preview.append(img);
-    }
-  });
-});
-</script>
+<script src="<?= e(admin_url('assets/js/popups.js')) ?>?v=1" defer></script>
 
 <?php require_once dirname(__DIR__) . '/includes/admin-footer.php'; ?>
