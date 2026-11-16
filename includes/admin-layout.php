@@ -23,7 +23,7 @@ if (!empty($requiredSuperAdmin) && !is_super_admin($currentAdmin)) {
         'reason' => 'super_admin_required',
     ]);
     http_response_code(403);
-    set_flash('error', 'Only a সুপার অ্যাডমিন can access this section.');
+    set_flash('error', 'শুধুমাত্র সুপার অ্যাডমিন এই বিভাগে প্রবেশ করতে পারবেন।');
     redirect_to(admin_url('dashboard.php'));
 }
 
@@ -33,7 +33,7 @@ if (!empty($requiredPermission) && !admin_has_permission((string) $requiredPermi
         'permission' => $requiredPermission,
     ]);
     http_response_code(403);
-    set_flash('error', 'You do not have permission to access that section.');
+    set_flash('error', 'এই বিভাগে প্রবেশের অনুমতি আপনার নেই।');
     redirect_to(admin_url('dashboard.php'));
 }
 

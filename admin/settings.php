@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $current = get_website_settings();
         $siteName = trim((string) ($_POST['site_name'] ?? ''));
         if ($siteName === '') {
-            throw new RuntimeException('Website name is required.');
+            throw new RuntimeException('ওয়েবসাইটের নাম লিখতে হবে।');
         }
 
         $logoPath    = $current['logo_path'] ?? null;
@@ -160,7 +160,7 @@ $settings = get_website_settings();
       <input class="form-control" type="url" id="social_youtube" name="social_youtube" value="<?= e($settings['social_youtube'] ?? '') ?>">
     </div>
 
-    <button type="submit" class="btn btn-green">Save ওয়েবসাইট সেটিংস</button>
+    <button type="submit" class="btn btn-green">ওয়েবসাইট সেটিংস সংরক্ষণ করুন</button>
   </form>
 </section>
 

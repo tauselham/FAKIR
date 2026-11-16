@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $confirmPw = (string) ($_POST['confirm_password'] ?? '');
             $res = reset_password_with_token($token, $newPw, $confirmPw);
             if ($res['ok']) {
-                set_flash('success', 'Your password has been updated. Please sign in.');
+                set_flash('success', 'আপনার পাসওয়ার্ড পরিবর্তন করা হয়েছে। অনুগ্রহ করে লগইন করুন।');
                 redirect_to(admin_url('login.php'));
             }
             $errors = $res['errors'];
@@ -70,13 +70,13 @@ $siteSettings = get_website_settings();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>পাসওয়ার্ড Recovery — <?= e($siteSettings['site_name']) ?></title>
+  <title>পাসওয়ার্ড পুনরুদ্ধার — <?= e($siteSettings['site_name']) ?></title>
   <link rel="stylesheet" href="<?= e(admin_url('assets/css/admin.css')) ?>">
 </head>
 <body class="auth-page">
   <div class="auth-card">
     <div class="auth-brand"><?= e($siteSettings['site_name']) ?></div>
-    <h1 class="auth-title"><?= $token !== '' ? 'Set New পাসওয়ার্ড' : 'Recover পাসওয়ার্ড' ?></h1>
+    <h1 class="auth-title"><?= $token !== '' ? 'নতুন পাসওয়ার্ড নির্ধারণ করুন' : 'পাসওয়ার্ড পুনরুদ্ধার' ?></h1>
     <p class="auth-subtitle">
       <?= $token !== '' ? 'Choose a strong password meeting all security requirements.' : 'Enter your administrator email address to generate a time-limited recovery token.' ?>
     </p>
@@ -99,15 +99,15 @@ $siteSettings = get_website_settings();
         <input type="hidden" name="action" value="reset">
         <input type="hidden" name="token" value="<?= e($token) ?>">
         <div class="form-row">
-          <label class="form-label" for="new_password">New পাসওয়ার্ড</label>
+          <label class="form-label" for="new_password">নতুন পাসওয়ার্ড</label>
           <input class="form-control" type="password" id="new_password" name="new_password" required minlength="10">
           <span class="form-hint">Minimum 10 characters with uppercase, lowercase, number, and symbol.</span>
         </div>
         <div class="form-row">
-          <label class="form-label" for="confirm_password">Confirm পাসওয়ার্ড</label>
+          <label class="form-label" for="confirm_password">পাসওয়ার্ড নিশ্চিত করুন</label>
           <input class="form-control" type="password" id="confirm_password" name="confirm_password" required minlength="10">
         </div>
-        <button type="submit" class="btn btn-green" style="width: 100%;">Reset পাসওয়ার্ড</button>
+        <button type="submit" class="btn btn-green" style="width: 100%;">পাসওয়ার্ড রিসেট করুন</button>
       </form>
     <?php else: ?>
       <form method="post" action="<?= e(admin_url('forgot-password.php')) ?>">
@@ -122,7 +122,7 @@ $siteSettings = get_website_settings();
     <?php endif; ?>
 
     <p style="margin-top: 18px; font-size: 0.85rem;">
-      <a href="<?= e(admin_url('login.php')) ?>" style="color: var(--adm-green); font-weight: 600;">← Back to লগইন করুন</a>
+      <a href="<?= e(admin_url('login.php')) ?>" style="color: var(--adm-green); font-weight: 600;">← লগইন পাতায় ফিরে যান</a>
     </p>
   </div>
 </body>

@@ -48,12 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($title !== '' && mb_strlen($title) > 180) throw new RuntimeException('শিরোনাম সর্বোচ্চ ১৮০ অক্ষরের হতে পারবে।');
             if ($type === 'text' && $body === '') throw new RuntimeException('পপআপের লেখা লিখুন।');
-            if (mb_strlen($body) > 10000) throw new RuntimeException('পপআপ text is too long (maximum 10,000 characters).');
+            if (mb_strlen($body) > 10000) throw new RuntimeException('পপআপের লেখা অনেক বড় (সর্বোচ্চ ১০,০০০ অক্ষর)।');
             if ($starts && $ends && strtotime($ends) <= strtotime($starts)) throw new RuntimeException('শেষের সময় শুরুর সময়ের পরে হতে হবে।');
-            if ($buttonText !== '' && $buttonUrl === '') throw new RuntimeException('Add a button লিংক or leave the button text empty.');
+            if ($buttonText !== '' && $buttonUrl === '') throw new RuntimeException('বাটনের লেখা দিলে তার লিংকও দিন, নতুবা লেখাটি ফাঁকা রাখুন।');
 
-            if ($imageLink !== '' && safe_url($imageLink, '') === '') throw new RuntimeException('Image link must be a safe relative or http/https লিংক.');
-            if ($buttonUrl !== '' && safe_url($buttonUrl, '') === '') throw new RuntimeException('Button link must be a safe relative or http/https লিংক.');
+            if ($imageLink !== '' && safe_url($imageLink, '') === '') throw new RuntimeException('ছবির জন্য নিরাপদ আপেক্ষিক অথবা http/https লিংক দিন।');
+            if ($buttonUrl !== '' && safe_url($buttonUrl, '') === '') throw new RuntimeException('বাটনের জন্য নিরাপদ আপেক্ষিক অথবা http/https লিংক দিন।');
             $imageLink = $imageLink !== '' ? safe_url($imageLink, '') : '';
             $buttonUrl = $buttonUrl !== '' ? safe_url($buttonUrl, '') : '';
 
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $st = $pdo->prepare('SELECT * FROM public.site_popups WHERE id = :id');
                 $st->execute([':id' => $id]);
                 $existing = $st->fetch();
-                if (!$existing) throw new RuntimeException('পপআপ not found.');
+                if (!$existing) throw new RuntimeException('পপআপটি পাওয়া যায়নি।');
             }
 
             $bucket = $existing['image_bucket'] ?? null;
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($oldImage && $oldImage[0] && $oldImage[1]) $storage->delete((string) $oldImage[0], (string) $oldImage[1]);
-            set_flash('success', $existing ? 'পপআপ updated successfully.' : 'পপআপ created successfully.');
+            set_flash('success', $existing ? 'পপআপ হালনাগাদ হয়েছে।' : 'পপআপ তৈরি হয়েছে।');
             redirect_to(admin_url('popups.php'));
         }
 
@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!empty($row['image_bucket']) && !empty($row['image_path'])) $storage->delete((string) $row['image_bucket'], (string) $row['image_path']);
                 log_admin_activity((int) $currentAdmin['id'], 'popup_deleted', 'site_popup', $id);
             }
-            set_flash('success', 'পপআপ deleted.');
+            set_flash('success', 'পপআপ মুছে ফেলা হয়েছে।');
             redirect_to(admin_url('popups.php'));
         }
 
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int) ($_POST['popup_id'] ?? 0);
             $pdo->prepare('UPDATE public.site_popups SET is_active = NOT is_active WHERE id = :id')->execute([':id' => $id]);
             log_admin_activity((int) $currentAdmin['id'], 'popup_toggled', 'site_popup', $id);
-            set_flash('success', 'পপআপ status updated.');
+            set_flash('success', 'পপআপের অবস্থা হালনাগাদ হয়েছে।');
             redirect_to(admin_url('popups.php'));
         }
     } catch (Throwable $e) {
@@ -166,7 +166,7 @@ $fmtLocal = static function (?string $value): string {
 
 <section class="adm-panel">
   <h2 class="adm-panel-title"><?= $edit ? 'পপআপ সম্পাদনা #' . (int) $edit['id'] : 'নতুন পপআপ তৈরি করুন' ?></h2>
-  <p class="form-hint">সময়সূচি in Bangladesh time (Asia/Dhaka). পপআপs appear automatically when their schedule and targeting rules match.</p>
+  <p class="form-hint">বাংলাদেশ সময় (এশিয়া/ঢাকা) অনুযায়ী সময় নির্ধারণ করুন। সময় ও প্রদর্শনের শর্ত মিললে পপআপ স্বয়ংক্রিয়ভাবে দেখাবে।</p>
   <form method="post" action="<?= e(admin_url('popups.php')) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save">
@@ -194,7 +194,7 @@ $fmtLocal = static function (?string $value): string {
       <span class="form-hint">JPG, PNG অথবা WebP ছবি ব্যবহার করুন। সর্বোচ্চ ৫ মেগাবাইট। ছবিটি Supabase Storage-এ সংরক্ষিত হবে।</span>
       <div class="popup-preview" id="popup-image-preview"><?php if ($edit && !empty($edit['image_url'])): ?><img src="<?= e(safe_url($edit['image_url'])) ?>" alt="বর্তমান পপআপের ছবি"><?php endif; ?></div>
       <div class="form-row">
-        <label class="form-label" for="image_link_url">Image Click লিংক (optional)</label>
+        <label class="form-label" for="image_link_url">ছবিতে ক্লিক করলে যে লিংকে যাবে (ঐচ্ছিক)</label>
         <input class="form-control" id="image_link_url" name="image_link_url" type="text" value="<?= e($edit['image_link_url'] ?? '') ?>" placeholder="https://example.com">
       </div>
       <div class="form-row">
@@ -211,7 +211,7 @@ $fmtLocal = static function (?string $value): string {
         <input class="form-control" id="button_text" name="button_text" maxlength="80" value="<?= e($edit['button_text'] ?? '') ?>" placeholder="আরও জানুন">
       </div>
       <div class="form-row">
-        <label class="form-label" for="button_url">Button লিংক</label>
+        <label class="form-label" for="button_url">বাটনের লিংক</label>
         <input class="form-control" id="button_url" name="button_url" value="<?= e($edit['button_url'] ?? '') ?>" placeholder="/gallery.php or https://...">
       </div>
     </div>
@@ -266,7 +266,7 @@ $fmtLocal = static function (?string $value): string {
       </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-green" type="submit"><?= $edit ? 'পপআপ সংরক্ষণ করুন' : 'Create পপআপ' ?></button>
+      <button class="btn btn-green" type="submit"><?= $edit ? 'পপআপ সংরক্ষণ করুন' : 'নতুন পপআপ তৈরি করুন' ?></button>
       <?php if ($edit): ?><a class="btn btn-outline" href="<?= e(admin_url('popups.php')) ?>">সম্পাদনা বাতিল</a><?php endif; ?>
     </div>
   </form>
@@ -276,11 +276,11 @@ $fmtLocal = static function (?string $value): string {
   <h2 class="adm-panel-title">পপআপ ব্যবস্থাপনা</h2>
   <div class="table-wrap">
     <table class="adm-table">
-      <thead><tr><th>পপআপ</th><th>ধরন</th><th>সময়সূচি</th><th>লক্ষ্য</th><th>প্রদর্শনের হার</th><th>Status</th><th>করণীয়</th></tr></thead>
+      <thead><tr><th>পপআপ</th><th>ধরন</th><th>সময়সূচি</th><th>লক্ষ্য</th><th>প্রদর্শনের হার</th><th>অবস্থা</th><th>করণীয়</th></tr></thead>
       <tbody>
       <?php foreach ($popups as $p): ?>
         <tr>
-          <td><strong><?= e($p['title'] ?: 'শিরোনামহীন পপআপ') ?></strong><br><span class="form-hint">Priority <?= (int) $p['priority'] ?></span></td>
+          <td><strong><?= e($p['title'] ?: 'শিরোনামহীন পপআপ') ?></strong><br><span class="form-hint">অগ্রাধিকার <?= (int) $p['priority'] ?></span></td>
           <td><?= e(ucfirst($p['popup_type'])) ?></td>
           <td><?= e($fmtLocal($p['starts_at']) ?: 'সঙ্গে সঙ্গে') ?><br><span class="form-hint"><?= e($fmtLocal($p['ends_at']) ?: 'শেষের সময় নির্ধারিত নয়') ?></span></td>
           <td><?= e(ucfirst($p['display_scope'])) ?> / <?= e(ucfirst($p['device_target'])) ?></td>

@@ -49,7 +49,7 @@ if (is_super_admin($currentAdmin)) {
     <p class="adm-stat-val"><?= $totalVideos ?></p>
   </div>
   <div class="adm-stat-card">
-    <p class="adm-stat-label">Total বিভাগসমূহ</p>
+    <p class="adm-stat-label">মোট বিভাগ</p>
     <p class="adm-stat-val"><?= $totalCategories ?></p>
   </div>
   <div class="adm-stat-card">
@@ -69,7 +69,7 @@ if (is_super_admin($currentAdmin)) {
         <a href="<?= e(admin_url('gallery.php')) ?>" class="btn btn-outline btn-sm">+ গ্যালারিতে ছবি আপলোড</a>
       <?php endif; ?>
       <?php if (admin_has_permission('manage_banners', $currentAdmin)): ?>
-        <a href="<?= e(admin_url('banners.php')) ?>" class="btn btn-outline btn-sm">Manage প্রধান ব্যানার</a>
+        <a href="<?= e(admin_url('banners.php')) ?>" class="btn btn-outline btn-sm">ব্যানার পরিচালনা</a>
       <?php endif; ?>
       <?php if (is_super_admin($currentAdmin)): ?>
         <a href="<?= e(admin_url('admins.php')) ?>" class="btn btn-outline btn-sm">Manage Admins &amp; Permissions</a>
@@ -83,7 +83,7 @@ if (is_super_admin($currentAdmin)) {
       $myLabels = array_map(static fn (string $k) => $allPerms[$k]['label'] ?? $k, $currentAdmin['permissions'] ?? []);
     ?>
     <p style="margin: 0 0 8px; color: var(--adm-ink); font-size: 0.9rem;">
-      <strong>Your Assigned Permissions:</strong> <?= e($myLabels ? implode(', ', $myLabels) : 'ড্যাশবোর্ড & পাসওয়ার্ড Only') ?>
+      <strong>আপনার জন্য নির্ধারিত অনুমতি:</strong> <?= e($myLabels ? implode(', ', $myLabels) : 'শুধু ড্যাশবোর্ড ও পাসওয়ার্ড') ?>
     </p>
   <?php endif; ?>
   <p style="margin: 0; color: var(--adm-muted); font-size: 0.9rem;">
@@ -92,7 +92,7 @@ if (is_super_admin($currentAdmin)) {
 </section>
 
 <section class="adm-panel">
-  <h2 class="adm-panel-title">Recent অ্যাডমিন Activity</h2>
+  <h2 class="adm-panel-title">সাম্প্রতিক অ্যাডমিন কার্যক্রম</h2>
   <?php if (empty($recentLogs)): ?>
     <p style="color: var(--adm-muted); margin: 0;">No activity recorded yet.</p>
   <?php else: ?>

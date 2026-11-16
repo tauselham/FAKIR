@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $bgColor   = sanitize_hex_color($_POST['header_bg_color'] ?? null, '#14532d');
             $textColor = sanitize_hex_color($_POST['header_text_color'] ?? null, '#ffffff');
             if ($siteName === '') {
-                throw new RuntimeException('Website name is required.');
+                throw new RuntimeException('ওয়েবসাইটের নাম লিখতে হবে।');
             }
 
             $current = get_website_settings();
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($oldLogoPath !== null) {
                 $storage->delete(BUCKET_WEBSITE_ASSETS, $oldLogoPath);
             }
-            set_flash('success', 'Header appearance and branding updated.');
+            set_flash('success', 'হেডারের নকশা ও পরিচিতি হালনাগাদ হয়েছে।');
         } elseif ($action === 'add_nav_item' || $action === 'update_nav_item') {
             $itemId   = (int) ($_POST['item_id'] ?? 0);
             $parentId = (int) ($_POST['parent_id'] ?? 0) ?: null;
@@ -169,7 +169,7 @@ if (!empty($_GET['edit'])) {
         <input class="form-control" type="text" id="site_name" name="site_name" value="<?= e($settings['site_name']) ?>" required>
       </div>
       <div class="form-row">
-        <label class="form-label" for="logo_file">Upload / Replace ওয়েবসাইটের লোগো</label>
+        <label class="form-label" for="logo_file">ওয়েবসাইটের লোগো আপলোড / পরিবর্তন</label>
         <input class="form-control" type="file" id="logo_file" name="logo_file" data-preview-target="header_logo_preview" accept="image/jpeg,image/png,image/webp">
         <div class="adm-media-preview" id="header_logo_preview">
           <?php if (!empty($settings['logo_url'])): ?>
@@ -210,7 +210,7 @@ if (!empty($_GET['edit'])) {
         <input class="form-control" type="text" id="label" name="label" value="<?= e($editItem['label'] ?? '') ?>" required>
       </div>
       <div class="form-row">
-        <label class="form-label" for="url">লিংক (Internal or External)</label>
+        <label class="form-label" for="url">লিংক (ওয়েবসাইটের ভেতরের বা বাইরের)</label>
         <input class="form-control" type="text" id="url" name="url" value="<?= e($editItem['url'] ?? '/') ?>" required placeholder="/gallery.php or https://...">
       </div>
     </div>
@@ -243,7 +243,7 @@ if (!empty($_GET['edit'])) {
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="mega_description">মেগা মেনু / Sub-item Description (Optional)</label>
+        <label class="form-label" for="mega_description">মেগা মেনু / সাব-মেনুর বিবরণ (ঐচ্ছিক)</label>
         <input class="form-control" type="text" id="mega_description" name="mega_description" value="<?= e($editItem['mega_description'] ?? '') ?>">
       </div>
       <div class="form-row">

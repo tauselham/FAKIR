@@ -179,7 +179,7 @@ function require_admin(): array
     start_secure_session();
     $admin = current_admin();
     if (!$admin) {
-        set_flash('error', 'Please sign in to access the Admin Panel.');
+        set_flash('error', 'অ্যাডমিন প্যানেলে প্রবেশ করতে অনুগ্রহ করে লগইন করুন।');
         redirect_to(admin_url('login.php'));
     }
     return $admin;

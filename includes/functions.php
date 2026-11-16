@@ -74,7 +74,7 @@ function validate_content_slug(string $slug): string
 {
     $slug = strtolower(trim($slug));
     if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug) || strlen($slug) > 120) {
-        throw new RuntimeException('URL Slug must contain only lowercase English letters, numbers, and single hyphens.');
+        throw new RuntimeException('পেজের ঠিকানায় শুধু ছোট হাতের ইংরেজি অক্ষর, সংখ্যা এবং একক হাইফেন ব্যবহার করুন।');
     }
 
     $reserved = [
@@ -83,7 +83,7 @@ function validate_content_slug(string $slug): string
         'content-frame', 'page', 'router', 'sitemap', 'robots', 'favicon', 'uploads',
     ];
     if (in_array($slug, $reserved, true)) {
-        throw new RuntimeException('This URL Slug is reserved by the website. Please choose another one.');
+        throw new RuntimeException('এই পেজের ঠিকানাটি ওয়েবসাইটের জন্য সংরক্ষিত। অনুগ্রহ করে অন্য ঠিকানা দিন।');
     }
     return $slug;
 }
