@@ -218,19 +218,19 @@ function validate_password_strength(string $password): array
 {
     $errors = [];
     if (strlen($password) < 10) {
-        $errors[] = 'Password must be at least 10 characters long.';
+        $errors[] = 'পাসওয়ার্ড কমপক্ষে ১০ অক্ষরের হতে হবে।';
     }
     if (!preg_match('/[A-Z]/', $password)) {
-        $errors[] = 'Password must contain at least one uppercase letter.';
+        $errors[] = 'পাসওয়ার্ডে অন্তত একটি বড় হাতের ইংরেজি অক্ষর থাকতে হবে।';
     }
     if (!preg_match('/[a-z]/', $password)) {
-        $errors[] = 'Password must contain at least one lowercase letter.';
+        $errors[] = 'পাসওয়ার্ডে অন্তত একটি ছোট হাতের ইংরেজি অক্ষর থাকতে হবে।';
     }
     if (!preg_match('/[0-9]/', $password)) {
-        $errors[] = 'Password must contain at least one number.';
+        $errors[] = 'পাসওয়ার্ডে অন্তত একটি সংখ্যা থাকতে হবে।';
     }
     if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
-        $errors[] = 'Password must contain at least one special character.';
+        $errors[] = 'পাসওয়ার্ডে অন্তত একটি বিশেষ চিহ্ন থাকতে হবে।';
     }
     return $errors;
 }
@@ -244,7 +244,7 @@ function attempt_admin_login(string $identifier, string $password): array
 {
     $identifier = trim($identifier);
     if ($identifier === '' || $password === '') {
-        return ['ok' => false, 'message' => 'Please enter both your username/email and password.'];
+        return ['ok' => false, 'message' => 'অনুগ্রহ করে ব্যবহারকারীর নাম অথবা ইমেইল এবং পাসওয়ার্ড—দুটিই লিখুন।'];
     }
 
     $targets = [
@@ -287,7 +287,7 @@ function attempt_admin_login(string $identifier, string $password): array
                 'message'      => $afterHit['retry_message'],
             ];
         }
-        return ['ok' => false, 'message' => 'Invalid credentials.'];
+        return ['ok' => false, 'message' => 'ব্যবহারকারীর নাম অথবা পাসওয়ার্ড সঠিক নয়।'];
     }
 
     // Rehash automatically if algorithm parameters improve

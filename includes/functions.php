@@ -88,7 +88,7 @@ function validate_content_slug(string $slug): string
     return $slug;
 }
 
-function format_date(?string $timestamp, string $format = 'M j, Y'): string
+function format_date(?string $timestamp, string $format = 'd/m/Y'): string
 {
     if (!$timestamp) {
         return '';
@@ -169,8 +169,8 @@ function get_website_settings(): array
     }
 
     $defaults = [
-        'site_name'         => 'Purbo Nijmaona Fakir Bari',
-        'site_description'  => 'Local village community stories, announcements, events, and photo memories.',
+        'site_name'         => 'পূর্ব নিজমাওনা ফকির বাড়ি',
+        'site_description'  => 'পূর্ব নিজমাওনা ফকির বাড়ির খবর, অনুষ্ঠান, স্মৃতি, ছবি এবং এলাকার মানুষের সঙ্গে যোগাযোগের একটি অনলাইন ঠিকানা।',
         'logo_url'          => null,
         'favicon_url'       => null,
         'header_bg_color'   => '#14532d',
@@ -179,8 +179,8 @@ function get_website_settings(): array
         'footer_text_color' => '#ecfdf5',
         'accent_color'      => '#15803d',
         'hero_interval_ms'  => 5500,
-        'seo_title'         => 'Purbo Nijmaona Fakir Bari — Local Community & Photo Archive',
-        'seo_description'   => 'Local community updates, announcements, events, and photography from Purbo Nijmaona Fakir Bari.',
+        'seo_title'         => 'পূর্ব নিজমাওনা ফকির বাড়ি — গ্রামের খবর ও ছবির সংগ্রহ',
+        'seo_description'   => 'পূর্ব নিজমাওনা ফকির বাড়ির খবর, সামাজিক আয়োজন, ঘোষণা, গল্প এবং গ্রামের ছবি দেখুন।',
     ];
 
     try {
@@ -202,16 +202,16 @@ function get_footer_settings(): array
 
     $defaults = [
         'logo_url'          => null,
-        'site_name'         => 'Purbo Nijmaona Fakir Bari',
-        'description'       => 'Sharing village life, local gatherings, and community memories from Purbo Nijmaona Fakir Bari.',
-        'contact_address'   => 'Purbo Nijmaona Fakir Bari',
+        'site_name'         => 'পূর্ব নিজমাওনা ফকির বাড়ি',
+        'description'       => 'পূর্ব নিজমাওনা ফকির বাড়ির গল্প, ঐতিহ্য, মানুষের মিলনমেলা ও প্রতিদিনের সুন্দর মুহূর্তগুলো সবার সঙ্গে ভাগ করে নেওয়ার ঠিকানা.',
+        'contact_address'   => 'পূর্ব নিজমাওনা ফকির বাড়ি',
         'contact_phone'     => '',
         'contact_email'     => '',
         'facebook_url'      => '',
         'instagram_url'     => '',
         'youtube_url'       => '',
         'x_url'             => '',
-        'copyright_text'    => '© ' . gmdate('Y') . ' Purbo Nijmaona Fakir Bari Community.',
+        'copyright_text'    => '© ' . gmdate('Y') . ' পূর্ব নিজমাওনা ফকির বাড়ি। গ্রামের মানুষের জন্য ভালোবাসা দিয়ে তৈরি।',
         'show_social_links' => true,
         'show_contact_info' => true,
         'is_visible'        => true,

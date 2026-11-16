@@ -23,8 +23,8 @@ final class RateLimiter
     public const DEFAULT_RULES = [
         'admin_login' => [
             'scope'        => 'admin_login',
-            'label'        => 'Admin Login',
-            'description'  => 'Protects administrator sign-in against brute-force attempts by IP and account.',
+            'label'        => 'অ্যাডমিন লগইন',
+            'description'  => 'আইপি ঠিকানা ও অ্যাকাউন্ট অনুযায়ী অতিরিক্ত লগইন চেষ্টার বিরুদ্ধে সুরক্ষা দেয়।',
             'max_requests' => 5,
             'window_value' => 15,
             'window_unit'  => 'minutes',
@@ -32,8 +32,8 @@ final class RateLimiter
         ],
         'password_recovery' => [
             'scope'        => 'password_recovery',
-            'label'        => 'Password Recovery',
-            'description'  => 'Limits password reset requests and token submissions by IP and email.',
+            'label'        => 'পাসওয়ার্ড পুনরুদ্ধার',
+            'description'  => 'আইপি ঠিকানা ও ইমেইল অনুযায়ী পাসওয়ার্ড রিসেটের অনুরোধ এবং টোকেন জমা দেওয়ার সংখ্যা সীমিত রাখে।',
             'max_requests' => 3,
             'window_value' => 1,
             'window_unit'  => 'hours',
@@ -41,8 +41,8 @@ final class RateLimiter
         ],
         'public_api' => [
             'scope'        => 'public_api',
-            'label'        => 'Public API',
-            'description'  => 'Protects public post feeds and query endpoints against scraping/flooding.',
+            'label'        => 'পাবলিক এপিআই',
+            'description'  => 'অতিরিক্ত অনুরোধ ও তথ্য সংগ্রহের অপব্যবহার থেকে পাবলিক পোস্ট এবং সার্চ সুবিধা সুরক্ষিত রাখে।',
             'max_requests' => 60,
             'window_value' => 1,
             'window_unit'  => 'minutes',
@@ -50,8 +50,8 @@ final class RateLimiter
         ],
         'gallery_api' => [
             'scope'        => 'gallery_api',
-            'label'        => 'Gallery API',
-            'description'  => 'Limits gallery AJAX pagination and category filter calls per client IP.',
+            'label'        => 'গ্যালারি এপিআই',
+            'description'  => 'প্রতি ব্যবহারকারীর আইপি অনুযায়ী গ্যালারির পৃষ্ঠা ও বিভাগ ফিল্টারের অনুরোধ সীমিত রাখে।',
             'max_requests' => 45,
             'window_value' => 1,
             'window_unit'  => 'minutes',
@@ -59,8 +59,8 @@ final class RateLimiter
         ],
         'post_submission' => [
             'scope'        => 'post_submission',
-            'label'        => 'Post Submission',
-            'description'  => 'Limits post creation and updates by IP and authenticated administrator.',
+            'label'        => 'পোস্ট জমা',
+            'description'  => 'আইপি ঠিকানা ও লগইন করা অ্যাডমিন অনুযায়ী পোস্ট তৈরি এবং হালনাগাদের অনুরোধ সীমিত রাখে।',
             'max_requests' => 20,
             'window_value' => 10,
             'window_unit'  => 'minutes',
@@ -68,8 +68,8 @@ final class RateLimiter
         ],
         'admin_api' => [
             'scope'        => 'admin_api',
-            'label'        => 'Admin API',
-            'description'  => 'Protects authenticated admin actions and dashboard API endpoints.',
+            'label'        => 'অ্যাডমিন এপিআই',
+            'description'  => 'লগইন করা অ্যাডমিনের কার্যক্রম এবং ড্যাশবোর্ডের এপিআই অনুরোধ সুরক্ষিত রাখে।',
             'max_requests' => 120,
             'window_value' => 1,
             'window_unit'  => 'minutes',
@@ -112,18 +112,18 @@ final class RateLimiter
     {
         $seconds = max(1, $seconds);
         if ($seconds < 60) {
-            return $seconds === 1 ? '1 second' : "{$seconds} seconds";
+            return $seconds === 1 ? '১ সেকেন্ড' : "{$seconds} সেকেন্ড";
         }
         if ($seconds < 3600) {
             $mins = (int) ceil($seconds / 60);
-            return $mins === 1 ? '1 minute' : "{$mins} minutes";
+            return $mins === 1 ? '১ মিনিট' : "{$mins} মিনিট";
         }
         if ($seconds < 86400) {
             $hours = (int) ceil($seconds / 3600);
-            return $hours === 1 ? '1 hour' : "{$hours} hours";
+            return $hours === 1 ? '১ ঘণ্টা' : "{$hours} ঘণ্টা";
         }
         $days = (int) ceil($seconds / 86400);
-        return $days === 1 ? '1 day' : "{$days} days";
+        return $days === 1 ? '১ দিন' : "{$days} দিন";
     }
 
     public static function parseTimestamp(string $value): ?int
@@ -297,7 +297,7 @@ final class RateLimiter
                     'limit'         => $maxRequests,
                     'remaining'     => 0,
                     'retry_after'   => $blockedRetryAfter,
-                    'retry_message' => "Too many requests for {$rule['label']}. Please retry after {$human}.",
+                    'retry_message' => "{$rule['label']} সীমা অতিক্রম হয়েছে। অনুগ্রহ করে {$human} পরে আবার চেষ্টা করুন।",
                     'reset_at'      => $now + $blockedRetryAfter,
                     'rule'          => $rule,
                 ];
@@ -457,7 +457,7 @@ final class RateLimiter
         $retryAfter = max(1, (int) ($result['retry_after'] ?? 60));
         $limit      = (int) ($result['limit'] ?? 0);
         $resetAt    = (int) ($result['reset_at'] ?? (time() + $retryAfter));
-        $message    = (string) ($result['retry_message'] ?? ('Too many requests. Please retry after ' . self::formatRetryAfter($retryAfter) . '.'));
+        $message    = (string) ($result['retry_message'] ?? ('অতিরিক্ত অনুরোধ করা হয়েছে। অনুগ্রহ করে ' . self::formatRetryAfter($retryAfter) . ' পরে আবার চেষ্টা করুন।'));
 
         if (!headers_sent()) {
             http_response_code(429);
@@ -480,7 +480,7 @@ final class RateLimiter
         }
 
         $safeMsg = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        echo "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\"><title>429 Too Many Requests</title><style>body{font-family:system-ui,sans-serif;background:#f4f7f4;color:#141e16;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px}.box{max-width:480px;background:#fff;border:1px solid #dce4dc;border-radius:10px;padding:28px}h1{margin:0 0 10px;font-size:1.35rem;color:#991b1b}p{margin:0 0 16px;line-height:1.6}a{color:#15803d;font-weight:600;text-decoration:none}</style></head><body><div class=\"box\"><h1>Too Many Requests (HTTP 429)</h1><p>{$safeMsg}</p><a href=\"/\">← Return to Homepage</a></div></body></html>";
+        echo "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\"><title>অতিরিক্ত অনুরোধ (HTTP 429)</title><style>body{font-family:system-ui,sans-serif;background:#f4f7f4;color:#141e16;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px}.box{max-width:480px;background:#fff;border:1px solid #dce4dc;border-radius:10px;padding:28px}h1{margin:0 0 10px;font-size:1.35rem;color:#991b1b}p{margin:0 0 16px;line-height:1.6}a{color:#15803d;font-weight:600;text-decoration:none}</style></head><body><div class=\"box\"><h1>অনেক বেশি অনুরোধ করা হয়েছে</h1><p>{$safeMsg}</p><a href=\"/\">← মূল পাতায় ফিরে যান</a></div></body></html>";
         exit;
     }
 
