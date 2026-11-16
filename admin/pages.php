@@ -235,7 +235,7 @@ foreach ($pages as $pageRow) {
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-outline btn-sm" href="<?= e(admin_url('pages.php')) ?>?edit=<?= (int) $p['id'] ?>">সম্পাদনা</a>
               <?php if ($p['status'] === 'published'): ?><a class="btn btn-outline btn-sm" href="/<?= e($p['slug']) ?>" target="_blank" rel="noopener noreferrer">View</a><?php endif; ?>
-              <form method="post" action="<?= e(admin_url('pages.php')) ?>" data-confirm="মুছুন this page permanently?">
+              <form method="post" action="<?= e(admin_url('pages.php')) ?>" data-confirm="এই পেজটি স্থায়ীভাবে মুছে ফেলবেন?">
                 <?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="page_id" value="<?= (int) $p['id'] ?>">
                 <button class="btn btn-danger btn-sm" type="submit">মুছুন</button>
               </form>

@@ -247,7 +247,7 @@ if (!empty($_GET['edit'])) {
             <td>
               <div style="display: flex; gap: 6px;">
                 <a href="<?= e(admin_url('banners.php')) ?>?edit=<?= (int) $b['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
-                <form method="post" action="<?= e(admin_url('banners.php')) ?>" data-confirm="মুছুন this banner?">
+                <form method="post" action="<?= e(admin_url('banners.php')) ?>" data-confirm="এই ব্যানারটি মুছে ফেলবেন?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="banner_id" value="<?= (int) $b['id'] ?>">

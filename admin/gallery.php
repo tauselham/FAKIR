@@ -351,7 +351,7 @@ if (!empty($_GET['edit'])) {
               <td>
                 <div style="display: flex; gap: 6px;">
                   <a href="<?= e(admin_url('gallery.php')) ?>?edit=<?= (int) $img['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
-                  <form method="post" action="<?= e(admin_url('gallery.php')) ?>" data-confirm="মুছুন this photo from the gallery and Supabase Storage?">
+                  <form method="post" action="<?= e(admin_url('gallery.php')) ?>" data-confirm="গ্যালারি ও Supabase Storage থেকে এই ছবিটি মুছে ফেলবেন?">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="image_id" value="<?= (int) $img['id'] ?>">

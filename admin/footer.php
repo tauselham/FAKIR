@@ -243,7 +243,7 @@ $footerLinks = $linksStmt->fetchAll();
               </form>
             </td>
             <td>
-              <form method="post" action="<?= e(admin_url('footer.php')) ?>" data-confirm="Remove this footer link?">
+              <form method="post" action="<?= e(admin_url('footer.php')) ?>" data-confirm="ফুটারের এই লিংক মুছে ফেলবেন?">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="delete_link">
                 <input type="hidden" name="item_id" value="<?= (int) $fl['id'] ?>">

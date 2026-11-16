@@ -97,7 +97,7 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
                 </form>
               </td>
               <td>
-                <form method="post" action="<?= e(admin_url('categories.php')) ?>" data-confirm="Delete this gallery category?">
+                <form method="post" action="<?= e(admin_url('categories.php')) ?>" data-confirm="গ্যালারির এই বিভাগটি মুছে ফেলবেন?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="scope" value="gallery">
@@ -148,7 +148,7 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
                 </form>
               </td>
               <td>
-                <form method="post" action="<?= e(admin_url('categories.php')) ?>" data-confirm="Delete this post category?">
+                <form method="post" action="<?= e(admin_url('categories.php')) ?>" data-confirm="পোস্টের এই বিভাগটি মুছে ফেলবেন?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="scope" value="post">

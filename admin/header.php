@@ -297,7 +297,7 @@ if (!empty($_GET['edit'])) {
             <td>
               <div style="display: flex; gap: 6px;">
                 <a href="<?= e(admin_url('header.php')) ?>?edit=<?= (int) $ni['id'] ?>" class="btn btn-outline btn-sm">সম্পাদনা</a>
-                <form method="post" action="<?= e(admin_url('header.php')) ?>" data-confirm="মুছুন this navigation item?">
+                <form method="post" action="<?= e(admin_url('header.php')) ?>" data-confirm="মেনুর এই আইটেম মুছে ফেলবেন?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete_nav_item">
                   <input type="hidden" name="item_id" value="<?= (int) $ni['id'] ?>">
