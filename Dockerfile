@@ -11,9 +11,8 @@ COPY . /var/www/app
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/app/public
 
-RUN sed -ri "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf \
-    && sed -ri "s!/var/www/!${APACHE_DOCUMENT_ROOT}/!g" /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
-    && printf '%s\\n' \
+RUN sed -ri 's!/var/www/html!/var/www/app/public!g' /etc/apache2/sites-available/*.conf \
+    && printf '%s\n' \
        '<Directory /var/www/app/public>' \
        '    Options -Indexes +FollowSymLinks' \
        '    AllowOverride All' \
@@ -21,7 +20,7 @@ RUN sed -ri "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-avail
        '</Directory>' \
        > /etc/apache2/conf-available/app-public-root.conf \
     && a2enconf app-public-root \
-    && printf '%s\\n' \
+    && printf '%s\n' \
        'file_uploads=On' \
        'upload_max_filesize=64M' \
        'post_max_size=64M' \
