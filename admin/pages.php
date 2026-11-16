@@ -137,7 +137,7 @@ foreach ($pages as $pageRow) {
 }
 ?>
 <section class="adm-panel">
-  <h2 class="adm-panel-title"><?= $editPage ? 'Edit Page' : 'Create a Page' ?></h2>
+  <h2 class="adm-panel-title"><?= $editPage ? 'পেজ সম্পাদনা' : 'নতুন পেজ তৈরি করুন' ?></h2>
   <p style="color:var(--adm-muted);margin-top:0;">নিজস্ব HTML, CSS ও JavaScript ব্যবহার করে নতুন পেজ তৈরি করুন অথবা আমাদের পরিচিতি পেজ পরিচালনা করুন। নিরাপত্তার জন্য কাস্টম কোড আলাদা সীমাবদ্ধ পরিবেশে চলে এবং অ্যাডমিন সেশনে প্রবেশ করতে পারে না।</p>
   <form method="post" action="<?= e(admin_url('pages.php')) ?>">
     <?= csrf_field() ?>
@@ -154,7 +154,7 @@ foreach ($pages as $pageRow) {
         <?php if ($editPage && $editPage['page_type'] === 'about'): ?><input type="hidden" name="page_type" value="about"><?php endif; ?>
       </div>
       <div class="form-row">
-        <label class="form-label" for="status">Status</label>
+        <label class="form-label" for="status">অবস্থা</label>
         <select class="form-control" name="status" id="status">
           <option value="draft" <?= (($editPage['status'] ?? 'draft') === 'draft') ? 'selected' : '' ?>>খসড়া</option>
           <option value="published" <?= (($editPage['status'] ?? '') === 'published') ? 'selected' : '' ?>>প্রকাশিত</option>
@@ -165,7 +165,7 @@ foreach ($pages as $pageRow) {
     <div class="adm-grid-2">
       <div class="form-row">
         <label class="form-label" for="title">পেজের শিরোনাম</label>
-        <input class="form-control" type="text" id="title" name="title" maxlength="220" required value="<?= e($editPage['title'] ?? '') ?>" placeholder="Example: Summer Festival">
+        <input class="form-control" type="text" id="title" name="title" maxlength="220" required value="<?= e($editPage['title'] ?? '') ?>" placeholder="যেমন: গ্রীষ্মকালীন উৎসব">
       </div>
       <div class="form-row">
         <label class="form-label" for="slug">পাবলিক লিংকের শেষ অংশ</label>
@@ -183,9 +183,9 @@ foreach ($pages as $pageRow) {
       <label class="form-label" for="editor_mode">কোড লেখার ধরন</label>
       <select class="form-control" name="editor_mode" id="page_editor_mode">
         <option value="separate" <?= empty($editPage['code_document']) ? 'selected' : '' ?>>HTML, CSS ও JavaScript আলাদা ঘরে লিখুন</option>
-        <option value="single" <?= !empty($editPage['code_document']) ? 'selected' : '' ?>>One complete HTML document (HTML + CSS + JavaScript together)</option>
+        <option value="single" <?= !empty($editPage['code_document']) ? 'selected' : '' ?>>HTML, CSS ও JavaScript-সহ একটি সম্পূর্ণ HTML ডকুমেন্ট</option>
       </select>
-      <span class="form-hint">একটি HTML ফাইলে HTML, &lt;style&gt; এবং &lt;script&gt; একসঙ্গে লিখতে চাইলে দ্বিতীয় অপশনটি বেছে নাও।</span>
+      <span class="form-hint">একটি HTML ফাইলে HTML, &lt;style&gt; এবং &lt;script&gt; একসঙ্গে লিখতে চাইলে দ্বিতীয় অপশনটি বেছে নিন।</span>
     </div>
 
     <div id="page_separate_code_fields" style="<?= !empty($editPage['code_document']) ? 'display:none;' : '' ?>">
@@ -210,8 +210,8 @@ foreach ($pages as $pageRow) {
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button type="submit" class="btn btn-green"><?= $editPage ? 'Save Changes' : 'Create Page' ?></button>
-      <?php if ($editPage): ?><a href="<?= e(admin_url('pages.php')) ?>" class="btn btn-outline">Cancel</a><?php endif; ?>
+      <button type="submit" class="btn btn-green"><?= $editPage ? 'পরিবর্তন সংরক্ষণ করুন' : 'পেজ তৈরি করুন' ?></button>
+      <?php if ($editPage): ?><a href="<?= e(admin_url('pages.php')) ?>" class="btn btn-outline">বাতিল</a><?php endif; ?>
     </div>
   </form>
 </section>
@@ -233,7 +233,7 @@ foreach ($pages as $pageRow) {
           <td><?= e(format_date($p['updated_at'])) ?></td>
           <td>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-outline btn-sm" href="<?= e(admin_url('pages.php')) ?>?edit=<?= (int) $p['id'] ?>">Edit</a>
+              <a class="btn btn-outline btn-sm" href="<?= e(admin_url('pages.php')) ?>?edit=<?= (int) $p['id'] ?>">সম্পাদনা</a>
               <?php if ($p['status'] === 'published'): ?><a class="btn btn-outline btn-sm" href="/<?= e($p['slug']) ?>" target="_blank" rel="noopener noreferrer">View</a><?php endif; ?>
               <form method="post" action="<?= e(admin_url('pages.php')) ?>" data-confirm="মুছুন this page permanently?">
                 <?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="page_id" value="<?= (int) $p['id'] ?>">

@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($oldAssetsToDelete as $oldPath) {
             $storage->delete(BUCKET_WEBSITE_ASSETS, $oldPath);
         }
-        set_flash('success', 'Website settings saved.');
+        set_flash('success', 'ওয়েবসাইটের সেটিংস সংরক্ষণ করা হয়েছে।');
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
     }

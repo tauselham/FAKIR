@@ -142,10 +142,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect_to(admin_url('posts.php'));
         } elseif ($action === 'toggle_status') {
             $postId = (int) ($_POST['post_id'] ?? 0);
-            $newStatus = ($_POST['new_status'] ?? 'draft') === 'published' ? 'published' : 'draft';
+            $newঅবস্থা = ($_POST['new_status'] ?? 'draft') === 'published' ? 'published' : 'draft';
             $upd = $pdo->prepare('UPDATE public.posts SET status = :status, published_at = CASE WHEN :status_check = \'published\' THEN COALESCE(published_at, NOW()) ELSE NULL END, updated_at = NOW() WHERE id = :id');
-            $upd->execute([':status' => $newStatus, ':status_check' => $newStatus, ':id' => $postId]);
-            log_admin_activity((int) $currentAdmin['id'], 'post_status_' . $newStatus, 'post', $postId);
+            $upd->execute([':status' => $newঅবস্থা, ':status_check' => $newঅবস্থা, ':id' => $postId]);
+            log_admin_activity((int) $currentAdmin['id'], 'post_status_' . $newঅবস্থা, 'post', $postId);
             set_flash('success', 'পোস্টের দৃশ্যমানতা হালনাগাদ হয়েছে।');
             redirect_to(admin_url('posts.php'));
         } elseif ($action === 'delete') {
@@ -270,7 +270,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
       <div class="adm-media-preview" id="post_media_preview">
         <?php if ($editPost && !empty($editPost['media_url'])): ?>
           <?php if ($editPost['post_type'] === 'video'): ?><video src="<?= e(safe_url($editPost['media_url'])) ?>" controls preload="metadata" class="adm-preview-media"></video>
-          <?php else: ?><img src="<?= e(safe_url($editPost['media_url'])) ?>" alt="Current post media" class="adm-preview-media"><?php endif; ?>
+          <?php else: ?><img src="<?= e(safe_url($editPost['media_url'])) ?>" alt="পোস্টের বর্তমান মিডিয়া" class="adm-preview-media"><?php endif; ?>
         <?php endif; ?>
       </div>
     </div>
@@ -314,7 +314,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button type="submit" class="btn btn-green"><?= $editPost ? 'পরিবর্তন সংরক্ষণ করুন' : 'পোস্ট প্রকাশ করুন' ?></button>
-      <a href="<?= e(admin_url('posts.php')) ?>" class="btn btn-outline">Cancel</a>
+      <a href="<?= e(admin_url('posts.php')) ?>" class="btn btn-outline">বাতিল</a>
     </div>
   </form>
 </section>
@@ -335,7 +335,7 @@ if ($editPost && ($editPost['post_type'] ?? '') === 'custom' && empty($editPost[
           <td><?= e($p['post_type'] === 'video' ? 'ভিডিও' : ($p['post_type'] === 'custom' ? 'কাস্টম কোড' : ($p['post_type'] === 'image' ? 'ছবি' : 'লেখা'))) ?></td><td><?= e($p['category_name'] ?? '—') ?></td><td><?= e($p['status'] === 'published' ? 'প্রকাশিত' : 'খসড়া') ?></td>
           <td class="num-tab"><?= e(format_date($p['published_at'] ?? $p['created_at'])) ?></td>
           <td><div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <a href="<?= e(admin_url('posts.php')) ?>?edit=<?= (int) $p['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
+            <a href="<?= e(admin_url('posts.php')) ?>?edit=<?= (int) $p['id'] ?>" class="btn btn-outline btn-sm">সম্পাদনা</a>
             <form method="post" action="<?= e(admin_url('posts.php')) ?>"><?= csrf_field() ?><input type="hidden" name="action" value="toggle_status"><input type="hidden" name="post_id" value="<?= (int) $p['id'] ?>"><input type="hidden" name="new_status" value="<?= $p['status'] === 'published' ? 'draft' : 'published' ?>"><button type="submit" class="btn btn-outline btn-sm"><?= $p['status'] === 'published' ? 'অপ্রকাশ করুন' : 'প্রকাশ করুন' ?></button></form>
             <form method="post" action="<?= e(admin_url('posts.php')) ?>" data-confirm="এই পোস্টটি স্থায়ীভাবে মুছে ফেলবেন? এটি আর ফেরানো যাবে না।"><?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="post_id" value="<?= (int) $p['id'] ?>"><button type="submit" class="btn btn-danger btn-sm">মুছুন</button></form>
           </div></td>

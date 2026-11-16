@@ -112,8 +112,8 @@ if (is_super_admin($currentAdmin)) {
             <tr>
               <td class="num-tab"><?= e(format_date($log['created_at'], 'd/m/Y H:i')) ?></td>
               <td><?= e($log['username'] ?? 'সিস্টেম') ?></td>
-              <td><?= e($log['action']) ?></td>
-              <td><?= e(($log['entity_type'] ?? '-') . ($log['entity_id'] ? ' #' . $log['entity_id'] : '')) ?></td>
+              <td><?= e(admin_activity_label((string) $log['action'])) ?></td>
+              <td><?= e(admin_entity_label((string) ($log['entity_type'] ?? '')) . ($log['entity_id'] ? ' #' . $log['entity_id'] : '')) ?></td>
               <td class="num-tab"><?= e($log['ip_address'] ?? '') ?></td>
             </tr>
           <?php endforeach; ?>

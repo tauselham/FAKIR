@@ -266,7 +266,7 @@ if (!empty($_GET['edit'])) {
     <div style="display: flex; gap: 10px;">
       <button type="submit" class="btn btn-green"><?= $editItem ? 'মেনুর আইটেম হালনাগাদ করুন' : 'মেনুর আইটেম যোগ করুন' ?></button>
       <?php if ($editItem): ?>
-        <a href="<?= e(admin_url('header.php')) ?>" class="btn btn-outline">Cancel</a>
+        <a href="<?= e(admin_url('header.php')) ?>" class="btn btn-outline">বাতিল</a>
       <?php endif; ?>
     </div>
   </form>
@@ -296,7 +296,7 @@ if (!empty($_GET['edit'])) {
             <td><?= !empty($ni['is_visible']) ? 'দৃশ্যমান' : 'লুকানো' ?></td>
             <td>
               <div style="display: flex; gap: 6px;">
-                <a href="<?= e(admin_url('header.php')) ?>?edit=<?= (int) $ni['id'] ?>" class="btn btn-outline btn-sm">Edit</a>
+                <a href="<?= e(admin_url('header.php')) ?>?edit=<?= (int) $ni['id'] ?>" class="btn btn-outline btn-sm">সম্পাদনা</a>
                 <form method="post" action="<?= e(admin_url('header.php')) ?>" data-confirm="মুছুন this navigation item?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete_nav_item">

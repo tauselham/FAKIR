@@ -46,12 +46,12 @@ $logs = $securityLogs->fetchAll();
 <section class="adm-panel">
   <h2 class="adm-panel-title">অ্যাডমিনের পাসওয়ার্ড পরিবর্তন</h2>
   <p style="color: var(--adm-muted); margin-top: 0; font-size: 0.9rem;">
-    পাসওয়ার্ড PHP দিয়ে নিরাপদভাবে হ্যাশ করা হয় <code>password_hash()</code> (Argon2id / bcrypt) and never stored in plain text.
+    পাসওয়ার্ড PHP-এর <code>password_hash()</code> (Argon2id / bcrypt) পদ্ধতিতে নিরাপদভাবে হ্যাশ করা হয় এবং কখনোই সাধারণ লেখার আকারে সংরক্ষণ করা হয় না।
   </p>
 
   <?php if (!empty($currentAdmin['must_change_password'])): ?>
     <div class="alert alert-error" role="status">
-      Your account is currently using an initial or temporary password. Enter it below as your বর্তমান পাসওয়ার্ড and choose a new permanent password.
+      আপনার অ্যাকাউন্টে এখনো প্রাথমিক অথবা অস্থায়ী পাসওয়ার্ড ব্যবহার হচ্ছে। নিচে বর্তমান পাসওয়ার্ড লিখে নতুন স্থায়ী পাসওয়ার্ড নির্ধারণ করুন।
     </div>
   <?php endif; ?>
 
@@ -79,7 +79,7 @@ $logs = $securityLogs->fetchAll();
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="confirm_password">Confirm নতুন পাসওয়ার্ড</label>
+      <label class="form-label" for="confirm_password">নতুন পাসওয়ার্ড নিশ্চিত করুন</label>
       <input class="form-control" type="password" id="confirm_password" name="confirm_password" required minlength="10" autocomplete="new-password">
     </div>
 
@@ -102,7 +102,7 @@ $logs = $securityLogs->fetchAll();
       <tbody>
         <?php foreach ($logs as $log): ?>
           <tr>
-            <td><?= e($log['action']) ?></td>
+            <td><?= e(admin_activity_label((string) $log['action'])) ?></td>
             <td class="num-tab"><?= e($log['ip_address'] ?? '') ?></td>
             <td class="num-tab"><?= e(format_date($log['created_at'], 'd/m/Y H:i:s')) ?></td>
           </tr>

@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $result = attempt_admin_login($identifier, $password);
     if ($result['ok']) {
-        set_flash('success', 'Welcome back to the অ্যাডমিন প্যানেল.');
+        set_flash('success', 'অ্যাডমিন প্যানেলে আপনাকে স্বাগতম।');
         redirect_to(admin_url('dashboard.php'));
     }
     if (!empty($result['rate_limited']) && !empty($result['limit_result'])) {

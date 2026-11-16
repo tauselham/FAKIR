@@ -31,7 +31,7 @@
     const postCustomGroup = document.getElementById('post_custom_code_group');
     const postRichGroup = document.getElementById('post_rich_editor_group');
     if (postTypeSelect) {
-      const syncPostEditor = () => {
+      const syncPostসম্পাদনাor = () => {
         const type = postTypeSelect.value;
         if (postMediaGroup) postMediaGroup.style.display = (type === 'image' || type === 'video') ? '' : 'none';
         if (postCustomGroup) postCustomGroup.style.display = type === 'custom' ? '' : 'none';
@@ -39,8 +39,8 @@
         const codeField = document.getElementById('post_code_document');
         if (codeField) codeField.required = type === 'custom';
       };
-      postTypeSelect.addEventListener('change', syncPostEditor);
-      syncPostEditor();
+      postTypeSelect.addEventListener('change', syncPostসম্পাদনাor);
+      syncPostসম্পাদনাor();
     }
 
     // Simple WordPress-style rich text editor. The server applies a strict
@@ -193,20 +193,20 @@
     });
 
     // Landing-page editor mode: separate fields or one complete HTML document.
-    const pageEditorMode = document.getElementById('page_editor_mode');
+    const pageসম্পাদনাorMode = document.getElementById('page_editor_mode');
     const pageSeparateFields = document.getElementById('page_separate_code_fields');
     const pageSingleField = document.getElementById('page_single_code_field');
     const pageHtmlField = document.getElementById('html_content');
-    if (pageEditorMode && pageSeparateFields && pageSingleField) {
+    if (pageসম্পাদনাorMode && pageSeparateFields && pageSingleField) {
       const syncPageMode = () => {
-        const single = pageEditorMode.value === 'single';
+        const single = pageসম্পাদনাorMode.value === 'single';
         pageSeparateFields.style.display = single ? 'none' : '';
         pageSingleField.style.display = single ? '' : 'none';
         if (pageHtmlField) pageHtmlField.required = !single;
         const singleCode = document.getElementById('code_document');
         if (singleCode) singleCode.required = single;
       };
-      pageEditorMode.addEventListener('change', syncPageMode);
+      pageসম্পাদনাorMode.addEventListener('change', syncPageMode);
       syncPageMode();
     }
 
@@ -224,8 +224,8 @@
           /[^a-zA-Z0-9]/.test(v),
         ];
         const score = checks.filter(Boolean).length;
-        const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
-        pwHint.textContent = v.length === 0 ? '' : `পাসওয়ার্ডের শক্তি: ${labels[score]} (${score}/5 requirements met)`;
+        const labels = ['খুব দুর্বল', 'দুর্বল', 'মোটামুটি', 'ভালো', 'শক্তিশালী', 'Very শক্তিশালী'];
+        pwHint.textContent = v.length === 0 ? '' : `পাসওয়ার্ডের শক্তি: ${labels[score]} (${score}/5 শর্ত পূরণ হয়েছে)`;
       });
     }
 

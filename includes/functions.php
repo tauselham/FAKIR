@@ -294,3 +294,46 @@ function enforce_rate_limit(string $scope, array $targets, bool $asJson = false)
     return $res;
 }
 
+
+/** Returns a Bengali label for a stored admin activity action. */
+function admin_activity_label(string $action): string
+{
+    return [
+        'admin_account_updated' => 'অ্যাডমিন অ্যাকাউন্ট হালনাগাদ',
+        'admin_login' => 'অ্যাডমিন লগইন',
+        'banner_created' => 'ব্যানার তৈরি',
+        'banner_deleted' => 'ব্যানার মুছে ফেলা',
+        'footer_settings_updated' => 'ফুটারের সেটিংস হালনাগাদ',
+        'gallery_image_deleted' => 'গ্যালারির ছবি মুছে ফেলা',
+        'gallery_image_uploaded' => 'গ্যালারিতে ছবি আপলোড',
+        'password_reset_completed' => 'পাসওয়ার্ড পরিবর্তন সম্পন্ন',
+        'password_reset_requested' => 'পাসওয়ার্ড পরিবর্তনের অনুরোধ',
+        'website_settings_updated' => 'ওয়েবসাইটের সেটিংস হালনাগাদ',
+        'post_created' => 'পোস্ট তৈরি',
+        'post_updated' => 'পোস্ট হালনাগাদ',
+        'post_deleted' => 'পোস্ট মুছে ফেলা',
+        'popup_created' => 'পপআপ তৈরি',
+        'popup_updated' => 'পপআপ হালনাগাদ',
+        'popup_deleted' => 'পপআপ মুছে ফেলা',
+        'popup_toggled' => 'পপআপের অবস্থা পরিবর্তন',
+        'password_changed' => 'পাসওয়ার্ড পরিবর্তন',
+        'navigation_item_created' => 'মেনু আইটেম তৈরি',
+        'navigation_item_updated' => 'মেনু আইটেম হালনাগাদ',
+        'navigation_item_deleted' => 'মেনু আইটেম মুছে ফেলা',
+    ][$action] ?? 'অন্যান্য কার্যক্রম';
+}
+
+/** Returns a Bengali label for a stored admin activity entity type. */
+function admin_entity_label(string $type): string
+{
+    return [
+        'admin' => 'অ্যাডমিন',
+        'post' => 'পোস্ট',
+        'gallery_image' => 'গ্যালারির ছবি',
+        'hero_banner' => 'ব্যানার',
+        'site_popup' => 'পপআপ',
+        'website_settings' => 'ওয়েবসাইটের সেটিংস',
+        'footer_settings' => 'ফুটারের সেটিংস',
+        'navigation_item' => 'মেনু আইটেম',
+    ][$type] ?? 'অন্যান্য';
+}
