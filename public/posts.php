@@ -8,7 +8,7 @@ enforce_rate_limit('public_api', ['ip' => client_ip()]);
 $pdo = db();
 $categories = $pdo->query(
     'SELECT * FROM public.post_categories WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC'
-)->fetchসব();
+)->fetchAll();
 
 $catSlug = trim((string) ($_GET['category'] ?? 'all'));
 $postType = trim((string) ($_GET['type'] ?? 'all'));
@@ -52,9 +52,9 @@ foreach ($params as $k => $v) {
 $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
-$posts = $stmt->fetchসব();
+$posts = $stmt->fetchAll();
 
-$customPageশিরোনাম = 'গ্রামের খবর ও পোস্ট';
+$customPageTitle = 'গ্রামের খবর ও পোস্ট';
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
 
@@ -77,7 +77,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     </div>
 
     <div class="category-bar" aria-label="পোস্টের ধরন অনুযায়ী বাছাই করুন" style="margin-top: -12px;">
-      <?php foreach (['all' => 'সব Formats', 'text' => 'Text', 'image' => 'Photos', 'video' => 'ভিডিওs', 'custom' => 'Custom Code'] as $key => $label): ?>
+      <?php foreach (['all' => 'সব ধরন', 'text' => 'লেখা', 'image' => 'ছবি', 'video' => 'ভিডিওs', 'custom' => 'কাস্টম কোড'] as $key => $label): ?>
         <a href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e($key) ?>" class="cat-tab <?= $postType === $key ? 'is-active' : '' ?>">
           <?= e($label) ?>
         </a>
