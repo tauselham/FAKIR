@@ -61,14 +61,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mediaPath = $existing['media_path'] ?? null;
             $mediaUrl = $existing['media_url'] ?? null;
             $mediaMime = $existing['media_mime'] ?? null;
-            $oldBucketToমুছুন = null;
-            $oldPathToমুছুন = null;
+            $oldBucketToRemoveুছুন = null;
+            $oldPathToRemoveুছুন = null;
             $newlyUploaded = null;
 
             if (in_array($postType, ['text', 'custom'], true)) {
                 if ($existing && !empty($existing['media_bucket']) && !empty($existing['media_path'])) {
-                    $oldBucketToমুছুন = (string) $existing['media_bucket'];
-                    $oldPathToমুছুন = (string) $existing['media_path'];
+                    $oldBucketToRemoveুছুন = (string) $existing['media_bucket'];
+                    $oldPathToRemoveুছুন = (string) $existing['media_path'];
                 }
                 $mediaBucket = $mediaPath = $mediaUrl = $mediaMime = null;
             } elseif (!empty($_FILES['media_file']['name'])) {
@@ -76,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $maxSize = $postType === 'video' ? MAX_VIDEO_UPLOAD_BYTES : MAX_IMAGE_UPLOAD_BYTES;
                 $newlyUploaded = $storage->upload($_FILES['media_file'], BUCKET_POST_MEDIA, $allowed, $maxSize, 'posts');
                 if ($existing && !empty($existing['media_bucket']) && !empty($existing['media_path'])) {
-                    $oldBucketToমুছুন = (string) $existing['media_bucket'];
-                    $oldPathToমুছুন = (string) $existing['media_path'];
+                    $oldBucketToRemoveুছুন = (string) $existing['media_bucket'];
+                    $oldPathToRemoveুছুন = (string) $existing['media_path'];
                 }
                 $mediaBucket = $newlyUploaded['bucket'];
                 $mediaPath = $newlyUploaded['path'];
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw $dbErr;
             }
 
-            if ($oldBucketToমুছুন !== null && $oldPathToমুছুন !== null) $storage->delete($oldBucketToমুছুন, $oldPathToমুছুন);
+            if ($oldBucketToRemoveুছুন !== null && $oldPathToRemoveুছুন !== null) $storage->delete($oldBucketToRemoveুছুন, $oldPathToRemoveুছুন);
             redirect_to(admin_url('posts.php'));
         } elseif ($action === 'toggle_status') {
             $postId = (int) ($_POST['post_id'] ?? 0);
