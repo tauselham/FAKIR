@@ -109,6 +109,10 @@ function all_admin_permissions(): array
             'label'       => 'Hero Banners',
             'description' => 'Upload, reorder, and configure homepage hero banner slides and timing.',
         ],
+        'manage_popups' => [
+            'label'       => 'Popup Campaigns',
+            'description' => 'Create and schedule image or text popups, links, display targeting, and frequency.',
+        ],
         'manage_categories' => [
             'label'       => 'Categories',
             'description' => 'Create, edit, reorder, and delete Post and Gallery categories.',
