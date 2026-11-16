@@ -28,6 +28,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
   <meta property="og:title" content="<?= e($pageTitle) ?>">
   <meta property="og:description" content="<?= e($pageDesc) ?>">
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="bn_BD">
   <?php if (!empty($siteSettings['favicon_url'])): ?>
     <link rel="icon" href="<?= e(safe_url($siteSettings['favicon_url'])) ?>">
   <?php endif; ?>
