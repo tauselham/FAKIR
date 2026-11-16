@@ -25,7 +25,7 @@
       if (file.files && file.files[0]) {
         const img = document.createElement('img');
         img.src = URL.createObjectURL(file.files[0]);
-        img.alt = 'Selected popup image preview';
+        img.alt = 'নির্বাচিত পপআপের ছবির পূর্বরূপ';
         img.addEventListener('load', () => URL.revokeObjectURL(img.src), { once: true });
         preview.append(img);
       }
