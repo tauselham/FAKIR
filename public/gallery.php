@@ -41,7 +41,7 @@ if ($initialCat !== '' && $initialCat !== 'all') {
 $hasMore = count($rows) > $perPage;
 $images = array_slice($rows, 0, $perPage);
 
-$customPageTitle = 'Photo ছবির গ্যালারি';
+$customPageTitle = 'ছবির গ্যালারি';
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
 
@@ -49,7 +49,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <div class="container">
     <div class="section-header">
       <div>
-        <h1 class="section-title">Village Photo ছবির গ্যালারি</h1>
+        <h1 class="section-title">Village ছবির গ্যালারি</h1>
         <p class="section-subtitle">বিভাগ অনুযায়ী গ্রামের স্মৃতির ছবি দেখুন। যেকোনো ছবিতে ক্লিক করে বড় করুন অথবা সোয়াইপ করে অন্য ছবি দেখুন।</p>
       </div>
     </div>

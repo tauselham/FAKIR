@@ -51,7 +51,7 @@ $footerText = sanitize_hex_color($siteSettings['footer_text_color'] ?? null, '#e
           <?php else: ?>
             <li><a href="/">হোম</a></li>
             <li><a href="/posts.php">গ্রামের খবর ও পোস্ট</a></li>
-            <li><a href="/gallery.php">Photo ছবির গ্যালারি</a></li>
+            <li><a href="/gallery.php">ছবির গ্যালারি</a></li>
           <?php endif; ?>
         </ul>
       </div>

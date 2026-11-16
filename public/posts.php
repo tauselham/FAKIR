@@ -127,10 +127,10 @@ require_once dirname(__DIR__) . '/includes/header.php';
             <a class="btn-secondary" href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e(urlencode($postType)) ?>&amp;page=<?= $page - 1 ?>">← আগের পৃষ্ঠা</a>
           <?php endif; ?>
           <span style="padding: 10px 14px; font-size: 0.9rem; color: var(--text-muted);">
-            পৃষ্ঠা <?= $page ?> / <?= $totalPages ?>
+            Page <?= $page ?> of <?= $totalPages ?>
           </span>
           <?php if ($page < $totalPages): ?>
-            <a class="btn-secondary" href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e(urlencode($postType)) ?>&amp;page=<?= $page + 1 ?>">পরের পৃষ্ঠা →</a>
+            <a class="btn-secondary" href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e(urlencode($postType)) ?>&amp;page=<?= $page + 1 ?>">পরের পৃষ্ঠা</a>
           <?php endif; ?>
         </nav>
       <?php endif; ?>

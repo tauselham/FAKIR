@@ -147,7 +147,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
       </nav>
 
       <div class="header-actions">
-        <a href="/gallery.php" class="header-cta">ছবির গ্যালারি</a>
+        <a href="/gallery.php" class="header-cta">Gallery</a>
         <button
           type="button"
           class="mobile-menu-toggle"
@@ -185,7 +185,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
                   </a>
                 <?php endif; ?>
                 <?php if (!empty($item['children'])): ?>
-                  <button type="button" class="mobile-উপমেনু-btn" aria-expanded="false" aria-label="খুলুন <?= e($item['label']) ?> উপমেনু">+</button>
+                  <button type="button" class="mobile-submenu-btn" aria-expanded="false" aria-label="Toggle <?= e($item['label']) ?> submenu">+</button>
                 <?php endif; ?>
               </div>
               <?php if (!empty($item['children'])): ?>

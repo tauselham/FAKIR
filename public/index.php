@@ -11,7 +11,7 @@ $banners = $pdo->query(
     'SELECT * FROM public.hero_banners WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC'
 )->fetchAll();
 
-// 2. ছবির গ্যালারি Categories & Horizontal Slider Items
+// 2. Gallery Categories & Horizontal Slider Items
 $galleryCategories = $pdo->query(
     'SELECT * FROM public.gallery_categories WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC'
 )->fetchAll();
@@ -35,7 +35,7 @@ $recentPosts = $pdo->query(
      LIMIT 6"
 )->fetchAll();
 
-// 4. Initial Instagram-Style Photo ছবির গ্যালারি (8 items -> 2 clean rows of 4 on desktop)
+// 4. Initial Instagram-Style ছবির গ্যালারি (8 items -> 2 clean rows of 4 on desktop)
 $initialCat = trim((string) ($_GET['category'] ?? 'all'));
 $perPage = 8;
 
@@ -66,7 +66,7 @@ if ($initialCat !== '' && $initialCat !== 'all') {
     $galleryRows = $stmt->fetchAll();
 }
 
-$hasMoreছবির গ্যালারি = count($galleryRows) > $perPage;
+$hasMoreGallery = count($galleryRows) > $perPage;
 $galleryImages = array_slice($galleryRows, 0, $perPage);
 
 // 5. Featured Images with Optional Titles
@@ -238,12 +238,12 @@ require_once dirname(__DIR__) . '/includes/header.php';
   </div>
 </section>
 
-<!-- Section 5: Instagram-Style Photo ছবির গ্যালারি (4-col desktop / 2-col mobile) -->
+<!-- Section 5: Instagram-Style ছবির গ্যালারি (4-col desktop / 2-col mobile) -->
 <section class="section section-tinted" id="gallery-section">
   <div class="container">
     <div class="section-header">
       <div>
-        <h2 class="section-title">Village Photo ছবির গ্যালারি</h2>
+        <h2 class="section-title">Village ছবির গ্যালারি</h2>
         <p class="section-subtitle">যেকোনো ছবিতে ক্লিক করে বড় করে দেখুন এবং জুম বা সোয়াইপ করে ছবি বদলান।</p>
       </div>
       <a href="/gallery.php" class="section-link">সব ছবি দেখুন →</a>
@@ -291,7 +291,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     </div>
 
     <div class="gallery-actions">
-      <button type="button" class="btn-primary" id="gallery-load-more" <?= $hasMoreছবির গ্যালারি ? '' : 'hidden' ?>>
+      <button type="button" class="btn-primary" id="gallery-load-more" <?= $hasMoreGallery ? '' : 'hidden' ?>>
         Load More Photos
       </button>
     </div>
