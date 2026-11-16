@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'footer';
-$adminPageTitle = 'ফুটার সেটিংস';
+$adminPageশিরোনাম = 'ফুটার সেটিংস';
 $requiredPermission = 'manage_navigation';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -119,7 +119,7 @@ $footer = get_footer_settings();
 $site   = get_website_settings();
 $linksStmt = $pdo->prepare('SELECT * FROM public.navigation_items WHERE menu_id = :mid ORDER BY sort_order ASC, id ASC');
 $linksStmt->execute([':mid' => $footerMenuId]);
-$footerলিংকs = $linksStmt->fetchAll();
+$footerলিংকs = $linksStmt->fetchসব();
 ?>
 
 <section class="adm-panel">
@@ -130,7 +130,7 @@ $footerলিংকs = $linksStmt->fetchAll();
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="site_name">Footer ওয়েবসাইটের নাম</label>
+        <label class="form-label" for="site_name">ফুটারে ওয়েবসাইটের নাম</label>
         <input class="form-control" type="text" id="site_name" name="site_name" value="<?= e($footer['site_name']) ?>" required>
       </div>
       <div class="form-row">
@@ -227,7 +227,7 @@ $footerলিংকs = $linksStmt->fetchAll();
 
   <div class="table-wrap">
     <table class="adm-table">
-      <thead><tr><th>নাম &amp; লিংক</th><th>কার্যক্রমs</th></tr></thead>
+      <thead><tr><th>নাম ও লিংক</th><th>কার্যক্রম</th></tr></thead>
       <tbody>
         <?php foreach ($footerলিংকs as $fl): ?>
           <tr>

@@ -6,8 +6,8 @@ require_once __DIR__ . '/functions.php';
 $siteSettings = get_website_settings();
 $headerNav    = get_navigation_tree('header');
 
-$pageTitle = isset($customPageTitle) && $customPageTitle !== ''
-    ? $customPageTitle . ' — ' . $siteSettings['site_name']
+$pageশিরোনাম = isset($customPageশিরোনাম) && $customPageশিরোনাম !== ''
+    ? $customPageশিরোনাম . ' — ' . $siteSettings['site_name']
     : ($siteSettings['seo_title'] ?: $siteSettings['site_name']);
 
 $pageDesc = isset($customPageDesc) && $customPageDesc !== ''
@@ -23,9 +23,9 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= e($pageTitle) ?></title>
+  <title><?= e($pageশিরোনাম) ?></title>
   <meta name="description" content="<?= e($pageDesc) ?>">
-  <meta property="og:title" content="<?= e($pageTitle) ?>">
+  <meta property="og:title" content="<?= e($pageশিরোনাম) ?>">
   <meta property="og:description" content="<?= e($pageDesc) ?>">
   <meta property="og:type" content="website">
   <?php if (!empty($siteSettings['favicon_url'])): ?>
@@ -185,7 +185,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
                   </a>
                 <?php endif; ?>
                 <?php if (!empty($item['children'])): ?>
-                  <button type="button" class="mobile-উপমেনু-btn" aria-expanded="false" aria-label="খুলুন <?= e($item['label']) ?> উপমেনু">+</button>
+                  <button type="button" class="mobile-submenu-btn" aria-expanded="false" aria-label="খুলুন <?= e($item['label']) ?> উপমেনু">+</button>
                 <?php endif; ?>
               </div>
               <?php if (!empty($item['children'])): ?>

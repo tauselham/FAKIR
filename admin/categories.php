@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'categories';
-$adminPageTitle = 'বিভাগসমূহ';
+$adminPageশিরোনাম = 'বিভাগসমূহ';
 $requiredPermission = 'manage_categories';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 
@@ -19,20 +19,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name      = trim((string) ($_POST['name'] ?? ''));
             $sortক্রম = (int) ($_POST['sort_order'] ?? 0);
             if ($name === '') {
-                throw new RuntimeException('বিভাগ name is required.');
+                throw new RuntimeException('বিভাগের নাম লিখতে হবে।');
             }
             $slug = slugify($name);
             $stmt = $pdo->prepare("INSERT INTO public.{$table} (name, slug, sort_order, is_active) VALUES (:name, :slug, :ord, TRUE) RETURNING id");
             $stmt->execute([':name' => $name, ':slug' => $slug, ':ord' => $sortক্রম]);
             log_admin_activity((int) $currentঅ্যাডমিন['id'], $scope . '_category_created', $table, (int) $stmt->fetchColumn());
-            set_flash('success', 'বিভাগ added.');
+            set_flash('success', 'বিভাগ যোগ করা হয়েছে।');
         } elseif ($action === 'update') {
             $id        = (int) ($_POST['id'] ?? 0);
             $name      = trim((string) ($_POST['name'] ?? ''));
             $sortক্রম = (int) ($_POST['sort_order'] ?? 0);
             $isচালু  = !empty($_POST['is_active']);
             if ($name === '') {
-                throw new RuntimeException('বিভাগ name cannot be empty.');
+                throw new RuntimeException('বিভাগের নাম ফাঁকা রাখা যাবে না।');
             }
             $stmt = $pdo->prepare("UPDATE public.{$table} SET name = :name, slug = :slug, sort_order = :ord, is_active = :act WHERE id = :id");
             $stmt->execute([
@@ -43,12 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':id'   => $id,
             ]);
             log_admin_activity((int) $currentঅ্যাডমিন['id'], $scope . '_category_updated', $table, $id);
-            set_flash('success', 'বিভাগ updated.');
+            set_flash('success', 'বিভাগ হালনাগাদ হয়েছে।');
         } elseif ($action === 'delete') {
             $id = (int) ($_POST['id'] ?? 0);
             $pdo->prepare("DELETE FROM public.{$table} WHERE id = :id")->execute([':id' => $id]);
             log_admin_activity((int) $currentঅ্যাডমিন['id'], $scope . '_category_deleted', $table, $id);
-            set_flash('success', 'বিভাগ deleted.');
+            set_flash('success', 'বিভাগ মুছে ফেলা হয়েছে।');
         }
     } catch (Throwable $e) {
         set_flash('error', $e->getMessage());
@@ -56,14 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect_to(admin_url('categories.php'));
 }
 
-$galleryCats = $pdo->query('SELECT * FROM public.gallery_categories ORDER BY sort_order ASC, id ASC')->fetchAll();
-$postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_order ASC, id ASC')->fetchAll();
+$galleryCats = $pdo->query('SELECT * FROM public.gallery_categories ORDER BY sort_order ASC, id ASC')->fetchসব();
+$postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_order ASC, id ASC')->fetchসব();
 ?>
 
 <div class="adm-grid-2">
-  <!-- Gallery বিভাগসমূহ -->
+  <!-- গ্যালারির বিভাগসমূহ -->
   <section class="adm-panel">
-    <h2 class="adm-panel-title">Gallery বিভাগসমূহ</h2>
+    <h2 class="adm-panel-title">গ্যালারির বিভাগসমূহ</h2>
     <form method="post" action="<?= e(admin_url('categories.php')) ?>" style="display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap;">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="create">
@@ -76,7 +76,7 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
     <div class="table-wrap">
       <table class="adm-table">
         <thead>
-          <tr><th>Name &amp; ক্রম</th><th>কার্যক্রমs</th></tr>
+          <tr><th>Name &amp; ক্রম</th><th>কার্যক্রম</th></tr>
         </thead>
         <tbody>
           <?php foreach ($galleryCats as $c): ?>
@@ -127,7 +127,7 @@ $postCats    = $pdo->query('SELECT * FROM public.post_categories ORDER BY sort_o
     <div class="table-wrap">
       <table class="adm-table">
         <thead>
-          <tr><th>Name &amp; ক্রম</th><th>কার্যক্রমs</th></tr>
+          <tr><th>Name &amp; ক্রম</th><th>কার্যক্রম</th></tr>
         </thead>
         <tbody>
           <?php foreach ($postCats as $c): ?>

@@ -9,12 +9,12 @@ $siteSettings = get_website_settings();
 // 1. Active Hero Banners
 $banners = $pdo->query(
     'SELECT * FROM public.hero_banners WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC'
-)->fetchAll();
+)->fetchসব();
 
 // 2. ছবির গ্যালারি Categories & Horizontal Slider Items
 $galleryCategories = $pdo->query(
     'SELECT * FROM public.gallery_categories WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC'
-)->fetchAll();
+)->fetchসব();
 
 $sliderItems = $pdo->query(
     "SELECT gi.*, gc.name AS category_name, gc.slug AS category_slug
@@ -23,7 +23,7 @@ $sliderItems = $pdo->query(
      WHERE gi.status = 'published' AND gi.is_slider_item = TRUE
      ORDER BY gi.sort_order ASC, gi.uploaded_at DESC
      LIMIT 16"
-)->fetchAll();
+)->fetchসব();
 
 // 3. Recent Published গ্রামের খবর ও পোস্ট
 $recentPosts = $pdo->query(
@@ -33,7 +33,7 @@ $recentPosts = $pdo->query(
      WHERE p.status = 'published'
      ORDER BY COALESCE(p.published_at, p.created_at) DESC
      LIMIT 6"
-)->fetchAll();
+)->fetchসব();
 
 // 4. Initial Instagram-Style Photo ছবির গ্যালারি (8 items -> 2 clean rows of 4 on desktop)
 $initialCat = trim((string) ($_GET['category'] ?? 'all'));
@@ -51,7 +51,7 @@ if ($initialCat !== '' && $initialCat !== 'all') {
     $stmt->bindValue(':slug', $initialCat, PDO::PARAM_STR);
     $stmt->bindValue(':limit', $perPage + 1, PDO::PARAM_INT);
     $stmt->execute();
-    $galleryRows = $stmt->fetchAll();
+    $galleryRows = $stmt->fetchসব();
 } else {
     $stmt = $pdo->prepare(
         "SELECT gi.*, gc.name AS category_name, gc.slug AS category_slug
@@ -63,13 +63,13 @@ if ($initialCat !== '' && $initialCat !== 'all') {
     );
     $stmt->bindValue(':limit', $perPage + 1, PDO::PARAM_INT);
     $stmt->execute();
-    $galleryRows = $stmt->fetchAll();
+    $galleryRows = $stmt->fetchসব();
 }
 
 $hasMoreছবির গ্যালারি = count($galleryRows) > $perPage;
 $galleryImages = array_slice($galleryRows, 0, $perPage);
 
-// 5. Featured Images with Optional Titles
+// 5. Featured Images with Optional শিরোনামs
 $featuredImages = $pdo->query(
     "SELECT gi.*, gc.name AS category_name
      FROM public.gallery_images gi
@@ -77,7 +77,7 @@ $featuredImages = $pdo->query(
      WHERE gi.status = 'published' AND gi.is_featured = TRUE
      ORDER BY gi.sort_order ASC, gi.uploaded_at DESC
      LIMIT 4"
-)->fetchAll();
+)->fetchসব();
 
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
@@ -88,15 +88,15 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <div class="hero-track">
     <?php foreach ($banners as $banner): ?>
       <?php
-        $hasTitle = trim((string) ($banner['title'] ?? '')) !== '';
+        $hasশিরোনাম = trim((string) ($banner['title'] ?? '')) !== '';
         $hasSub   = trim((string) ($banner['subtitle'] ?? '')) !== '';
         $hasBtn   = trim((string) ($banner['button_text'] ?? '')) !== '' && trim((string) ($banner['button_url'] ?? '')) !== '';
-        $hasCopy  = $hasTitle || $hasSub || $hasBtn;
+        $hasCopy  = $hasশিরোনাম || $hasSub || $hasBtn;
       ?>
       <div class="hero-slide">
         <img
           src="<?= e(safe_url($banner['image_url'])) ?>"
-          alt="<?= e($hasTitle ? $banner['title'] : 'Village community banner') ?>"
+          alt="<?= e($hasশিরোনাম ? $banner['title'] : 'Village community banner') ?>"
           class="hero-img"
           referrerpolicy="no-referrer"
         >
@@ -105,7 +105,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
           <div class="hero-content">
             <div class="container">
               <div class="hero-copy">
-                <?php if ($hasTitle): ?>
+                <?php if ($hasশিরোনাম): ?>
                   <h1 class="hero-title"><?= e($banner['title']) ?></h1>
                 <?php endif; ?>
                 <?php if ($hasSub): ?>
@@ -243,7 +243,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <div class="container">
     <div class="section-header">
       <div>
-        <h2 class="section-title">Village Photo ছবির গ্যালারি</h2>
+        <h2 class="section-title">গ্রামের ছবির গ্যালারি</h2>
         <p class="section-subtitle">যেকোনো ছবিতে ক্লিক করে বড় করে দেখুন এবং জুম বা সোয়াইপ করে ছবি বদলান।</p>
       </div>
       <a href="/gallery.php" class="section-link">সব ছবি দেখুন →</a>
@@ -298,7 +298,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
   </div>
 </section>
 
-<!-- Section 6: Featured Images with Optional Titles -->
+<!-- Section 6: Featured Images with Optional শিরোনামs -->
 <?php if (!empty($featuredImages)): ?>
 <section class="section">
   <div class="container">

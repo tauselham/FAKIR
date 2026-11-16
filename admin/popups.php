@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'popups';
-$adminPageTitle = 'পপআপ ব্যবস্থাপনা';
+$adminPageশিরোনাম = 'পপআপ ব্যবস্থাপনা';
 $requiredPermission = 'manage_popups';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $ends = popup_local_datetime($_POST['ends_at'] ?? null);
             $active = !empty($_POST['is_active']);
 
-            if ($title !== '' && mb_strlen($title) > 180) throw new RuntimeException('Title must be 180 characters or fewer.');
+            if ($title !== '' && mb_strlen($title) > 180) throw new RuntimeException('শিরোনাম must be 180 characters or fewer.');
             if ($type === 'text' && $body === '') throw new RuntimeException('Please enter popup text.');
             if (mb_strlen($body) > 10000) throw new RuntimeException('Popup text is too long (maximum 10,000 characters).');
             if ($starts && $ends && strtotime($ends) <= strtotime($starts)) throw new RuntimeException('End time must be later than start time.');
@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$popups = $pdo->query('SELECT * FROM public.site_popups ORDER BY priority DESC, created_at DESC')->fetchAll();
+$popups = $pdo->query('SELECT * FROM public.site_popups ORDER BY priority DESC, created_at DESC')->fetchসব();
 $edit = null;
 if (!empty($_GET['edit'])) {
     $st = $pdo->prepare('SELECT * FROM public.site_popups WHERE id = :id');
@@ -180,7 +180,7 @@ $fmtLocal = static function (?string $value): string {
         </select>
       </div>
       <div class="form-row">
-        <label class="form-label" for="popup_title">Title (optional)</label>
+        <label class="form-label" for="popup_title">শিরোনাম (optional)</label>
         <input class="form-control" id="popup_title" name="title" maxlength="180" value="<?= e($edit['title'] ?? '') ?>" placeholder="Announcement title">
       </div>
     </div>
@@ -243,14 +243,14 @@ $fmtLocal = static function (?string $value): string {
       <div class="form-row">
         <label class="form-label" for="display_scope">Where to show</label>
         <select class="form-control" id="display_scope" name="display_scope">
-          <option value="all" <?= ($edit['display_scope'] ?? 'all') === 'all' ? 'selected' : '' ?>>All public pages</option>
+          <option value="all" <?= ($edit['display_scope'] ?? 'all') === 'all' ? 'selected' : '' ?>>সব public pages</option>
           <option value="home" <?= ($edit['display_scope'] ?? '') === 'home' ? 'selected' : '' ?>>Homepage only</option>
         </select>
       </div>
       <div class="form-row">
         <label class="form-label" for="device_target">Devices</label>
         <select class="form-control" id="device_target" name="device_target">
-          <option value="all" <?= ($edit['device_target'] ?? 'all') === 'all' ? 'selected' : '' ?>>All devices</option>
+          <option value="all" <?= ($edit['device_target'] ?? 'all') === 'all' ? 'selected' : '' ?>>সব devices</option>
           <option value="desktop" <?= ($edit['device_target'] ?? '') === 'desktop' ? 'selected' : '' ?>>Desktop only</option>
           <option value="mobile" <?= ($edit['device_target'] ?? '') === 'mobile' ? 'selected' : '' ?>>Mobile only</option>
         </select>
@@ -276,7 +276,7 @@ $fmtLocal = static function (?string $value): string {
   <h2 class="adm-panel-title">পপআপ ব্যবস্থাপনা</h2>
   <div class="table-wrap">
     <table class="adm-table">
-      <thead><tr><th>Popup</th><th>ধরন</th><th>Schedule</th><th>Target</th><th>Frequency</th><th>অবস্থা</th><th>কার্যক্রমs</th></tr></thead>
+      <thead><tr><th>Popup</th><th>ধরন</th><th>Schedule</th><th>Target</th><th>Frequency</th><th>অবস্থা</th><th>কার্যক্রম</th></tr></thead>
       <tbody>
       <?php foreach ($popups as $p): ?>
         <tr>

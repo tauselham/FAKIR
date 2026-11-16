@@ -6,7 +6,7 @@ require_once dirname(__DIR__) . '/includes/functions.php';
 $pdo = db();
 $categories = $pdo->query(
     'SELECT * FROM public.gallery_categories WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC'
-)->fetchAll();
+)->fetchসব();
 
 $initialCat = trim((string) ($_GET['category'] ?? 'all'));
 $perPage = 16;
@@ -23,7 +23,7 @@ if ($initialCat !== '' && $initialCat !== 'all') {
     $stmt->bindValue(':slug', $initialCat, PDO::PARAM_STR);
     $stmt->bindValue(':limit', $perPage + 1, PDO::PARAM_INT);
     $stmt->execute();
-    $rows = $stmt->fetchAll();
+    $rows = $stmt->fetchসব();
 } else {
     $stmt = $pdo->prepare(
         "SELECT gi.*, gc.name AS category_name, gc.slug AS category_slug
@@ -35,13 +35,13 @@ if ($initialCat !== '' && $initialCat !== 'all') {
     );
     $stmt->bindValue(':limit', $perPage + 1, PDO::PARAM_INT);
     $stmt->execute();
-    $rows = $stmt->fetchAll();
+    $rows = $stmt->fetchসব();
 }
 
 $hasMore = count($rows) > $perPage;
 $images = array_slice($rows, 0, $perPage);
 
-$customPageTitle = 'Photo ছবির গ্যালারি';
+$customPageশিরোনাম = 'Photo ছবির গ্যালারি';
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
 
@@ -49,7 +49,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <div class="container">
     <div class="section-header">
       <div>
-        <h1 class="section-title">Village Photo ছবির গ্যালারি</h1>
+        <h1 class="section-title">গ্রামের ছবির গ্যালারি</h1>
         <p class="section-subtitle">বিভাগ অনুযায়ী গ্রামের স্মৃতির ছবি দেখুন। যেকোনো ছবিতে ক্লিক করে বড় করুন অথবা সোয়াইপ করে অন্য ছবি দেখুন।</p>
       </div>
     </div>

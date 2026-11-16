@@ -22,21 +22,21 @@ $post = $stmt->fetch();
 
 if (!$post) {
     http_response_code(404);
-    $customPageTitle = 'পোস্টটি পাওয়া যায়নি';
+    $customPageশিরোনাম = 'পোস্টটি পাওয়া যায়নি';
     require_once dirname(__DIR__) . '/includes/header.php';
     echo '<div class="container section"><div class="empty-state"><h1>পোস্টটি পাওয়া যায়নি</h1><p>পোস্টটি হয়তো অপ্রকাশিত করা হয়েছে অথবা সরিয়ে ফেলা হয়েছে।</p><p><a class="btn-primary" href="/posts.php">পোস্টে ফিরে যান</a></p></div></div>';
     require_once dirname(__DIR__) . '/includes/footer.php';
     exit;
 }
 
-$customPageTitle = $post['title'] ?: 'Community Update';
+$customPageশিরোনাম = $post['title'] ?: 'Community Update';
 $customPageDesc = mb_substr(trim((string) $post['description']), 0, 155);
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
 
 <article class="post-detail-wrap">
   <p style="margin: 0 0 18px;">
-    <a href="/posts.php" class="section-link">← Back to গ্রামের খবর ও পোস্ট</a>
+    <a href="/posts.php" class="section-link">← সব পোস্টে ফিরে যান</a>
   </p>
 
   <div class="post-meta" style="margin-bottom: 10px;">

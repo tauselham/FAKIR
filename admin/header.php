@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'header';
-$adminPageTitle = 'Header & Navigation';
+$adminPageশিরোনাম = 'Header & Navigation';
 $requiredPermission = 'manage_navigation';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $bgColor   = sanitize_hex_color($_POST['header_bg_color'] ?? null, '#14532d');
             $textColor = sanitize_hex_color($_POST['header_text_color'] ?? null, '#ffffff');
             if ($siteName === '') {
-                throw new RuntimeException('Website name is required.');
+                throw new RuntimeException('ওয়েবসাইটের নাম লিখতে হবে।');
             }
 
             $current = get_website_settings();
@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $settings = get_website_settings();
 $navStmt = $pdo->prepare('SELECT * FROM public.navigation_items WHERE menu_id = :mid ORDER BY sort_order ASC, id ASC');
 $navStmt->execute([':mid' => $headerMenuId]);
-$navItems = $navStmt->fetchAll();
+$navItems = $navStmt->fetchসব();
 
 $editItem = null;
 if (!empty($_GET['edit'])) {
@@ -169,7 +169,7 @@ if (!empty($_GET['edit'])) {
         <input class="form-control" type="text" id="site_name" name="site_name" value="<?= e($settings['site_name']) ?>" required>
       </div>
       <div class="form-row">
-        <label class="form-label" for="logo_file">Upload / Replace ওয়েবসাইটের লোগো</label>
+        <label class="form-label" for="logo_file">ওয়েবসাইটের লোগো আপলোড / পরিবর্তন</label>
         <input class="form-control" type="file" id="logo_file" name="logo_file" data-preview-target="header_logo_preview" accept="image/jpeg,image/png,image/webp">
         <div class="adm-media-preview" id="header_logo_preview">
           <?php if (!empty($settings['logo_url'])): ?>
@@ -243,7 +243,7 @@ if (!empty($_GET['edit'])) {
 
     <div class="adm-grid-2">
       <div class="form-row">
-        <label class="form-label" for="mega_description">মেগা মেনু / Sub-item বিবরণ (ঐচ্ছিক)</label>
+        <label class="form-label" for="mega_description">মেগা মেনু / সাব-মেনুর বিবরণ (ঐচ্ছিক)</label>
         <input class="form-control" type="text" id="mega_description" name="mega_description" value="<?= e($editItem['mega_description'] ?? '') ?>">
       </div>
       <div class="form-row">
@@ -283,7 +283,7 @@ if (!empty($_GET['edit'])) {
           <th>ধরন</th>
           <th>ক্রম</th>
           <th>দৃশ্যমান</th>
-          <th>কার্যক্রমs</th>
+          <th>কার্যক্রম</th>
         </tr>
       </thead>
       <tbody>

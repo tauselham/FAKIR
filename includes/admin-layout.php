@@ -23,7 +23,7 @@ if (!empty($requiredSuperঅ্যাডমিন) && !is_super_admin($current�
         'reason' => 'super_admin_required',
     ]);
     http_response_code(403);
-    set_flash('error', 'শুধুমাত্র একজন সুপার অ্যাডমিন can access this section.');
+    set_flash('error', 'শুধুমাত্র সুপার অ্যাডমিন এই বিভাগে প্রবেশ করতে পারবেন।');
     redirect_to(admin_url('dashboard.php'));
 }
 
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $siteSettings = get_website_settings();
 $flash        = get_flash();
 $activePage   = $activePage ?? 'dashboard';
-$pageTitle    = $adminPageTitle ?? 'ড্যাশবোর্ড';
+$pageশিরোনাম    = $adminPageশিরোনাম ?? 'ড্যাশবোর্ড';
 
 $allNavItems = [
     ['id' => 'dashboard',   'label' => 'ড্যাশবোর্ড',           'href' => admin_url('dashboard.php'),   'perm' => null,                 'super' => false],
@@ -81,7 +81,7 @@ $navItems = array_values(array_filter($allNavItems, static function (array $item
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= e($pageTitle) ?> — অ্যাডমিন প্যানেল</title>
+  <title><?= e($pageশিরোনাম) ?> — অ্যাডমিন প্যানেল</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -117,7 +117,7 @@ $navItems = array_values(array_filter($allNavItems, static function (array $item
     <header class="adm-topbar">
       <div class="adm-topbar-left">
         <button type="button" class="adm-menu-btn" id="adm-menu-btn" aria-label="সাইডবার খুলুন বা বন্ধ করুন">☰</button>
-        <h1 class="adm-page-title"><?= e($pageTitle) ?></h1>
+        <h1 class="adm-page-title"><?= e($pageশিরোনাম) ?></h1>
       </div>
       <div style="font-size: 0.85rem; color: var(--adm-muted);">
         লগইন করেছেন <strong><?= e($currentঅ্যাডমিন['full_name']) ?></strong>

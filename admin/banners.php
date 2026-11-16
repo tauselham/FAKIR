@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $activePage = 'banners';
-$adminPageTitle = 'প্রধান ব্যানার';
+$adminPageশিরোনাম = 'প্রধান ব্যানার';
 $requiredPermission = 'manage_banners';
 require_once dirname(__DIR__) . '/includes/admin-layout.php';
 require_once dirname(__DIR__) . '/includes/storage.php';
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $upd = $pdo->prepare('UPDATE public.website_settings SET hero_interval_ms = :ms WHERE id = 1');
             $upd->execute([':ms' => $interval]);
             log_admin_activity((int) $currentঅ্যাডমিন['id'], 'hero_interval_updated', 'website_settings', 1);
-            set_flash('success', 'Slideshow interval updated.');
+            set_flash('success', 'স্লাইডশোর সময় হালনাগাদ হয়েছে।');
             redirect_to(admin_url('banners.php'));
         } elseif ($action === 'create' || $action === 'update') {
             $bannerId   = (int) ($_POST['banner_id'] ?? 0);
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($action === 'create') {
                 if (empty($_FILES['banner_image']['name'])) {
-                    throw new RuntimeException('Banner image file is required.');
+                    throw new RuntimeException('ব্যানারের ছবি নির্বাচন করতে হবে।');
                 }
                 $res = $storage->upload($_FILES['banner_image'], BUCKET_HERO_BANNERS, ALLOWED_BANNER_MIMES, MAX_IMAGE_UPLOAD_BYTES, 'banners');
                 try {
@@ -58,13 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $storage->delete($res['bucket'], $res['path']);
                     throw $dbErr;
                 }
-                set_flash('success', 'Hero banner added.');
+                set_flash('success', 'ব্যানার যোগ করা হয়েছে।');
             } else {
                 $st = $pdo->prepare('SELECT * FROM public.hero_banners WHERE id = :id LIMIT 1');
                 $st->execute([':id' => $bannerId]);
                 $existing = $st->fetch();
                 if (!$existing) {
-                    throw new RuntimeException('Hero banner not found.');
+                    throw new RuntimeException('ব্যানারটি পাওয়া যায়নি।');
                 }
 
                 $bucket = $existing['storage_bucket'];
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($oldBucket !== null && $oldPath !== null) {
                     $storage->delete($oldBucket, $oldPath);
                 }
-                set_flash('success', 'Hero banner updated.');
+                set_flash('success', 'ব্যানার হালনাগাদ হয়েছে।');
             }
             redirect_to(admin_url('banners.php'));
         } elseif ($action === 'delete') {
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->prepare('DELETE FROM public.hero_banners WHERE id = :id')->execute([':id' => $bannerId]);
                 log_admin_activity((int) $currentঅ্যাডমিন['id'], 'banner_deleted', 'hero_banner', $bannerId);
             }
-            set_flash('success', 'Hero banner deleted.');
+            set_flash('success', 'ব্যানার মুছে ফেলা হয়েছে।');
             redirect_to(admin_url('banners.php'));
         }
     } catch (Throwable $e) {
@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$banners = $pdo->query('SELECT * FROM public.hero_banners ORDER BY sort_order ASC, id ASC')->fetchAll();
+$banners = $pdo->query('SELECT * FROM public.hero_banners ORDER BY sort_order ASC, id ASC')->fetchসব();
 $editBanner = null;
 if (!empty($_GET['edit'])) {
     $st = $pdo->prepare('SELECT * FROM public.hero_banners WHERE id = :id LIMIT 1');
@@ -179,7 +179,7 @@ if (!empty($_GET['edit'])) {
         </div>
       </div>
       <div class="form-row">
-        <label class="form-label" for="sort_order">Display ক্রম</label>
+        <label class="form-label" for="sort_order">প্রদর্শনের ক্রম</label>
         <input class="form-control" type="number" id="sort_order" name="sort_order" value="<?= (int) ($editBanner['sort_order'] ?? 0) ?>">
       </div>
     </div>
@@ -229,11 +229,11 @@ if (!empty($_GET['edit'])) {
       <thead>
         <tr>
           <th>ছবি</th>
-          <th>Title</th>
+          <th>শিরোনাম</th>
           <th>বাটন</th>
           <th>ক্রম</th>
           <th>অবস্থা</th>
-          <th>কার্যক্রমs</th>
+          <th>কার্যক্রম</th>
         </tr>
       </thead>
       <tbody>
