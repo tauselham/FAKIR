@@ -41,7 +41,7 @@ if ($initialCat !== '' && $initialCat !== 'all') {
 $hasMore = count($rows) > $perPage;
 $images = array_slice($rows, 0, $perPage);
 
-$customPageTitle = 'Photo Gallery';
+$customPageTitle = 'Photo ছবির গ্যালারি';
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
 
@@ -49,13 +49,13 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <div class="container">
     <div class="section-header">
       <div>
-        <h1 class="section-title">Village Photo Gallery</h1>
-        <p class="section-subtitle">Browse community memories by category. Click any photo to zoom or swipe through the collection.</p>
+        <h1 class="section-title">Village Photo ছবির গ্যালারি</h1>
+        <p class="section-subtitle">বিভাগ অনুযায়ী গ্রামের স্মৃতির ছবি দেখুন। যেকোনো ছবিতে ক্লিক করে বড় করুন অথবা সোয়াইপ করে অন্য ছবি দেখুন।</p>
       </div>
     </div>
 
-    <div class="category-bar" id="gallery-category-bar" data-active-category="<?= e($initialCat) ?>" role="tablist" aria-label="Filter gallery by category">
-      <button type="button" class="cat-tab <?= $initialCat === 'all' ? 'is-active' : '' ?>" data-category="all">All Photos</button>
+    <div class="category-bar" id="gallery-category-bar" data-active-category="<?= e($initialCat) ?>" role="tablist" aria-label="বিভাগ অনুযায়ী ছবি বাছাই করুন">
+      <button type="button" class="cat-tab <?= $initialCat === 'all' ? 'is-active' : '' ?>" data-category="all">সব ছবি</button>
       <?php foreach ($categories as $cat): ?>
         <button type="button" class="cat-tab <?= $initialCat === $cat['slug'] ? 'is-active' : '' ?>" data-category="<?= e($cat['slug']) ?>">
           <?= e($cat['name']) ?>
@@ -65,7 +65,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
     <div class="ig-gallery-grid" id="ig-gallery-grid" data-page="1">
       <?php if (empty($images)): ?>
-        <div class="empty-state" style="grid-column: 1 / -1;">No photographs available in this category yet.</div>
+        <div class="empty-state" style="grid-column: 1 / -1;">এই বিভাগে এখনো কোনো ছবি নেই।</div>
       <?php else: ?>
         <?php foreach ($images as $img): ?>
           <button
@@ -77,7 +77,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
             data-desc="<?= e($img['description'] ?? '') ?>"
             data-category="<?= e($img['category_name'] ?? '') ?>"
             data-date="<?= e(format_date($img['uploaded_at'])) ?>"
-            aria-label="<?= e($img['title'] ?: 'View community photograph') ?>"
+            aria-label="<?= e($img['title'] ?: 'গ্রামের ছবি দেখুন') ?>"
           >
             <img
               src="<?= e(safe_url($img['image_url'])) ?>"

@@ -22,9 +22,9 @@ $post = $stmt->fetch();
 
 if (!$post) {
     http_response_code(404);
-    $customPageTitle = 'Post Not Found';
+    $customPageTitle = 'পোস্টটি পাওয়া যায়নি';
     require_once dirname(__DIR__) . '/includes/header.php';
-    echo '<div class="container section"><div class="empty-state"><h1>Post Not Found</h1><p>This community post may have been unpublished or removed.</p><p><a class="btn-primary" href="/posts.php">Back to Posts</a></p></div></div>';
+    echo '<div class="container section"><div class="empty-state"><h1>পোস্টটি পাওয়া যায়নি</h1><p>পোস্টটি হয়তো অপ্রকাশিত করা হয়েছে অথবা সরিয়ে ফেলা হয়েছে।</p><p><a class="btn-primary" href="/posts.php">পোস্টে ফিরে যান</a></p></div></div>';
     require_once dirname(__DIR__) . '/includes/footer.php';
     exit;
 }
@@ -36,7 +36,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
 <article class="post-detail-wrap">
   <p style="margin: 0 0 18px;">
-    <a href="/posts.php" class="section-link">← Back to Community Posts</a>
+    <a href="/posts.php" class="section-link">← Back to গ্রামের খবর ও পোস্ট</a>
   </p>
 
   <div class="post-meta" style="margin-bottom: 10px;">
@@ -57,7 +57,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <iframe
       class="custom-content-frame"
       src="/content-frame.php?type=post&amp;id=<?= (int) $post['id'] ?>"
-      title="<?= e($post['title'] ?: 'Custom Community Post') ?>"
+      title="<?= e($post['title'] ?: 'কমিউনিটির পোস্ট') ?>"
       sandbox="allow-scripts"
       loading="lazy"
       referrerpolicy="no-referrer"
@@ -65,7 +65,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     ></iframe>
   <?php elseif ($post['post_type'] === 'image' && !empty($post['media_url'])): ?>
     <div class="post-detail-media">
-      <img src="<?= e(safe_url($post['media_url'])) ?>" alt="<?= e($post['title'] ?: 'Post photograph') ?>" referrerpolicy="no-referrer">
+      <img src="<?= e(safe_url($post['media_url'])) ?>" alt="<?= e($post['title'] ?: 'পোস্টের ছবি') ?>" referrerpolicy="no-referrer">
     </div>
   <?php elseif ($post['post_type'] === 'video' && !empty($post['media_url'])): ?>
     <div class="post-detail-media">

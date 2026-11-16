@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Greenfield Village Community — Clean Editorial & Gallery Stylesheet
+   Greenfield Village Community — Clean Editorial & ছবির গ্যালারি Stylesheet
    ========================================================================== */
 
 :root {
@@ -380,7 +380,7 @@ button {
   font-size: 1rem;
 }
 
-.mobile-submenu-btn {
+.mobile-উপমেনু-btn {
   width: 40px;
   height: 40px;
   background: transparent;
@@ -720,7 +720,7 @@ button {
 }
 
 /* ==========================================================================
-   Community Posts Grid (Text, Image, Video)
+   গ্রামের খবর ও পোস্ট Grid (Text, Image, ভিডিও)
    ========================================================================== */
 .posts-grid {
   display: grid;
@@ -862,7 +862,7 @@ button {
 }
 
 /* ==========================================================================
-   Category Filter Tabs & Instagram-Style Photo Gallery
+   Category Filter Tabs & Instagram-Style Photo ছবির গ্যালারি
    Desktop: EXACTLY 4 columns | Mobile: EXACTLY 2 columns
    ========================================================================== */
 .category-bar {
@@ -1306,7 +1306,7 @@ button {
 }
 
 /* ==========================================================================
-   Responsive Breakpoints (Desktop 4-col, Tablet 3-col, Mobile 2-col Gallery)
+   Responsive Breakpoints (Desktop 4-col, Tablet 3-col, Mobile 2-col ছবির গ্যালারি)
    ========================================================================== */
 @media (max-width: 1023px) {
   .primary-nav {

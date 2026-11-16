@@ -11,7 +11,7 @@ $banners = $pdo->query(
     'SELECT * FROM public.hero_banners WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC'
 )->fetchAll();
 
-// 2. Gallery Categories & Horizontal Slider Items
+// 2. ছবির গ্যালারি Categories & Horizontal Slider Items
 $galleryCategories = $pdo->query(
     'SELECT * FROM public.gallery_categories WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC'
 )->fetchAll();
@@ -25,7 +25,7 @@ $sliderItems = $pdo->query(
      LIMIT 16"
 )->fetchAll();
 
-// 3. Recent Published Community Posts
+// 3. Recent Published গ্রামের খবর ও পোস্ট
 $recentPosts = $pdo->query(
     "SELECT p.*, pc.name AS category_name, pc.slug AS category_slug
      FROM public.posts p
@@ -35,7 +35,7 @@ $recentPosts = $pdo->query(
      LIMIT 6"
 )->fetchAll();
 
-// 4. Initial Instagram-Style Photo Gallery (8 items -> 2 clean rows of 4 on desktop)
+// 4. Initial Instagram-Style Photo ছবির গ্যালারি (8 items -> 2 clean rows of 4 on desktop)
 $initialCat = trim((string) ($_GET['category'] ?? 'all'));
 $perPage = 8;
 
@@ -66,7 +66,7 @@ if ($initialCat !== '' && $initialCat !== 'all') {
     $galleryRows = $stmt->fetchAll();
 }
 
-$hasMoreGallery = count($galleryRows) > $perPage;
+$hasMoreছবির গ্যালারি = count($galleryRows) > $perPage;
 $galleryImages = array_slice($galleryRows, 0, $perPage);
 
 // 5. Featured Images with Optional Titles
@@ -84,7 +84,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
 <!-- Section 2: Full-Width Hero Banner Slideshow -->
 <?php if (!empty($banners)): ?>
-<section class="hero-section" id="hero-slider" data-interval="<?= (int) ($siteSettings['hero_interval_ms'] ?? 5500) ?>" aria-label="Featured Community Highlights">
+<section class="hero-section" id="hero-slider" data-interval="<?= (int) ($siteSettings['hero_interval_ms'] ?? 5500) ?>" aria-label="গ্রামের বিশেষ মুহূর্ত">
   <div class="hero-track">
     <?php foreach ($banners as $banner): ?>
       <?php
@@ -125,11 +125,11 @@ require_once dirname(__DIR__) . '/includes/header.php';
   </div>
 
   <?php if (count($banners) > 1): ?>
-    <button type="button" class="hero-nav-btn hero-prev" aria-label="Previous banner">‹</button>
-    <button type="button" class="hero-nav-btn hero-next" aria-label="Next banner">›</button>
-    <div class="hero-dots" aria-label="Banner slide selector">
+    <button type="button" class="hero-nav-btn hero-prev" aria-label="আগের ব্যানার">‹</button>
+    <button type="button" class="hero-nav-btn hero-next" aria-label="পরের ব্যানার">›</button>
+    <div class="hero-dots" aria-label="ব্যানার নির্বাচন">
       <?php foreach ($banners as $idx => $_): ?>
-        <button type="button" class="hero-dot <?= $idx === 0 ? 'is-active' : '' ?>" aria-label="Go to slide <?= $idx + 1 ?>"></button>
+        <button type="button" class="hero-dot <?= $idx === 0 ? 'is-active' : '' ?>" aria-label="এই স্লাইডে যান <?= $idx + 1 ?>"></button>
       <?php endforeach; ?>
     </div>
   <?php endif; ?>
@@ -138,13 +138,13 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
 <!-- Section 3: Horizontal Auto-Scrolling Highlights & Categories -->
 <?php if (!empty($sliderItems)): ?>
-<section class="slider-section" aria-label="Village Themes and Highlights">
+<section class="slider-section" aria-label="গ্রামের দৃশ্য ও বিশেষ মুহূর্ত">
   <div class="container">
     <div class="slider-header">
-      <h2 class="slider-heading">Across the Village</h2>
+      <h2 class="slider-heading">গ্রামের পথে-প্রান্তরে</h2>
       <div class="slider-controls">
-        <button type="button" class="slider-arrow" id="hscroll-prev" aria-label="Scroll left">‹</button>
-        <button type="button" class="slider-arrow" id="hscroll-next" aria-label="Scroll right">›</button>
+        <button type="button" class="slider-arrow" id="hscroll-prev" aria-label="বামে সরান">‹</button>
+        <button type="button" class="slider-arrow" id="hscroll-next" aria-label="ডানে সরান">›</button>
       </div>
     </div>
 
@@ -177,19 +177,19 @@ require_once dirname(__DIR__) . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- Section 4: Recent Community Posts -->
+<!-- Section 4: Recent গ্রামের খবর ও পোস্ট -->
 <section class="section" id="posts-section">
   <div class="container">
     <div class="section-header">
       <div>
-        <h2 class="section-title">Community Posts</h2>
-        <p class="section-subtitle">Local announcements, gatherings, stories, and neighborhood videos.</p>
+        <h2 class="section-title">গ্রামের খবর ও পোস্ট</h2>
+        <p class="section-subtitle">স্থানীয় ঘোষণা, আয়োজন, গল্প এবং এলাকার ভিডিও।</p>
       </div>
-      <a href="/posts.php" class="section-link">View all posts →</a>
+      <a href="/posts.php" class="section-link">সব পোস্ট দেখুন →</a>
     </div>
 
     <?php if (empty($recentPosts)): ?>
-      <div class="empty-state">No community posts have been published yet.</div>
+      <div class="empty-state">এখনো কোনো পোস্ট প্রকাশ করা হয়নি।</div>
     <?php else: ?>
       <div class="posts-grid">
         <?php foreach ($recentPosts as $post): ?>
@@ -206,7 +206,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
             <?php elseif ($post['post_type'] === 'video' && !empty($post['media_url'])): ?>
               <div class="post-media">
                 <video src="<?= e(safe_url($post['media_url'])) ?>" preload="metadata" controls playsinline></video>
-                <span class="post-video-badge">Video</span>
+                <span class="post-video-badge">ভিডিও</span>
               </div>
             <?php endif; ?>
 
@@ -229,7 +229,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
               <p class="post-excerpt"><?= e($post['description']) ?></p>
 
-              <a href="/post.php?id=<?= (int) $post['id'] ?>" class="post-read-link">Read update →</a>
+              <a href="/post.php?id=<?= (int) $post['id'] ?>" class="post-read-link">বিস্তারিত পড়ুন →</a>
             </div>
           </article>
         <?php endforeach; ?>
@@ -238,19 +238,19 @@ require_once dirname(__DIR__) . '/includes/header.php';
   </div>
 </section>
 
-<!-- Section 5: Instagram-Style Photo Gallery (4-col desktop / 2-col mobile) -->
+<!-- Section 5: Instagram-Style Photo ছবির গ্যালারি (4-col desktop / 2-col mobile) -->
 <section class="section section-tinted" id="gallery-section">
   <div class="container">
     <div class="section-header">
       <div>
-        <h2 class="section-title">Village Photo Gallery</h2>
-        <p class="section-subtitle">Click any photograph to open fullscreen view with zoom and swipe navigation.</p>
+        <h2 class="section-title">Village Photo ছবির গ্যালারি</h2>
+        <p class="section-subtitle">যেকোনো ছবিতে ক্লিক করে বড় করে দেখুন এবং জুম বা সোয়াইপ করে ছবি বদলান।</p>
       </div>
-      <a href="/gallery.php" class="section-link">Open full gallery →</a>
+      <a href="/gallery.php" class="section-link">সব ছবি দেখুন →</a>
     </div>
 
-    <div class="category-bar" id="gallery-category-bar" data-active-category="<?= e($initialCat) ?>" role="tablist" aria-label="Filter gallery by category">
-      <button type="button" class="cat-tab <?= $initialCat === 'all' ? 'is-active' : '' ?>" data-category="all">All Photos</button>
+    <div class="category-bar" id="gallery-category-bar" data-active-category="<?= e($initialCat) ?>" role="tablist" aria-label="বিভাগ অনুযায়ী ছবি বাছাই করুন">
+      <button type="button" class="cat-tab <?= $initialCat === 'all' ? 'is-active' : '' ?>" data-category="all">সব ছবি</button>
       <?php foreach ($galleryCategories as $cat): ?>
         <button type="button" class="cat-tab <?= $initialCat === $cat['slug'] ? 'is-active' : '' ?>" data-category="<?= e($cat['slug']) ?>">
           <?= e($cat['name']) ?>
@@ -260,7 +260,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
     <div class="ig-gallery-grid" id="ig-gallery-grid" data-page="1">
       <?php if (empty($galleryImages)): ?>
-        <div class="empty-state" style="grid-column: 1 / -1;">No photos have been uploaded to this category yet.</div>
+        <div class="empty-state" style="grid-column: 1 / -1;">এই বিভাগে এখনো কোনো ছবি যোগ করা হয়নি।</div>
       <?php else: ?>
         <?php foreach ($galleryImages as $img): ?>
           <button
@@ -272,7 +272,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
             data-desc="<?= e($img['description'] ?? '') ?>"
             data-category="<?= e($img['category_name'] ?? '') ?>"
             data-date="<?= e(format_date($img['uploaded_at'])) ?>"
-            aria-label="<?= e($img['title'] ?: 'View community photograph') ?>"
+            aria-label="<?= e($img['title'] ?: 'গ্রামের ছবি দেখুন') ?>"
           >
             <img
               src="<?= e(safe_url($img['image_url'])) ?>"
@@ -291,7 +291,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     </div>
 
     <div class="gallery-actions">
-      <button type="button" class="btn-primary" id="gallery-load-more" <?= $hasMoreGallery ? '' : 'hidden' ?>>
+      <button type="button" class="btn-primary" id="gallery-load-more" <?= $hasMoreছবির গ্যালারি ? '' : 'hidden' ?>>
         Load More Photos
       </button>
     </div>
@@ -304,8 +304,8 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <div class="container">
     <div class="section-header">
       <div>
-        <h2 class="section-title">Featured Memories</h2>
-        <p class="section-subtitle">Selected photographs highlighting village heritage and neighborhood life.</p>
+        <h2 class="section-title">স্মরণীয় মুহূর্ত</h2>
+        <p class="section-subtitle">গ্রামের ঐতিহ্য ও মানুষের জীবনযাত্রার নির্বাচিত কিছু ছবি।</p>
       </div>
     </div>
 
@@ -321,7 +321,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
             data-desc="<?= e($feat['description'] ?? '') ?>"
             data-category="<?= e($feat['category_name'] ?? '') ?>"
             data-date="<?= e(format_date($feat['uploaded_at'])) ?>"
-            aria-label="<?= e($feat['title'] ?: 'View featured photograph') ?>"
+            aria-label="<?= e($feat['title'] ?: 'বিশেষ ছবিটি দেখুন') ?>"
           >
             <img
               src="<?= e(safe_url($feat['image_url'])) ?>"

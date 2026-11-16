@@ -19,7 +19,7 @@ $headerText = sanitize_hex_color($siteSettings['header_text_color'] ?? null, '#f
 $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d');
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +33,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
   <?php endif; ?>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/style.css">
   <style>
     :root {
@@ -44,7 +44,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#main-content">Skip to content</a>
+  <a class="skip-link" href="#main-content">মূল লেখায় যান</a>
 
   <header class="site-header" id="site-header">
     <div class="container header-inner">
@@ -67,7 +67,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
         <span class="brand-name"><?= e($siteSettings['site_name']) ?></span>
       </a>
 
-      <nav class="primary-nav" aria-label="Primary Navigation">
+      <nav class="primary-nav" aria-label="প্রধান নেভিগেশন">
         <ul class="nav-list">
           <?php foreach ($headerNav as $item): ?>
             <?php
@@ -119,12 +119,12 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
                         <?php endforeach; ?>
                       <?php else: ?>
                         <a href="/gallery.php" class="mega-link-card">
-                          <span class="mega-link-title">All Photos</span>
-                          <span class="mega-link-sub">Explore the full community photo archive</span>
+                          <span class="mega-link-title">সব ছবি</span>
+                          <span class="mega-link-sub">গ্রামের সব ছবি ও স্মৃতির সংগ্রহ দেখুন</span>
                         </a>
                         <a href="/posts.php" class="mega-link-card">
-                          <span class="mega-link-title">Community Posts</span>
-                          <span class="mega-link-sub">Read local announcements, stories &amp; videos</span>
+                          <span class="mega-link-title">গ্রামের খবর ও পোস্ট</span>
+                          <span class="mega-link-sub">স্থানীয় ঘোষণা, গল্প ও ভিডিও পড়ুন</span>
                         </a>
                       <?php endif; ?>
                     </div>
@@ -147,14 +147,14 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
       </nav>
 
       <div class="header-actions">
-        <a href="/gallery.php" class="header-cta">Gallery</a>
+        <a href="/gallery.php" class="header-cta">ছবির গ্যালারি</a>
         <button
           type="button"
           class="mobile-menu-toggle"
           id="mobile-menu-toggle"
           aria-expanded="false"
           aria-controls="mobile-nav-drawer"
-          aria-label="Open navigation menu"
+          aria-label="নেভিগেশন মেনু খুলুন"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -167,7 +167,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
 
     <!-- Mobile Responsive Drawer -->
     <div class="mobile-drawer" id="mobile-nav-drawer" hidden>
-      <nav aria-label="Mobile Navigation">
+      <nav aria-label="মোবাইল নেভিগেশন">
         <ul class="mobile-nav-list">
           <?php foreach ($headerNav as $item): ?>
             <?php
@@ -185,7 +185,7 @@ $accentHex  = sanitize_hex_color($siteSettings['accent_color'] ?? null, '#15803d
                   </a>
                 <?php endif; ?>
                 <?php if (!empty($item['children'])): ?>
-                  <button type="button" class="mobile-submenu-btn" aria-expanded="false" aria-label="Toggle <?= e($item['label']) ?> submenu">+</button>
+                  <button type="button" class="mobile-উপমেনু-btn" aria-expanded="false" aria-label="খুলুন <?= e($item['label']) ?> উপমেনু">+</button>
                 <?php endif; ?>
               </div>
               <?php if (!empty($item['children'])): ?>

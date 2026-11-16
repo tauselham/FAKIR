@@ -45,7 +45,7 @@ $js = (string) ($content['js_content'] ?? '');
 $js = preg_replace('~</script~i', '<\\/script', $js) ?? $js;
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

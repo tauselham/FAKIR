@@ -54,7 +54,7 @@ $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $posts = $stmt->fetchAll();
 
-$customPageTitle = 'Community Posts';
+$customPageTitle = 'গ্রামের খবর ও পোস্ট';
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
 
@@ -62,13 +62,13 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <div class="container">
     <div class="section-header">
       <div>
-        <h1 class="section-title">Community Posts</h1>
-        <p class="section-subtitle">Stories, announcements, event updates, and videos shared by our village.</p>
+        <h1 class="section-title">গ্রামের খবর ও পোস্ট</h1>
+        <p class="section-subtitle">আমাদের গ্রামের গল্প, ঘোষণা, আয়োজনের খবর এবং ভিডিও।</p>
       </div>
     </div>
 
-    <div class="category-bar" aria-label="Filter posts by category">
-      <a href="/posts.php?category=all&amp;type=<?= e(urlencode($postType)) ?>" class="cat-tab <?= $catSlug === 'all' ? 'is-active' : '' ?>">All Categories</a>
+    <div class="category-bar" aria-label="বিভাগ অনুযায়ী পোস্ট বাছাই করুন">
+      <a href="/posts.php?category=all&amp;type=<?= e(urlencode($postType)) ?>" class="cat-tab <?= $catSlug === 'all' ? 'is-active' : '' ?>">সব বিভাগ</a>
       <?php foreach ($categories as $cat): ?>
         <a href="/posts.php?category=<?= e(urlencode($cat['slug'])) ?>&amp;type=<?= e(urlencode($postType)) ?>" class="cat-tab <?= $catSlug === $cat['slug'] ? 'is-active' : '' ?>">
           <?= e($cat['name']) ?>
@@ -76,8 +76,8 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <?php endforeach; ?>
     </div>
 
-    <div class="category-bar" aria-label="Filter posts by format" style="margin-top: -12px;">
-      <?php foreach (['all' => 'All Formats', 'text' => 'Text', 'image' => 'Photos', 'video' => 'Videos', 'custom' => 'Custom Code'] as $key => $label): ?>
+    <div class="category-bar" aria-label="পোস্টের ধরন অনুযায়ী বাছাই করুন" style="margin-top: -12px;">
+      <?php foreach (['all' => 'All Formats', 'text' => 'Text', 'image' => 'Photos', 'video' => 'ভিডিওs', 'custom' => 'Custom Code'] as $key => $label): ?>
         <a href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e($key) ?>" class="cat-tab <?= $postType === $key ? 'is-active' : '' ?>">
           <?= e($label) ?>
         </a>
@@ -85,19 +85,19 @@ require_once dirname(__DIR__) . '/includes/header.php';
     </div>
 
     <?php if (empty($posts)): ?>
-      <div class="empty-state">No community posts match your selected filter.</div>
+      <div class="empty-state">আপনার নির্বাচিত বিভাগে কোনো পোস্ট পাওয়া যায়নি।</div>
     <?php else: ?>
       <div class="posts-grid">
         <?php foreach ($posts as $post): ?>
           <article class="post-card">
             <?php if ($post['post_type'] === 'image' && !empty($post['media_url'])): ?>
               <a href="/post.php?id=<?= (int) $post['id'] ?>" class="post-media">
-                <img src="<?= e(safe_url($post['media_url'])) ?>" alt="<?= e($post['title'] ?: 'Post image') ?>" loading="lazy" referrerpolicy="no-referrer">
+                <img src="<?= e(safe_url($post['media_url'])) ?>" alt="<?= e($post['title'] ?: 'পোস্টের ছবি') ?>" loading="lazy" referrerpolicy="no-referrer">
               </a>
             <?php elseif ($post['post_type'] === 'video' && !empty($post['media_url'])): ?>
               <div class="post-media">
                 <video src="<?= e(safe_url($post['media_url'])) ?>" preload="metadata" controls playsinline></video>
-                <span class="post-video-badge">Video</span>
+                <span class="post-video-badge">ভিডিও</span>
               </div>
             <?php endif; ?>
 
@@ -115,22 +115,22 @@ require_once dirname(__DIR__) . '/includes/header.php';
                 <h2 class="post-title"><a href="/post.php?id=<?= (int) $post['id'] ?>"><?= e($post['title']) ?></a></h2>
               <?php endif; ?>
               <p class="post-excerpt"><?= e($post['description']) ?></p>
-              <a href="/post.php?id=<?= (int) $post['id'] ?>" class="post-read-link">Read update →</a>
+              <a href="/post.php?id=<?= (int) $post['id'] ?>" class="post-read-link">বিস্তারিত পড়ুন →</a>
             </div>
           </article>
         <?php endforeach; ?>
       </div>
 
       <?php if ($totalPages > 1): ?>
-        <nav class="gallery-actions" aria-label="Posts pagination" style="gap: 8px;">
+        <nav class="gallery-actions" aria-label="পোস্টের পৃষ্ঠা" style="gap: 8px;">
           <?php if ($page > 1): ?>
-            <a class="btn-secondary" href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e(urlencode($postType)) ?>&amp;page=<?= $page - 1 ?>">← Previous</a>
+            <a class="btn-secondary" href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e(urlencode($postType)) ?>&amp;page=<?= $page - 1 ?>">← আগের পৃষ্ঠা</a>
           <?php endif; ?>
           <span style="padding: 10px 14px; font-size: 0.9rem; color: var(--text-muted);">
-            Page <?= $page ?> of <?= $totalPages ?>
+            পৃষ্ঠা <?= $page ?> / <?= $totalPages ?>
           </span>
           <?php if ($page < $totalPages): ?>
-            <a class="btn-secondary" href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e(urlencode($postType)) ?>&amp;page=<?= $page + 1 ?>">Next →</a>
+            <a class="btn-secondary" href="/posts.php?category=<?= e(urlencode($catSlug)) ?>&amp;type=<?= e(urlencode($postType)) ?>&amp;page=<?= $page + 1 ?>">পরের পৃষ্ঠা →</a>
           <?php endif; ?>
         </nav>
       <?php endif; ?>

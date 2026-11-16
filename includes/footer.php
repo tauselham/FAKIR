@@ -38,7 +38,7 @@ $footerText = sanitize_hex_color($siteSettings['footer_text_color'] ?? null, '#e
       </div>
 
       <div class="footer-links-col">
-        <h3 class="footer-heading">Community Links</h3>
+        <h3 class="footer-heading">গুরুত্বপূর্ণ লিংক</h3>
         <ul class="footer-link-list">
           <?php if (!empty($footerLinks)): ?>
             <?php foreach ($footerLinks as $link): ?>
@@ -49,16 +49,16 @@ $footerText = sanitize_hex_color($siteSettings['footer_text_color'] ?? null, '#e
               </li>
             <?php endforeach; ?>
           <?php else: ?>
-            <li><a href="/">Home</a></li>
-            <li><a href="/posts.php">Community Posts</a></li>
-            <li><a href="/gallery.php">Photo Gallery</a></li>
+            <li><a href="/">হোম</a></li>
+            <li><a href="/posts.php">গ্রামের খবর ও পোস্ট</a></li>
+            <li><a href="/gallery.php">Photo ছবির গ্যালারি</a></li>
           <?php endif; ?>
         </ul>
       </div>
 
       <?php if (!empty($footerSettings['show_contact_info'])): ?>
       <div class="footer-contact-col">
-        <h3 class="footer-heading">Local Contact</h3>
+        <h3 class="footer-heading">যোগাযোগ</h3>
         <ul class="footer-contact-list">
           <?php if (!empty($footerSettings['contact_address'])): ?>
             <li><?= e($footerSettings['contact_address']) ?></li>
@@ -75,7 +75,7 @@ $footerText = sanitize_hex_color($siteSettings['footer_text_color'] ?? null, '#e
 
       <?php if (!empty($footerSettings['show_social_links'])): ?>
       <div class="footer-social-col">
-        <h3 class="footer-heading">Follow Along</h3>
+        <h3 class="footer-heading">আমাদের সঙ্গে থাকুন</h3>
         <div class="footer-social-links">
           <?php if (!empty($footerSettings['facebook_url'])): ?>
             <a href="<?= e(safe_url($footerSettings['facebook_url'])) ?>" target="_blank" rel="noopener noreferrer" aria-label="Facebook">Facebook</a>
@@ -103,20 +103,20 @@ $footerText = sanitize_hex_color($siteSettings['footer_text_color'] ?? null, '#e
   <?php endif; ?>
 
   <!-- Global Instagram-Style Image Lightbox -->
-  <div class="lightbox" id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Image Viewer" hidden>
+  <div class="lightbox" id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="ছবি দেখুন" hidden>
     <div class="lightbox-backdrop" data-lb-close></div>
     <div class="lightbox-topbar">
       <div class="lightbox-counter" id="lb-counter">1 / 1</div>
       <div class="lightbox-controls">
-        <button type="button" class="lb-btn" id="lb-zoom-out" aria-label="Zoom out" title="Zoom out (-)">−</button>
-        <button type="button" class="lb-btn" id="lb-zoom-reset" aria-label="Reset zoom" title="Reset zoom (0)">100%</button>
-        <button type="button" class="lb-btn" id="lb-zoom-in" aria-label="Zoom in" title="Zoom in (+)">+</button>
-        <button type="button" class="lb-btn lb-close" id="lb-close" data-lb-close aria-label="Close viewer" title="Close (Esc)">✕</button>
+        <button type="button" class="lb-btn" id="lb-zoom-out" aria-label="ছোট করুন" title="ছোট করুন (-)">−</button>
+        <button type="button" class="lb-btn" id="lb-zoom-reset" aria-label="আকার আগের মতো করুন" title="আকার আগের মতো করুন (0)">100%</button>
+        <button type="button" class="lb-btn" id="lb-zoom-in" aria-label="বড় করুন" title="বড় করুন (+)">+</button>
+        <button type="button" class="lb-btn lb-close" id="lb-close" data-lb-close aria-label="ছবি বন্ধ করুন" title="Close (Esc)">✕</button>
       </div>
     </div>
 
-    <button type="button" class="lb-nav lb-prev" id="lb-prev" aria-label="Previous image">‹</button>
-    <button type="button" class="lb-nav lb-next" id="lb-next" aria-label="Next image">›</button>
+    <button type="button" class="lb-nav lb-prev" id="lb-prev" aria-label="আগের ছবি">‹</button>
+    <button type="button" class="lb-nav lb-next" id="lb-next" aria-label="পরের ছবি">›</button>
 
     <div class="lightbox-stage" id="lb-stage">
       <img src="" alt="" id="lb-image" class="lightbox-image" draggable="false">

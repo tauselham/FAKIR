@@ -7,9 +7,9 @@ enforce_rate_limit('public_api', ['ip' => client_ip()]);
 $slug = trim((string) ($_GET['slug'] ?? ''));
 if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) {
     http_response_code(404);
-    $customPageTitle = 'Page Not Found';
+    $customPageTitle = 'পেজটি পাওয়া যায়নি';
     require_once dirname(__DIR__) . '/includes/header.php';
-    echo '<div class="container section"><h1>Page Not Found</h1><p>The requested page does not exist.</p></div>';
+    echo '<div class="container section"><h1>পেজটি পাওয়া যায়নি</h1><p>আপনার চাওয়া পেজটি পাওয়া যায়নি।</p></div>';
     require_once dirname(__DIR__) . '/includes/footer.php';
     exit;
 }
@@ -20,9 +20,9 @@ $page = $stmt->fetch();
 
 if (!$page) {
     http_response_code(404);
-    $customPageTitle = 'Page Not Found';
+    $customPageTitle = 'পেজটি পাওয়া যায়নি';
     require_once dirname(__DIR__) . '/includes/header.php';
-    echo '<div class="container section"><div class="empty-state"><h1>Page Not Found</h1><p>This page may have been unpublished or removed.</p><p><a class="btn-primary" href="/">Back to Home</a></p></div></div>';
+    echo '<div class="container section"><div class="empty-state"><h1>পেজটি পাওয়া যায়নি</h1><p>পেজটি হয়তো অপ্রকাশিত করা হয়েছে অথবা সরিয়ে ফেলা হয়েছে।</p><p><a class="btn-primary" href="/">Back to হোম</a></p></div></div>';
     require_once dirname(__DIR__) . '/includes/footer.php';
     exit;
 }
