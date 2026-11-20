@@ -64,30 +64,16 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <?php endif; ?>
 
   <?php if ($post['post_type'] === 'custom'): ?>
-    <script>
-    (() => {
-      window.addEventListener('message', (event) => {
-        const frame = document.getElementById('published-post-content');
-        if (!frame || event.source !== frame.contentWindow) return;
-        const data = event.data;
-        if (!data || data.type !== 'fakir:content-height') return;
-        const height = Number(data.height);
-        if (!Number.isFinite(height) || height <= 0) return;
-        frame.style.height = Math.max(240, Math.min(30000, Math.ceil(height))) + 'px';
-      });
-    })();
-    </script>
     <iframe
       class="custom-content-frame"
+      data-auto-resize="true"
       src="/content-frame.php?type=post&amp;id=<?= (int) $post['id'] ?>"
       title="<?= e($post['title'] ?: 'কমিউনিটির পোস্ট') ?>"
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       scrolling="no"
       loading="eager"
-      onload="this.contentWindow.postMessage({type:'fakir:request-height'}, '*')"
       referrerpolicy="no-referrer"
       id="published-post-content"
-      style="display:block;width:100%;height:320px;min-height:240px;border:0;background:transparent;overflow:hidden;"
     ></iframe>
   <?php elseif ($post['post_type'] === 'image' && !empty($post['media_url'])): ?>
     <div class="post-detail-media">

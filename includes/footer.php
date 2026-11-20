@@ -133,6 +133,6 @@ $footerText = sanitize_hex_color($siteSettings['footer_text_color'] ?? null, '#e
   <link rel="stylesheet" href="/assets/css/popup.css?v=1">
   <script src="/assets/js/popup.js?v=1" defer></script>
   <script src="/assets/js/lightbox.js" defer></script>
-  <script src="/assets/js/app.js" defer></script>
+  <script src="/assets/js/app.js?v=20261120" defer></script>
 </body>
 </html>

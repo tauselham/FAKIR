@@ -320,6 +320,11 @@ function admin_activity_label(string $action): string
         'navigation_item_created' => 'মেনু আইটেম তৈরি',
         'navigation_item_updated' => 'মেনু আইটেম হালনাগাদ',
         'navigation_item_deleted' => 'মেনু আইটেম মুছে ফেলা',
+        'content_page_created' => 'ল্যান্ডিং পেজ তৈরি',
+        'content_page_updated' => 'ল্যান্ডিং পেজ হালনাগাদ',
+        'content_page_published' => 'ল্যান্ডিং পেজ প্রকাশিত',
+        'content_page_unpublished' => 'ল্যান্ডিং পেজ অপ্রকাশিত',
+        'content_page_deleted' => 'ল্যান্ডিং পেজ মুছে ফেলা',
     ][$action] ?? 'অন্যান্য কার্যক্রম';
 }
 
@@ -329,6 +334,7 @@ function admin_entity_label(string $type): string
     return [
         'admin' => 'অ্যাডমিন',
         'post' => 'পোস্ট',
+        'content_page' => 'কাস্টম পেজ',
         'gallery_image' => 'গ্যালারির ছবি',
         'hero_banner' => 'ব্যানার',
         'site_popup' => 'পপআপ',

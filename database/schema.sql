@@ -79,9 +79,11 @@ CREATE TABLE IF NOT EXISTS public.posts (
     media_path      TEXT         NULL,
     media_url       TEXT         NULL,
     media_mime      VARCHAR(100) NULL,
+    content_html    TEXT         NULL,
     html_content    TEXT         NULL,
     css_content     TEXT         NULL,
     js_content      TEXT         NULL,
+    code_document   TEXT         NULL,
     status          VARCHAR(20)  NOT NULL DEFAULT 'published' CHECK (status IN ('draft', 'published')),
     published_at    TIMESTAMPTZ  NULL DEFAULT NOW(),
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
@@ -101,6 +103,7 @@ CREATE TABLE IF NOT EXISTS public.content_pages (
     html_content     TEXT         NOT NULL DEFAULT '',
     css_content      TEXT         NOT NULL DEFAULT '',
     js_content       TEXT         NOT NULL DEFAULT '',
+    code_document    TEXT         NULL,
     meta_description VARCHAR(300) NULL,
     status           VARCHAR(20)  NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
     admin_id         BIGINT       NULL REFERENCES public.admins(id) ON DELETE SET NULL,
@@ -301,7 +304,7 @@ DECLARE
     tbl TEXT;
 BEGIN
     FOREACH tbl IN ARRAY ARRAY[
-        'admins', 'post_categories', 'posts', 'gallery_categories',
+        'admins', 'post_categories', 'posts', 'content_pages', 'gallery_categories',
         'gallery_images', 'hero_banners', 'navigation_menus',
         'navigation_items', 'footer_settings', 'website_settings',
         'rate_limit_rules'

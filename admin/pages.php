@@ -81,6 +81,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 set_flash('success', 'পেজ তৈরি হয়েছে।');
             }
             redirect_to(admin_url('pages.php'));
+        } elseif ($action === 'toggle_status') {
+            $pageId = (int) ($_POST['page_id'] ?? 0);
+            $newStatus = ($_POST['new_status'] ?? 'draft') === 'published' ? 'published' : 'draft';
+            $stmt = $pdo->prepare(
+                "UPDATE public.content_pages
+                 SET status = :status,
+                     published_at = CASE WHEN :status_check = 'published' THEN COALESCE(published_at, NOW()) ELSE NULL END,
+                     updated_at = NOW()
+                 WHERE id = :id
+                 RETURNING id, slug"
+            );
+            $stmt->execute([':status' => $newStatus, ':status_check' => $newStatus, ':id' => $pageId]);
+            $updated = $stmt->fetch();
+            if (!$updated) {
+                throw new RuntimeException('পেজটি পাওয়া যায়নি।');
+            }
+            $logAction = $newStatus === 'published' ? 'content_page_published' : 'content_page_unpublished';
+            log_admin_activity((int) $currentAdmin['id'], $logAction, 'content_page', (int) $updated['id'], ['slug' => $updated['slug'], 'status' => $newStatus]);
+            set_flash('success', $newStatus === 'published' ? 'পেজটি প্রকাশ করা হয়েছে।' : 'পেজটি খসড়ায় (অপ্রকাশিত) নেওয়া হয়েছে।');
+            redirect_to(admin_url('pages.php'));
         } elseif ($action === 'delete') {
             $pageId = (int) ($_POST['page_id'] ?? 0);
             $stmt = $pdo->prepare('DELETE FROM public.content_pages WHERE id = :id RETURNING id, slug');
@@ -95,8 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Throwable $e) {
         if ($e instanceof PDOException) {
             $message = str_contains(strtolower($e->getMessage()), 'unique')
-                ? 'That লিংক Slug is already in use, or an আমাদের পরিচিতি page already exists.'
-                : 'The page could not be saved because of a database error. Check the server log for details.';
+                ? 'এই পাবলিক লিংক (Slug) ইতিমধ্যে ব্যবহৃত হয়েছে, অথবা আমাদের পরিচিতি পেজ আগেই তৈরি করা আছে।'
+                : 'ডাটাবেস ত্রুটির কারণে পেজটি সংরক্ষণ করা যায়নি।';
             error_log('Content page save failed: ' . $e->getMessage());
         } else {
             $message = $e->getMessage();
@@ -230,7 +250,11 @@ foreach ($pages as $pageRow) {
           <td>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-outline btn-sm" href="<?= e(admin_url('pages.php')) ?>?edit=<?= (int) $p['id'] ?>">সম্পাদনা</a>
-              <?php if ($p['status'] === 'published'): ?><a class="btn btn-outline btn-sm" href="/<?= e($p['slug']) ?>" target="_blank" rel="noopener noreferrer">View</a><?php endif; ?>
+              <form method="post" action="<?= e(admin_url('pages.php')) ?>">
+                <?= csrf_field() ?><input type="hidden" name="action" value="toggle_status"><input type="hidden" name="page_id" value="<?= (int) $p['id'] ?>"><input type="hidden" name="new_status" value="<?= $p['status'] === 'published' ? 'draft' : 'published' ?>">
+                <button class="btn btn-outline btn-sm" type="submit"><?= $p['status'] === 'published' ? 'অপ্রকাশ করুন' : 'প্রকাশ করুন' ?></button>
+              </form>
+              <?php if ($p['status'] === 'published'): ?><a class="btn btn-outline btn-sm" href="/<?= e($p['slug']) ?>" target="_blank" rel="noopener noreferrer">দেখুন ↗</a><?php endif; ?>
               <form method="post" action="<?= e(admin_url('pages.php')) ?>" data-confirm="এই পেজটি স্থায়ীভাবে মুছে ফেলবেন?">
                 <?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="page_id" value="<?= (int) $p['id'] ?>">
                 <button class="btn btn-danger btn-sm" type="submit">মুছুন</button>
