@@ -141,10 +141,22 @@
       if (linkButton) {
         linkButton.addEventListener('mousedown', (event) => event.preventDefault());
         linkButton.addEventListener('click', () => {
-          const url = window.prompt('লিংক লিখুন (https://... অথবা /পেজের-ঠিকানা):');
-          if (!url) return;
-          if (!/^(https?:\/\/|\/|#)/i.test(url)) {
-            window.alert('শুধু https://, http://, / দিয়ে শুরু হওয়া স্থানীয় ঠিকানা অথবা পেজের নির্দিষ্ট অংশের লিংক ব্যবহার করা যাবে।');
+          const entered = window.prompt('লিংক লিখুন (যেমন https://example.com, example.com, /about-us অথবা #section):');
+          if (!entered) return;
+          let url = entered.trim();
+          if (!url || url.startsWith('//') || /[\s\x00-\x1F]/.test(url)) {
+            window.alert('সঠিক ওয়েবসাইটের লিংক লিখুন।');
+            return;
+          }
+          if (!/^(https?:\/\/|\/|#)/i.test(url)) url = 'https://' + url;
+          try {
+            if (!url.startsWith('/') && !url.startsWith('#')) {
+              const parsed = new URL(url);
+              if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Invalid URL');
+              url = parsed.href;
+            }
+          } catch (_) {
+            window.alert('সঠিক http:// অথবা https:// লিংক লিখুন।');
             return;
           }
           restoreSelection();
