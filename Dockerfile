@@ -21,6 +21,21 @@ RUN sed -ri 's!/var/www/html!/var/www/app/public!g' /etc/apache2/sites-available
        > /etc/apache2/conf-available/app-public-root.conf \
     && a2enconf app-public-root \
     && printf '%s\n' \
+       '<IfModule mpm_prefork_module>' \
+       '    StartServers 2' \
+       '    MinSpareServers 2' \
+       '    MaxSpareServers 4' \
+       '    ServerLimit 8' \
+       '    MaxRequestWorkers 8' \
+       '    MaxConnectionsPerChild 500' \
+       '</IfModule>' \
+       'KeepAlive On' \
+       'MaxKeepAliveRequests 100' \
+       'KeepAliveTimeout 2' \
+       'Timeout 60' \
+       > /etc/apache2/conf-available/app-capacity.conf \
+    && a2enconf app-capacity \
+    && printf '%s\n' \
        'file_uploads=On' \
        'upload_max_filesize=64M' \
        'post_max_size=64M' \
