@@ -43,6 +43,7 @@ $customPageDesc = trim((string) ($page['meta_description'] ?? ''));
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
 <style>
+  .site-header { position: static !important; }
   .published-custom-page {
     padding-block: 10px 14px;
     margin: 0;
@@ -83,7 +84,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
       title="<?= e((string) $page['title']) ?>"
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       loading="eager"
-      scrolling="auto"
+      scrolling="no"
       referrerpolicy="no-referrer"
     ></iframe>
   </div>
