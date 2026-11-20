@@ -204,24 +204,6 @@
       form.addEventListener('submit', () => { hidden.value = surface.innerHTML; });
     });
 
-    // Landing-page editor mode: separate fields or one complete HTML document.
-    const pageEditorMode = document.getElementById('page_editor_mode');
-    const pageSeparateFields = document.getElementById('page_separate_code_fields');
-    const pageSingleField = document.getElementById('page_single_code_field');
-    const pageHtmlField = document.getElementById('html_content');
-    if (pageEditorMode && pageSeparateFields && pageSingleField) {
-      const syncPageMode = () => {
-        const single = pageEditorMode.value === 'single';
-        pageSeparateFields.style.display = single ? 'none' : '';
-        pageSingleField.style.display = single ? '' : 'none';
-        if (pageHtmlField) pageHtmlField.required = !single;
-        const singleCode = document.getElementById('code_document');
-        if (singleCode) singleCode.required = single;
-      };
-      pageEditorMode.addEventListener('change', syncPageMode);
-      syncPageMode();
-    }
-
     // Password strength feedback on security page
     const newPw = document.getElementById('new_password_input');
     const pwHint = document.getElementById('pw_strength_feedback');
