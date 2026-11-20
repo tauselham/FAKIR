@@ -48,7 +48,59 @@ body > * {
   overflow-y: visible !important;
 }
 </style>';
-$reporter = "<script>\n(() => {\n  const report = () => {\n    const body = document.body;\n    const root = document.documentElement;\n    const height = Math.max(\n      body ? body.scrollHeight : 0,\n      body ? body.offsetHeight : 0,\n      root ? root.scrollHeight : 0,\n      root ? root.offsetHeight : 0\n    );\n    parent.postMessage({ type: 'fakir:content-height', height }, '*');\n  };\n  const start = () => {\n    report();\n    if ('ResizeObserver' in window) {\n      const observer = new ResizeObserver(report);\n      if (document.documentElement) observer.observe(document.documentElement);\n      if (document.body) observer.observe(document.body);\n    }\n    if ('MutationObserver' in window && document.documentElement) {\n      const observer = new MutationObserver(report);\n      observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });\n    }\n    window.addEventListener('load', report);\n    window.addEventListener('resize', report);\n    document.addEventListener('DOMContentLoaded', report);\n    if (document.fonts && document.fonts.ready) document.fonts.ready.then(report).catch(() => {});\n    document.querySelectorAll('img').forEach((img) => {\n      if (!img.complete) {\n        img.addEventListener('load', report, { once: true });\n        img.addEventListener('error', report, { once: true });\n      }\n    });\n  };\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });\n  else start();\n})();\n</script>";
+$reporter = <<<'HTML'
+<script>
+(() => {
+  let lastHeight = 0;
+  let scheduled = false;
+  const measure = () => {
+    const root = document.documentElement;
+    const body = document.body;
+    if (!root || !body) return;
+    const height = Math.ceil(Math.max(
+      root.scrollHeight, root.offsetHeight, root.clientHeight,
+      body.scrollHeight, body.offsetHeight, body.clientHeight,
+      body.getBoundingClientRect().height
+    ));
+    if (height > 0 && height !== lastHeight) {
+      lastHeight = height;
+      parent.postMessage({ type: 'fakir:content-height', height }, '*');
+    }
+  };
+  const report = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      measure();
+    });
+  };
+  const start = () => {
+    report();
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(report);
+      ro.observe(document.documentElement);
+      if (document.body) ro.observe(document.body);
+    }
+    if ('MutationObserver' in window) {
+      const mo = new MutationObserver(report);
+      mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
+    }
+    window.addEventListener('load', report);
+    window.addEventListener('resize', report);
+    document.querySelectorAll('img, video, iframe').forEach((el) => {
+      el.addEventListener('load', report);
+      el.addEventListener('loadedmetadata', report);
+      el.addEventListener('error', report);
+    });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(report).catch(() => {});
+    [0, 100, 300, 700, 1500, 3000].forEach(ms => setTimeout(report, ms));
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  else start();
+})();
+</script>
+HTML;
 if ($codeDocument !== '') {
     // Keep admin-authored content sandboxed, but prevent a second scroll area.
     // The outer page owns scrolling; this frame expands to its real content height.
