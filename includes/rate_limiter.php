@@ -154,7 +154,9 @@ final class RateLimiter
             if ($row) {
                 $row['max_requests'] = (int) $row['max_requests'];
                 $row['window_value'] = (int) $row['window_value'];
-                $row['is_enabled']   = (bool) $row['is_enabled'];
+                // Disable traffic throttles for normal browsing and admin work.
+                // Keep only admin-login protection to reduce password-guessing risk.
+                $row['is_enabled'] = ($scope === 'admin_login') && (bool) $row['is_enabled'];
                 return $row;
             }
         } catch (Throwable $e) {
