@@ -144,7 +144,7 @@ if ($editPage) {
                 }
             }
         } else {
-            $editCodeDocument = "<!doctype html>\n<html lang=\\"bn\\">\n<head>\n<meta charset=\\"utf-8\\">\n<meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\n<style>\n" . $legacyCss . "\n</style>\n</head>\n<body>\n" . $legacyHtml . "\n<script>\n" . $legacyJs . "\n</script>\n</body>\n</html>";
+            $editCodeDocument = "<!doctype html>\n<html lang='bn'>\n<head>\n<meta charset='utf-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1'>\n<style>\n" . $legacyCss . "\n</style>\n</head>\n<body>\n" . $legacyHtml . "\n<script>\n" . $legacyJs . "\n</script>\n</body>\n</html>";
         }
     }
 }
