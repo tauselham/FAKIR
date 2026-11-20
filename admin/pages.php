@@ -128,7 +128,7 @@ if ($editPage) {
         if (preg_match('~<html\\b~i', $legacyHtml)) {
             $editCodeDocument = $legacyHtml;
             if ($legacyCss !== '') {
-                $styleTag = "<style>\\n" . $legacyCss . "\\n</style>\\n";
+                $styleTag = "<style>\n" . $legacyCss . "\n</style>\n";
                 if (preg_match('~</head>~i', $editCodeDocument)) {
                     $editCodeDocument = preg_replace('~</head>~i', $styleTag . '</head>', $editCodeDocument, 1) ?? $editCodeDocument;
                 } else {
@@ -136,7 +136,7 @@ if ($editPage) {
                 }
             }
             if ($legacyJs !== '') {
-                $scriptTag = "\\n<script>\\n" . $legacyJs . "\\n</script>\\n";
+                $scriptTag = "\n<script>\n" . $legacyJs . "\n</script>\n";
                 if (preg_match('~</body>~i', $editCodeDocument)) {
                     $editCodeDocument = preg_replace('~</body>~i', $scriptTag . '</body>', $editCodeDocument, 1) ?? $editCodeDocument;
                 } else {
@@ -144,7 +144,7 @@ if ($editPage) {
                 }
             }
         } else {
-            $editCodeDocument = "<!doctype html>\\n<html lang=\\\"bn\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\">\\n<style>\\n" . $legacyCss . "\\n</style>\\n</head>\\n<body>\\n" . $legacyHtml . "\\n<script>\\n" . $legacyJs . "\\n</script>\\n</body>\\n</html>";
+            $editCodeDocument = "<!doctype html>\n<html lang=\\"bn\\">\n<head>\n<meta charset=\\"utf-8\\">\n<meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1\\">\n<style>\n" . $legacyCss . "\n</style>\n</head>\n<body>\n" . $legacyHtml . "\n<script>\n" . $legacyJs . "\n</script>\n</body>\n</html>";
         }
     }
 }
