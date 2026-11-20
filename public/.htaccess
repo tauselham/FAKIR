@@ -22,6 +22,9 @@ Options -Indexes
   # Route /448662 and /448662/* to the secure server-side PHP Admin dispatcher
   RewriteRule ^448662(/.*)?$ /448662.php [QSA,L]
 
+  # Resolve readable public post URLs by their database slug.
+  RewriteRule ^post/([a-z0-9]+(?:-[a-z0-9]+)*)/?$ post.php?slug=$1 [QSA,L,NC]
+
   # Resolve published custom page slugs (for example /summer-festival).
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
