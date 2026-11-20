@@ -57,12 +57,16 @@ $reporter = <<<'HTML'
     const root = document.documentElement;
     const body = document.body;
     if (!root || !body) return;
+    let contentBottom = 0;
+    for (const element of Array.from(body.children)) {
+      const rect = element.getBoundingClientRect();
+      contentBottom = Math.max(contentBottom, rect.bottom + window.scrollY);
+    }
     const height = Math.ceil(Math.max(
-      root.scrollHeight, root.offsetHeight, root.clientHeight,
-      body.scrollHeight, body.offsetHeight, body.clientHeight,
-      body.getBoundingClientRect().height
+      root.scrollHeight || 0, root.offsetHeight || 0,
+      body.scrollHeight || 0, body.offsetHeight || 0, contentBottom
     ));
-    if (height > 0 && height !== lastHeight) {
+    if (height > 0 && Math.abs(height - lastHeight) > 1) {
       lastHeight = height;
       parent.postMessage({ type: 'fakir:content-height', height }, '*');
     }
@@ -70,31 +74,30 @@ $reporter = <<<'HTML'
   const report = () => {
     if (scheduled) return;
     scheduled = true;
-    requestAnimationFrame(() => {
-      scheduled = false;
-      measure();
-    });
+    requestAnimationFrame(() => { scheduled = false; measure(); });
   };
   const start = () => {
     report();
     if ('ResizeObserver' in window) {
-      const ro = new ResizeObserver(report);
-      ro.observe(document.documentElement);
-      if (document.body) ro.observe(document.body);
+      const observer = new ResizeObserver(report);
+      observer.observe(document.documentElement);
+      if (document.body) observer.observe(document.body);
+      document.querySelectorAll('body > *').forEach((element) => observer.observe(element));
     }
     if ('MutationObserver' in window) {
-      const mo = new MutationObserver(report);
-      mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
+      const observer = new MutationObserver(report);
+      observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
     }
     window.addEventListener('load', report);
     window.addEventListener('resize', report);
-    document.querySelectorAll('img, video, iframe').forEach((el) => {
-      el.addEventListener('load', report);
-      el.addEventListener('loadedmetadata', report);
-      el.addEventListener('error', report);
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'fakir:request-height') report();
+    });
+    document.querySelectorAll('img, video, iframe').forEach((element) => {
+      ['load', 'loadedmetadata', 'error'].forEach((eventName) => element.addEventListener(eventName, report));
     });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(report).catch(() => {});
-    [0, 100, 300, 700, 1500, 3000].forEach(ms => setTimeout(report, ms));
+    [0, 100, 300, 700, 1500, 3000, 5000].forEach((delay) => window.setTimeout(report, delay));
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
   else start();
