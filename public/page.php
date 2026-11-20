@@ -42,17 +42,63 @@ $customPageTitle = (string) $page['title'];
 $customPageDesc = trim((string) ($page['meta_description'] ?? ''));
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
-<main class="section published-custom-page">
+<style>
+  .published-custom-page {
+    padding-block: 10px 14px;
+    margin: 0;
+  }
+  .published-custom-page > .container {
+    padding-inline: 20px;
+  }
+  .published-page-heading {
+    margin: 0 0 10px;
+    color: var(--text-primary, #141e16);
+    font-family: var(--font-display, 'Noto Sans Bengali', sans-serif);
+    font-size: clamp(1.45rem, 2.5vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .custom-content-frame {
+    display: block;
+    width: 100%;
+    min-height: 240px;
+    height: 320px;
+    border: 0;
+    background: transparent;
+    overflow: hidden;
+  }
+  @media (max-width: 640px) {
+    .published-custom-page { padding-block: 6px 10px; }
+    .published-custom-page > .container { padding-inline: 12px; }
+    .published-page-heading { margin-bottom: 8px; }
+  }
+</style>
+<main class="published-custom-page">
   <div class="container">
+    <h1 class="published-page-heading"><?= e((string) $page['title']) ?></h1>
     <iframe
+      id="published-page-content"
       class="custom-content-frame"
       src="/content-frame.php?type=page&amp;id=<?= (int) $page['id'] ?>"
       title="<?= e((string) $page['title']) ?>"
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       loading="eager"
       referrerpolicy="no-referrer"
-      style="display:block;width:100%;min-height:1400px;border:0;background:#fff;"
     ></iframe>
   </div>
 </main>
+<script>
+(() => {
+  const frame = document.getElementById('published-page-content');
+  if (!frame) return;
+  window.addEventListener('message', (event) => {
+    if (event.source !== frame.contentWindow) return;
+    const data = event.data;
+    if (!data || data.type !== 'fakir:content-height') return;
+    const height = Number(data.height);
+    if (!Number.isFinite(height)) return;
+    frame.style.height = Math.max(180, Math.min(12000, Math.ceil(height))) + 'px';
+  });
+})();
+</script>
 <?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
