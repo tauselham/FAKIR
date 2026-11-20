@@ -34,10 +34,13 @@ function start_secure_session(): void
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
     ini_set('session.cookie_httponly', '1');
+    ini_set('session.gc_maxlifetime', '31536000');
+    ini_set('session.gc_probability', '1');
+    ini_set('session.gc_divisor', '1000');
 
     session_name(SESSION_NAME);
     session_set_cookie_params([
-        'lifetime' => 0,
+        'lifetime' => 31536000,
         'path'     => '/',
         'domain'   => '',
         'secure'   => $secureCookie,
