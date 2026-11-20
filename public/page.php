@@ -76,6 +76,19 @@ require_once dirname(__DIR__) . '/includes/header.php';
 <main class="published-custom-page">
   <div class="container">
     <h1 class="published-page-heading"><?= e((string) $page['title']) ?></h1>
+    <script>
+    (() => {
+      window.addEventListener('message', (event) => {
+        const frame = document.getElementById('published-page-content');
+        if (!frame || event.source !== frame.contentWindow) return;
+        const data = event.data;
+        if (!data || data.type !== 'fakir:content-height') return;
+        const height = Number(data.height);
+        if (!Number.isFinite(height) || height <= 0) return;
+        frame.style.height = Math.max(240, Math.min(30000, Math.ceil(height))) + 'px';
+      });
+    })();
+    </script>
     <iframe
       id="published-page-content"
       class="custom-content-frame"
@@ -84,22 +97,9 @@ require_once dirname(__DIR__) . '/includes/header.php';
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       loading="eager"
       scrolling="no"
+      onload="this.contentWindow.postMessage({type:'fakir:request-height'}, '*')"
       referrerpolicy="no-referrer"
     ></iframe>
   </div>
 </main>
-<script>
-(() => {
-  const frame = document.getElementById('published-page-content');
-  if (!frame) return;
-  window.addEventListener('message', (event) => {
-    if (event.source !== frame.contentWindow) return;
-    const data = event.data;
-    if (!data || data.type !== 'fakir:content-height') return;
-    const height = Number(data.height);
-    if (!Number.isFinite(height)) return;
-    frame.style.height = Math.max(180, Math.min(12000, Math.ceil(height))) + 'px';
-  });
-})();
-</script>
 <?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
