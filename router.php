@@ -92,6 +92,13 @@ if ($publicRoot !== false && $candidate !== false && str_starts_with($candidate,
     }
 }
 
+// Resolve clean public post URLs by their stable database slug.
+if (preg_match('#^/post/([a-z0-9]+(?:-[a-z0-9]+)*)/?$#i', $uriPath, $postMatch)) {
+    $_GET['slug'] = strtolower($postMatch[1]);
+    require $publicRoot . '/post.php';
+    return true;
+}
+
 // Resolve clean one-segment custom page slugs from the content_pages table.
 if (preg_match('#^/[a-z0-9]+(?:-[a-z0-9]+)*/?$#', $uriPath)) {
     $_GET['slug'] = trim($uriPath, '/');
