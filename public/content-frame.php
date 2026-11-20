@@ -31,12 +31,32 @@ if (!$content) {
 }
 
 $codeDocument = (string) ($content['code_document'] ?? '');
+$layoutFix = '<style id="fakir-frame-layout-fix">
+html, body {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overflow-y: visible !important;
+}
+html { margin: 0 !important; }
+body { margin: 0 !important; }
+body > * {
+  max-height: none !important;
+  overflow: visible !important;
+  overflow-y: visible !important;
+}
+</style>';
 $reporter = "<script>\n(() => {\n  const report = () => {\n    const body = document.body;\n    const root = document.documentElement;\n    const height = Math.max(\n      body ? body.scrollHeight : 0,\n      body ? body.offsetHeight : 0,\n      root ? root.scrollHeight : 0,\n      root ? root.offsetHeight : 0\n    );\n    parent.postMessage({ type: 'fakir:content-height', height }, '*');\n  };\n  const start = () => {\n    report();\n    if ('ResizeObserver' in window) {\n      const observer = new ResizeObserver(report);\n      if (document.documentElement) observer.observe(document.documentElement);\n      if (document.body) observer.observe(document.body);\n    }\n    if ('MutationObserver' in window && document.documentElement) {\n      const observer = new MutationObserver(report);\n      observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });\n    }\n    window.addEventListener('load', report);\n    window.addEventListener('resize', report);\n    document.addEventListener('DOMContentLoaded', report);\n    if (document.fonts && document.fonts.ready) document.fonts.ready.then(report).catch(() => {});\n    document.querySelectorAll('img').forEach((img) => {\n      if (!img.complete) {\n        img.addEventListener('load', report, { once: true });\n        img.addEventListener('error', report, { once: true });\n      }\n    });\n  };\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });\n  else start();\n})();\n</script>";
 if ($codeDocument !== '') {
-    // Full HTML documents are admin-authored and rendered only inside an iframe
-    // whose sandbox omits same-origin, forms, popups and top-navigation.
-    // Inject automatic height reporting so the public wrapper can remove
-    // excess blank space without granting the iframe same-origin access.
+    // Keep admin-authored content sandboxed, but prevent a second scroll area.
+    // The outer page owns scrolling; this frame expands to its real content height.
+    if (stripos($codeDocument, '</head>') !== false) {
+        $codeDocument = preg_replace('~</head>~i', $layoutFix . '</head>', $codeDocument, 1) ?? $codeDocument;
+    } else {
+        $codeDocument = $layoutFix . $codeDocument;
+    }
     if (stripos($codeDocument, '</body>') !== false) {
         $codeDocument = preg_replace('~</body>~i', $reporter . '</body>', $codeDocument, 1) ?? $codeDocument;
     } elseif (stripos($codeDocument, '</html>') !== false) {
@@ -62,6 +82,7 @@ $js = preg_replace('~</script~i', '<\\/script', $js) ?? $js;
 <meta name="referrer" content="no-referrer">
 <title><?= $title ?></title>
 <style><?= $css ?></style>
+<?= $layoutFix ?>
 </head>
 <body>
 <?= $html ?>
