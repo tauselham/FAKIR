@@ -195,7 +195,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <?php foreach ($recentPosts as $post): ?>
           <article class="post-card">
             <?php if ($post['post_type'] === 'image' && !empty($post['media_url'])): ?>
-              <a href="/post.php?id=<?= (int) $post['id'] ?>" class="post-media">
+              <a href="/post/<?= e(rawurlencode((string) $post['slug'])) ?>" class="post-media">
                 <img
                   src="<?= e(safe_url($post['media_url'])) ?>"
                   alt="<?= e($post['title'] ?: 'Community post image') ?>"
@@ -223,13 +223,13 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
               <?php if (!empty($post['title'])): ?>
                 <h3 class="post-title">
-                  <a href="/post.php?id=<?= (int) $post['id'] ?>"><?= e($post['title']) ?></a>
+                  <a href="/post/<?= e(rawurlencode((string) $post['slug'])) ?>"><?= e($post['title']) ?></a>
                 </h3>
               <?php endif; ?>
 
               <p class="post-excerpt"><?= e($post['description']) ?></p>
 
-              <a href="/post.php?id=<?= (int) $post['id'] ?>" class="post-read-link">বিস্তারিত পড়ুন →</a>
+              <a href="/post/<?= e(rawurlencode((string) $post['slug'])) ?>" class="post-read-link">বিস্তারিত পড়ুন →</a>
             </div>
           </article>
         <?php endforeach; ?>
