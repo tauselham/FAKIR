@@ -91,7 +91,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <?php foreach ($posts as $post): ?>
           <article class="post-card">
             <?php if ($post['post_type'] === 'image' && !empty($post['media_url'])): ?>
-              <a href="/post.php?id=<?= (int) $post['id'] ?>" class="post-media">
+              <a href="/post/<?= e(rawurlencode((string) $post['slug'])) ?>" class="post-media">
                 <img src="<?= e(safe_url($post['media_url'])) ?>" alt="<?= e($post['title'] ?: 'পোস্টের ছবি') ?>" loading="lazy" referrerpolicy="no-referrer">
               </a>
             <?php elseif ($post['post_type'] === 'video' && !empty($post['media_url'])): ?>
@@ -112,10 +112,10 @@ require_once dirname(__DIR__) . '/includes/header.php';
                 </time>
               </div>
               <?php if (!empty($post['title'])): ?>
-                <h2 class="post-title"><a href="/post.php?id=<?= (int) $post['id'] ?>"><?= e($post['title']) ?></a></h2>
+                <h2 class="post-title"><a href="/post/<?= e(rawurlencode((string) $post['slug'])) ?>"><?= e($post['title']) ?></a></h2>
               <?php endif; ?>
               <p class="post-excerpt"><?= e($post['description']) ?></p>
-              <a href="/post.php?id=<?= (int) $post['id'] ?>" class="post-read-link">বিস্তারিত পড়ুন →</a>
+              <a href="/post/<?= e(rawurlencode((string) $post['slug'])) ?>" class="post-read-link">বিস্তারিত পড়ুন →</a>
             </div>
           </article>
         <?php endforeach; ?>
