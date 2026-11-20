@@ -5,19 +5,31 @@ require_once dirname(__DIR__) . '/includes/functions.php';
 
 enforce_rate_limit('public_api', ['ip' => client_ip()]);
 
+$slug = strtolower(trim((string) ($_GET['slug'] ?? '')));
 $id = max(0, (int) ($_GET['id'] ?? 0));
-if ($id <= 0) {
+if ($slug === '' && $id <= 0) {
     redirect_to('/posts.php');
 }
 
-$stmt = db()->prepare(
-    "SELECT p.*, pc.name AS category_name, pc.slug AS category_slug
-     FROM public.posts p
-     LEFT JOIN public.post_categories pc ON pc.id = p.category_id
-     WHERE p.id = :id AND p.status = 'published'
-     LIMIT 1"
-);
-$stmt->execute([':id' => $id]);
+if ($slug !== '') {
+    $stmt = db()->prepare(
+        "SELECT p.*, pc.name AS category_name, pc.slug AS category_slug
+         FROM public.posts p
+         LEFT JOIN public.post_categories pc ON pc.id = p.category_id
+         WHERE p.slug = :slug AND p.status = 'published'
+         LIMIT 1"
+    );
+    $stmt->execute([':slug' => $slug]);
+} else {
+    $stmt = db()->prepare(
+        "SELECT p.*, pc.name AS category_name, pc.slug AS category_slug
+         FROM public.posts p
+         LEFT JOIN public.post_categories pc ON pc.id = p.category_id
+         WHERE p.id = :id AND p.status = 'published'
+         LIMIT 1"
+    );
+    $stmt->execute([':id' => $id]);
+}
 $post = $stmt->fetch();
 
 if (!$post) {
@@ -58,7 +70,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
       class="custom-content-frame"
       src="/content-frame.php?type=post&amp;id=<?= (int) $post['id'] ?>"
       title="<?= e($post['title'] ?: 'কমিউনিটির পোস্ট') ?>"
-      sandbox="allow-scripts"
+      sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       loading="lazy"
       referrerpolicy="no-referrer"
       style="display:block;width:100%;min-height:900px;border:0;background:#fff;"
