@@ -18,28 +18,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pageType = ($_POST['page_type'] ?? 'landing') === 'about' ? 'about' : 'landing';
             $title = trim((string) ($_POST['title'] ?? ''));
             $slug = validate_content_slug((string) ($_POST['slug'] ?? ''));
-            $editorMode = ($_POST['editor_mode'] ?? 'separate') === 'single' ? 'single' : 'separate';
-            $html = (string) ($_POST['html_content'] ?? '');
-            $css = (string) ($_POST['css_content'] ?? '');
-            $js = (string) ($_POST['js_content'] ?? '');
             $codeDocument = (string) ($_POST['code_document'] ?? '');
+            $html = '';
+            $css = '';
+            $js = '';
             $meta = trim((string) ($_POST['meta_description'] ?? ''));
             $status = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
 
             if ($title === '' || mb_strlen($title) > 220) {
                 throw new RuntimeException('পেজের শিরোনাম দিতে হবে এবং তা ২২০ অক্ষরের মধ্যে হতে হবে।');
             }
-            if ($editorMode === 'single') {
-                if (trim($codeDocument) === '') throw new RuntimeException('সম্পূর্ণ HTML ডকুমেন্টের কোড দিতে হবে।');
-                if (strlen($codeDocument) > 2097152) throw new RuntimeException('সম্পূর্ণ HTML ডকুমেন্ট ২ মেগাবাইটের মধ্যে হতে হবে।');
-                $html = $css = $js = '';
-            } else {
-                if (strlen($html) > 1048576 || strlen($css) > 524288 || strlen($js) > 524288) {
-                    throw new RuntimeException('কোডের আকার নির্ধারিত সীমা ছাড়িয়েছে। HTML সর্বোচ্চ ১ মেগাবাইট এবং CSS ও JavaScript প্রতিটি সর্বোচ্চ ৫১২ কিলোবাইট হতে পারবে।');
-                }
-                if (trim($html) === '') throw new RuntimeException('HTML কনটেন্ট দিতে হবে।');
-                $codeDocument = '';
-            }
+            if (trim($codeDocument) === '') throw new RuntimeException('সম্পূর্ণ HTML ডকুমেন্টের কোড দিতে হবে।');
+            if (strlen($codeDocument) > 2097152) throw new RuntimeException('সম্পূর্ণ HTML ডকুমেন্ট ২ মেগাবাইটের মধ্যে হতে হবে।');
             if (mb_strlen($meta) > 300) {
                 throw new RuntimeException('সার্চ বিবরণ ৩০০ অক্ষরের বেশি হতে পারবে না।');
             }
@@ -128,6 +118,36 @@ if (!empty($_GET['edit'])) {
     $stmt->execute([':id' => (int) $_GET['edit']]);
     $editPage = $stmt->fetch() ?: null;
 }
+$editCodeDocument = '';
+if ($editPage) {
+    $editCodeDocument = (string) ($editPage['code_document'] ?? '');
+    if ($editCodeDocument === '') {
+        $legacyHtml = (string) ($editPage['html_content'] ?? '');
+        $legacyCss = (string) ($editPage['css_content'] ?? '');
+        $legacyJs = (string) ($editPage['js_content'] ?? '');
+        if (preg_match('~<html\\b~i', $legacyHtml)) {
+            $editCodeDocument = $legacyHtml;
+            if ($legacyCss !== '') {
+                $styleTag = "<style>\\n" . $legacyCss . "\\n</style>\\n";
+                if (preg_match('~</head>~i', $editCodeDocument)) {
+                    $editCodeDocument = preg_replace('~</head>~i', $styleTag . '</head>', $editCodeDocument, 1) ?? $editCodeDocument;
+                } else {
+                    $editCodeDocument = preg_replace('~<body\\b~i', $styleTag . '<body', $editCodeDocument, 1) ?? $editCodeDocument;
+                }
+            }
+            if ($legacyJs !== '') {
+                $scriptTag = "\\n<script>\\n" . $legacyJs . "\\n</script>\\n";
+                if (preg_match('~</body>~i', $editCodeDocument)) {
+                    $editCodeDocument = preg_replace('~</body>~i', $scriptTag . '</body>', $editCodeDocument, 1) ?? $editCodeDocument;
+                } else {
+                    $editCodeDocument .= $scriptTag;
+                }
+            }
+        } else {
+            $editCodeDocument = "<!doctype html>\\n<html lang=\\\"bn\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\">\\n<style>\\n" . $legacyCss . "\\n</style>\\n</head>\\n<body>\\n" . $legacyHtml . "\\n<script>\\n" . $legacyJs . "\\n</script>\\n</body>\\n</html>";
+        }
+    }
+}
 $hasAbout = false;
 foreach ($pages as $pageRow) {
     if ($pageRow['page_type'] === 'about') {
@@ -180,33 +200,9 @@ foreach ($pages as $pageRow) {
     </div>
 
     <div class="form-row">
-      <label class="form-label" for="editor_mode">কোড লেখার ধরন</label>
-      <select class="form-control" name="editor_mode" id="page_editor_mode">
-        <option value="separate" <?= empty($editPage['code_document']) ? 'selected' : '' ?>>HTML, CSS ও JavaScript আলাদা ঘরে লিখুন</option>
-        <option value="single" <?= !empty($editPage['code_document']) ? 'selected' : '' ?>>HTML, CSS ও JavaScript-সহ একটি সম্পূর্ণ HTML ডকুমেন্ট</option>
-      </select>
-      <span class="form-hint">একটি HTML ফাইলে HTML, &lt;style&gt; এবং &lt;script&gt; একসঙ্গে লিখতে চাইলে দ্বিতীয় অপশনটি বেছে নিন।</span>
-    </div>
-
-    <div id="page_separate_code_fields" style="<?= !empty($editPage['code_document']) ? 'display:none;' : '' ?>">
-    <div class="form-row">
-      <label class="form-label" for="html_content">HTML-এর মূল অংশ (সম্পূর্ণ ডকুমেন্ট নয়)</label>
-      <textarea class="form-control" id="html_content" name="html_content" rows="14" spellcheck="false" required><?= e($editPage['html_content'] ?? '') ?></textarea>
-    </div>
-    <div class="form-row">
-      <label class="form-label" for="css_content">CSS</label>
-      <textarea class="form-control" id="css_content" name="css_content" rows="10" spellcheck="false"><?= e($editPage['css_content'] ?? '') ?></textarea>
-    </div>
-    <div class="form-row">
-      <label class="form-label" for="js_content">JavaScript</label>
-      <textarea class="form-control" id="js_content" name="js_content" rows="10" spellcheck="false"><?= e($editPage['js_content'] ?? '') ?></textarea>
-      <span class="form-hint">শুধু JavaScript কোড লিখুন (script ট্যাগ ছাড়া)। নিরাপত্তার জন্য Fetch/XHR/WebSocket, ফর্ম, পপআপ এবং মূল পেজে প্রবেশ বন্ধ থাকবে; HTTPS ছবি লোড হতে পারে।</span>
-    </div>
-    </div>
-    <div class="form-row" id="page_single_code_field" style="<?= empty($editPage['code_document']) ? 'display:none;' : '' ?>">
-      <label class="form-label" for="code_document">সম্পূর্ণ HTML ডকুমেন্ট</label>
-      <textarea class="form-control code-document-editor" id="code_document" name="code_document" rows="24" spellcheck="false"><?= e($editPage['code_document'] ?? '') ?></textarea>
-      <span class="form-hint">একই ডকুমেন্টের মধ্যে &lt;style&gt; ও &lt;script&gt; লিখবে। এটি sandboxed iframe-এ চলবে; একই উৎসে প্রবেশ ও fetch/XHR/WebSocket বন্ধ; HTTPS ছবি লোড হতে পারে।</span>
+      <label class="form-label" for="code_document">সম্পূর্ণ HTML কোড</label>
+      <textarea class="form-control code-document-editor" id="code_document" name="code_document" rows="28" spellcheck="false" required><?= e($editCodeDocument) ?></textarea>
+      <span class="form-hint">HTML, CSS এবং JavaScript একই কোড ঘরে লিখুন। CSS-এর জন্য &lt;style&gt; এবং JavaScript-এর জন্য &lt;script&gt; ট্যাগ ব্যবহার করুন।</span>
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
