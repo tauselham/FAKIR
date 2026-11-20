@@ -66,6 +66,8 @@ require_once dirname(__DIR__) . '/includes/header.php';
     border: 0;
     background: transparent;
     overflow: hidden;
+    overflow-y: hidden;
+    scrollbar-width: none;
   }
   @media (max-width: 640px) {
     .published-custom-page { padding-block: 6px 10px; }
@@ -83,6 +85,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
       title="<?= e((string) $page['title']) ?>"
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       loading="eager"
+      scrolling="no"
       referrerpolicy="no-referrer"
     ></iframe>
   </div>
