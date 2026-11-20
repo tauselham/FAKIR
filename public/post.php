@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/includes/functions.php';
 
-enforce_rate_limit('public_api', ['ip' => client_ip()]);
-
 $slug = strtolower(trim((string) ($_GET['slug'] ?? '')));
 $id = max(0, (int) ($_GET['id'] ?? 0));
 if ($slug === '' && $id <= 0) {
@@ -73,8 +71,22 @@ require_once dirname(__DIR__) . '/includes/header.php';
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       loading="lazy"
       referrerpolicy="no-referrer"
-      style="display:block;width:100%;min-height:900px;border:0;background:#fff;"
+      id="published-post-content"
+      style="display:block;width:100%;height:320px;min-height:240px;border:0;background:transparent;overflow:hidden;"
     ></iframe>
+    <script>
+    (() => {
+      const frame = document.getElementById('published-post-content');
+      if (!frame) return;
+      window.addEventListener('message', (event) => {
+        if (event.source !== frame.contentWindow) return;
+        const data = event.data;
+        if (!data || data.type !== 'fakir:content-height') return;
+        const height = Number(data.height);
+        if (Number.isFinite(height)) frame.style.height = Math.max(180, Math.min(12000, Math.ceil(height))) + 'px';
+      });
+    })();
+    </script>
   <?php elseif ($post['post_type'] === 'image' && !empty($post['media_url'])): ?>
     <div class="post-detail-media">
       <img src="<?= e(safe_url($post['media_url'])) ?>" alt="<?= e($post['title'] ?: 'পোস্টের ছবি') ?>" referrerpolicy="no-referrer">
