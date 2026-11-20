@@ -14,7 +14,6 @@ if ($slug === '' || !preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) {
 }
 
 try {
-    enforce_rate_limit('public_api', ['ip' => client_ip()]);
     $stmt = db()->prepare(
         "SELECT id, title, slug, meta_description
          FROM public.content_pages
