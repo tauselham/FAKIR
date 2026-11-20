@@ -61,14 +61,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mediaPath = $existing['media_path'] ?? null;
             $mediaUrl = $existing['media_url'] ?? null;
             $mediaMime = $existing['media_mime'] ?? null;
-            $oldBucketToRemoveুছুন = null;
-            $oldPathToRemoveুছুন = null;
+            $oldBucketToRemove = null;
+            $oldPathToRemove = null;
             $newlyUploaded = null;
 
             if (in_array($postType, ['text', 'custom'], true)) {
                 if ($existing && !empty($existing['media_bucket']) && !empty($existing['media_path'])) {
-                    $oldBucketToRemoveুছুন = (string) $existing['media_bucket'];
-                    $oldPathToRemoveুছুন = (string) $existing['media_path'];
+                    $oldBucketToRemove = (string) $existing['media_bucket'];
+                    $oldPathToRemove = (string) $existing['media_path'];
                 }
                 $mediaBucket = $mediaPath = $mediaUrl = $mediaMime = null;
             } elseif (!empty($_FILES['media_file']['name'])) {
@@ -76,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $maxSize = $postType === 'video' ? MAX_VIDEO_UPLOAD_BYTES : MAX_IMAGE_UPLOAD_BYTES;
                 $newlyUploaded = $storage->upload($_FILES['media_file'], BUCKET_POST_MEDIA, $allowed, $maxSize, 'posts');
                 if ($existing && !empty($existing['media_bucket']) && !empty($existing['media_path'])) {
-                    $oldBucketToRemoveুছুন = (string) $existing['media_bucket'];
-                    $oldPathToRemoveুছুন = (string) $existing['media_path'];
+                    $oldBucketToRemove = (string) $existing['media_bucket'];
+                    $oldPathToRemove = (string) $existing['media_path'];
                 }
                 $mediaBucket = $newlyUploaded['bucket'];
                 $mediaPath = $newlyUploaded['path'];
@@ -138,14 +138,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw $dbErr;
             }
 
-            if ($oldBucketToRemoveুছুন !== null && $oldPathToRemoveুছুন !== null) $storage->delete($oldBucketToRemoveুছুন, $oldPathToRemoveুছুন);
+            if ($oldBucketToRemove !== null && $oldPathToRemove !== null) $storage->delete($oldBucketToRemove, $oldPathToRemove);
             redirect_to(admin_url('posts.php'));
         } elseif ($action === 'toggle_status') {
             $postId = (int) ($_POST['post_id'] ?? 0);
-            $newStatus্থা্থা = ($_POST['new_status'] ?? 'draft') === 'published' ? 'published' : 'draft';
+            $newStatus = ($_POST['new_status'] ?? 'draft') === 'published' ? 'published' : 'draft';
             $upd = $pdo->prepare('UPDATE public.posts SET status = :status, published_at = CASE WHEN :status_check = \'published\' THEN COALESCE(published_at, NOW()) ELSE NULL END, updated_at = NOW() WHERE id = :id');
-            $upd->execute([':status' => $newStatus্থা্থা, ':status_check' => $newStatus্থা্থা, ':id' => $postId]);
-            log_admin_activity((int) $currentAdmin['id'], 'post_status_' . $newStatus্থা্থা, 'post', $postId);
+            $upd->execute([':status' => $newStatus, ':status_check' => $newStatus, ':id' => $postId]);
+            log_admin_activity((int) $currentAdmin['id'], 'post_status_' . $newStatus, 'post', $postId);
             set_flash('success', 'পোস্টের দৃশ্যমানতা হালনাগাদ হয়েছে।');
             redirect_to(admin_url('posts.php'));
         } elseif ($action === 'delete') {
