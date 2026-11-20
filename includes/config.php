@@ -29,8 +29,8 @@ if (PHP_SAPI !== 'cli' && !headers_sent()) {
 
 // Session Configuration
 define('SESSION_NAME', (string) env_value('SESSION_NAME', 'village_admin_session'));
-define('SESSION_IDLE_TIMEOUT', max(300, (int) env_value('SESSION_IDLE_TIMEOUT', '1800')));
-define('SESSION_ABSOLUTE_TIMEOUT', max(1800, (int) env_value('SESSION_ABSOLUTE_TIMEOUT', '28800')));
+define('SESSION_IDLE_TIMEOUT', max(31536000, (int) env_value('SESSION_IDLE_TIMEOUT', '31536000')));
+define('SESSION_ABSOLUTE_TIMEOUT', max(31536000, (int) env_value('SESSION_ABSOLUTE_TIMEOUT', '31536000')));
 
 // Upload Size Limits (bytes)
 define('MAX_IMAGE_UPLOAD_BYTES', 10 * 1024 * 1024); // 10 MB
