@@ -6,23 +6,40 @@ declare(strict_types=1);
 define('SANDBOXED_CONTENT_FRAME', true);
 require_once dirname(__DIR__) . '/includes/functions.php';
 
-header("Content-Security-Policy: default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: http: https:; media-src 'self' data: blob: http: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; worker-src 'none'; manifest-src 'none'");
+header("Content-Security-Policy: default-src 'none'; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https: http:; img-src 'self' data: blob: http: https:; media-src 'self' data: blob: http: https:; font-src 'self' data: https: http:; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; worker-src 'none'; manifest-src 'none'");
 header('Cache-Control: no-store, max-age=0');
 header('Content-Type: text/html; charset=UTF-8');
 header('Referrer-Policy: no-referrer');
 
 $type = (string) ($_GET['type'] ?? '');
 $id = max(0, (int) ($_GET['id'] ?? 0));
+$isPreview = (($_GET['preview'] ?? '') === '1');
 if ($id < 1 || !in_array($type, ['page', 'post'], true)) {
     http_response_code(404);
     exit('Content not found.');
 }
 
-if ($type === 'page') {
-    $stmt = db()->prepare("SELECT title, html_content, css_content, js_content, code_document FROM public.content_pages WHERE id = :id AND status = 'published' LIMIT 1");
-} else {
-    $stmt = db()->prepare("SELECT title, html_content, css_content, js_content, code_document FROM public.posts WHERE id = :id AND post_type = 'custom' AND status = 'published' LIMIT 1");
+$allowDraftPreview = false;
+if ($isPreview) {
+    require_once dirname(__DIR__) . '/includes/auth.php';
+    start_secure_session();
+    $previewAdmin = current_admin();
+    $neededPerm = $type === 'page' ? 'manage_pages' : 'manage_posts';
+    if ($previewAdmin && (($previewAdmin['role'] ?? '') === 'super_admin' || in_array($neededPerm, $previewAdmin['permissions'] ?? [], true))) {
+        $allowDraftPreview = true;
+    }
 }
+
+if ($type === 'page') {
+    $sql = $allowDraftPreview
+        ? 'SELECT title, html_content, css_content, js_content, code_document FROM public.content_pages WHERE id = :id LIMIT 1'
+        : "SELECT title, html_content, css_content, js_content, code_document FROM public.content_pages WHERE id = :id AND status = 'published' LIMIT 1";
+} else {
+    $sql = $allowDraftPreview
+        ? "SELECT title, html_content, css_content, js_content, code_document FROM public.posts WHERE id = :id AND post_type = 'custom' LIMIT 1"
+        : "SELECT title, html_content, css_content, js_content, code_document FROM public.posts WHERE id = :id AND post_type = 'custom' AND status = 'published' LIMIT 1";
+}
+$stmt = db()->prepare($sql);
 $stmt->execute([':id' => $id]);
 $content = $stmt->fetch();
 if (!$content) {
@@ -38,7 +55,7 @@ html, body {
   min-height: 0 !important;
   max-height: none !important;
   overflow: visible !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   overflow-y: visible !important;
   margin: 0 !important;
 }
@@ -80,12 +97,13 @@ $reporter = <<<'HTML'
       contentBottom = Math.max(contentBottom, endRect.bottom + window.scrollY);
     }
     for (const element of Array.from(body.children)) {
-      if (element.id === '__fakir_height_end__' || element.tagName === 'SCRIPT' || element.tagName === 'STYLE') continue;
+      if (element.id === '__fakir_height_end__' || element.tagName === 'SCRIPT' || element.tagName === 'STYLE' || element.tagName === 'LINK') continue;
       const cs = window.getComputedStyle(element);
       if (cs.display === 'none' || cs.position === 'fixed') continue;
       const rect = element.getBoundingClientRect();
       const mb = parseFloat(cs.marginBottom) || 0;
-      contentBottom = Math.max(contentBottom, rect.bottom + window.scrollY + Math.max(0, mb));
+      const effHeight = cs.overflowY === 'visible' ? Math.max(rect.height, element.scrollHeight || 0) : rect.height;
+      contentBottom = Math.max(contentBottom, rect.top + window.scrollY + effHeight + Math.max(0, mb));
     }
     const bodyStyle = window.getComputedStyle(body);
     const bodyPb = parseFloat(bodyStyle.paddingBottom) || 0;
@@ -120,7 +138,7 @@ $reporter = <<<'HTML'
     requestAnimationFrame(() => { scheduled = false; measure(Boolean(force)); });
   };
   const attachMediaListeners = (scope) => {
-    (scope || document).querySelectorAll('img, video, iframe').forEach((element) => {
+    (scope || document).querySelectorAll('img, video, iframe, link[rel="stylesheet"]').forEach((element) => {
       if (element.dataset.fakirBound) return;
       element.dataset.fakirBound = '1';
       ['load', 'loadedmetadata', 'error'].forEach((eventName) => element.addEventListener(eventName, () => { mutationSeq += 1; report(false); }));

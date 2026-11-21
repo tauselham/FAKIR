@@ -13,13 +13,23 @@ if ($slug === '' || !preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) {
     exit;
 }
 
+$isPreview = (($_GET['preview'] ?? '') === '1');
+$allowDraftPreview = false;
+if ($isPreview) {
+    require_once dirname(__DIR__) . '/includes/auth.php';
+    start_secure_session();
+    $previewAdmin = current_admin();
+    if ($previewAdmin && (($previewAdmin['role'] ?? '') === 'super_admin' || in_array('manage_pages', $previewAdmin['permissions'] ?? [], true))) {
+        $allowDraftPreview = true;
+        send_admin_nocache_headers();
+    }
+}
+
 try {
-    $stmt = db()->prepare(
-        "SELECT id, title, slug, meta_description
-         FROM public.content_pages
-         WHERE slug = :slug AND status = 'published'
-         LIMIT 1"
-    );
+    $sql = $allowDraftPreview
+        ? 'SELECT id, title, slug, meta_description, status FROM public.content_pages WHERE slug = :slug LIMIT 1'
+        : "SELECT id, title, slug, meta_description, status FROM public.content_pages WHERE slug = :slug AND status = 'published' LIMIT 1";
+    $stmt = db()->prepare($sql);
     $stmt->execute([':slug' => $slug]);
     $page = $stmt->fetch();
 } catch (Throwable $e) {
@@ -39,6 +49,7 @@ if (!$page) {
 
 $customPageTitle = (string) $page['title'];
 $customPageDesc = trim((string) ($page['meta_description'] ?? ''));
+$framePreviewQuery = ($allowDraftPreview && ($page['status'] ?? '') !== 'published') ? '&amp;preview=1' : '';
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
 <section class="published-custom-page">
@@ -48,7 +59,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
       id="published-page-content"
       class="custom-content-frame"
       data-auto-resize="true"
-      src="/content-frame.php?type=page&amp;id=<?= (int) $page['id'] ?>"
+      src="/content-frame.php?type=page&amp;id=<?= (int) $page['id'] ?><?= $framePreviewQuery ?>"
       title="<?= e((string) $page['title']) ?>"
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       loading="eager"

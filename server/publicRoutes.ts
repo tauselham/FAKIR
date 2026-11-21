@@ -3,6 +3,7 @@ import { store } from './store.ts';
 import type { NavigationItem } from './types.ts';
 import {
   applyRateLimitHeaders,
+  canPreviewDraft,
   checkRateLimit,
   cleanNavUrl,
   clientIp,
@@ -200,7 +201,7 @@ export function renderPublicHeader(options?: {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20261121">
   <style>
     :root {
       --header-bg: ${e(headerBg)};
@@ -381,7 +382,7 @@ export function renderPublicFooter(currentPath = '/'): string {
   <link rel="stylesheet" href="/assets/css/popup.css?v=1">
   <script src="/assets/js/popup.js?v=1" defer></script>
   <script src="/assets/js/lightbox.js" defer></script>
-  <script src="/assets/js/app.js?v=20261120" defer></script>
+  <script src="/assets/js/app.js?v=20261121" defer></script>
 </body>
 </html>`;
 }
@@ -1141,22 +1142,28 @@ export function registerPublicRoutes(app: Express): void {
   app.get('/content-frame.php', (req: Request, res: Response) => {
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: http: https:; media-src 'self' data: blob: http: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; worker-src 'none'; manifest-src 'none'"
+      "default-src 'none'; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https: http:; img-src 'self' data: blob: http: https:; media-src 'self' data: blob: http: https:; font-src 'self' data: https: http:; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; worker-src 'none'; manifest-src 'none'"
     );
     res.setHeader('Cache-Control', 'no-store, max-age=0');
     res.setHeader('Referrer-Policy', 'no-referrer');
 
     const type = String(req.query.type ?? '');
     const id = Math.max(0, Number.parseInt(String(req.query.id ?? '0'), 10) || 0);
+    const isPreview = String(req.query.preview ?? '') === '1';
     if (id < 1 || (type !== 'page' && type !== 'post')) {
       res.status(404).type('text').send('Content not found.');
       return;
     }
 
+    const allowDraftPreview =
+      isPreview && canPreviewDraft(req, type === 'page' ? 'manage_pages' : 'manage_posts');
+
     const content =
       type === 'page'
-        ? store.content_pages.find((pg) => pg.id === id && pg.status === 'published')
-        : store.posts.find((p) => p.id === id && p.post_type === 'custom' && p.status === 'published');
+        ? store.content_pages.find((pg) => pg.id === id && (allowDraftPreview || pg.status === 'published'))
+        : store.posts.find(
+            (p) => p.id === id && p.post_type === 'custom' && (allowDraftPreview || p.status === 'published')
+          );
 
     if (!content) {
       res.status(404).type('text').send('Content not found.');
@@ -1170,7 +1177,7 @@ html, body {
   min-height: 0 !important;
   max-height: none !important;
   overflow: visible !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   overflow-y: visible !important;
   margin: 0 !important;
 }
@@ -1212,12 +1219,13 @@ body {
       contentBottom = Math.max(contentBottom, endRect.bottom + window.scrollY);
     }
     for (const element of Array.from(body.children)) {
-      if (element.id === '__fakir_height_end__' || element.tagName === 'SCRIPT' || element.tagName === 'STYLE') continue;
+      if (element.id === '__fakir_height_end__' || element.tagName === 'SCRIPT' || element.tagName === 'STYLE' || element.tagName === 'LINK') continue;
       const cs = window.getComputedStyle(element);
       if (cs.display === 'none' || cs.position === 'fixed') continue;
       const rect = element.getBoundingClientRect();
       const mb = parseFloat(cs.marginBottom) || 0;
-      contentBottom = Math.max(contentBottom, rect.bottom + window.scrollY + Math.max(0, mb));
+      const effHeight = cs.overflowY === 'visible' ? Math.max(rect.height, element.scrollHeight || 0) : rect.height;
+      contentBottom = Math.max(contentBottom, rect.top + window.scrollY + effHeight + Math.max(0, mb));
     }
     const bodyStyle = window.getComputedStyle(body);
     const bodyPb = parseFloat(bodyStyle.paddingBottom) || 0;
@@ -1252,7 +1260,7 @@ body {
     requestAnimationFrame(() => { scheduled = false; measure(Boolean(force)); });
   };
   const attachMediaListeners = (scope) => {
-    (scope || document).querySelectorAll('img, video, iframe').forEach((element) => {
+    (scope || document).querySelectorAll('img, video, iframe, link[rel="stylesheet"]').forEach((element) => {
       if (element.dataset.fakirBound) return;
       element.dataset.fakirBound = '1';
       ['load', 'loadedmetadata', 'error'].forEach((eventName) => element.addEventListener(eventName, () => { mutationSeq += 1; report(false); }));
@@ -1360,7 +1368,15 @@ function renderPublishedPageBySlug(rawSlug: string, req: Request, res: Response)
     return;
   }
 
-  const page = store.content_pages.find((pg) => pg.slug === slug && pg.status === 'published');
+  const isPreview = String(req.query.preview ?? '') === '1';
+  const allowDraftPreview = isPreview && canPreviewDraft(req, 'manage_pages');
+  if (allowDraftPreview) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  }
+
+  const page = store.content_pages.find(
+    (pg) => pg.slug === slug && (allowDraftPreview || pg.status === 'published')
+  );
   if (!page) {
     res
       .status(404)
@@ -1373,6 +1389,7 @@ function renderPublishedPageBySlug(rawSlug: string, req: Request, res: Response)
     return;
   }
 
+  const framePreviewQuery = allowDraftPreview && page.status !== 'published' ? '&amp;preview=1' : '';
   const body = `
 <section class="published-custom-page">
   <div class="container">
@@ -1381,7 +1398,7 @@ function renderPublishedPageBySlug(rawSlug: string, req: Request, res: Response)
       id="published-page-content"
       class="custom-content-frame"
       data-auto-resize="true"
-      src="/content-frame.php?type=page&amp;id=${page.id}"
+      src="/content-frame.php?type=page&amp;id=${page.id}${framePreviewQuery}"
       title="${e(page.title)}"
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       loading="eager"

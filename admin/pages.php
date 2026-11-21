@@ -254,7 +254,11 @@ foreach ($pages as $pageRow) {
                 <?= csrf_field() ?><input type="hidden" name="action" value="toggle_status"><input type="hidden" name="page_id" value="<?= (int) $p['id'] ?>"><input type="hidden" name="new_status" value="<?= $p['status'] === 'published' ? 'draft' : 'published' ?>">
                 <button class="btn btn-outline btn-sm" type="submit"><?= $p['status'] === 'published' ? 'অপ্রকাশ করুন' : 'প্রকাশ করুন' ?></button>
               </form>
-              <?php if ($p['status'] === 'published'): ?><a class="btn btn-outline btn-sm" href="/<?= e($p['slug']) ?>" target="_blank" rel="noopener noreferrer">দেখুন ↗</a><?php endif; ?>
+              <?php if ($p['status'] === 'published'): ?>
+                <a class="btn btn-outline btn-sm" href="/<?= e($p['slug']) ?>" target="_blank" rel="noopener noreferrer">দেখুন ↗</a>
+              <?php else: ?>
+                <a class="btn btn-outline btn-sm" href="/<?= e($p['slug']) ?>?preview=1" target="_blank" rel="noopener noreferrer">প্রিভিউ ↗</a>
+              <?php endif; ?>
               <form method="post" action="<?= e(admin_url('pages.php')) ?>" data-confirm="এই পেজটি স্থায়ীভাবে মুছে ফেলবেন?">
                 <?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="page_id" value="<?= (int) $p['id'] ?>">
                 <button class="btn btn-danger btn-sm" type="submit">মুছুন</button>

@@ -587,6 +587,16 @@ export function getCurrentAdmin(session: AdminSession): AdminRecord | null {
   return admin;
 }
 
+export function canPreviewDraft(req: Request, permission: string): boolean {
+  const rawCookie = req.cookies?.[SESSION_COOKIE_NAME] as string | undefined;
+  const verifiedId = verifySessionCookie(rawCookie);
+  if (!verifiedId) return false;
+  const session = store.sessions.get(verifiedId);
+  if (!session) return false;
+  const admin = getCurrentAdmin(session);
+  return Boolean(admin && adminHasPermission(permission, admin));
+}
+
 export function setFlash(session: AdminSession, type: 'success' | 'error', message: string): void {
   session.flash = { type, message };
 }

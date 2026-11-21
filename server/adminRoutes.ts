@@ -1367,7 +1367,11 @@ export function registerAdminRoutes(app: Express): void {
                       ${csrfField(session)}<input type="hidden" name="action" value="toggle_status"><input type="hidden" name="page_id" value="${p.id}"><input type="hidden" name="new_status" value="${p.status === 'published' ? 'draft' : 'published'}">
                       <button class="btn btn-outline btn-sm" type="submit">${p.status === 'published' ? 'অপ্রকাশ করুন' : 'প্রকাশ করুন'}</button>
                     </form>
-                    ${p.status === 'published' ? `<a class="btn btn-outline btn-sm" href="/${e(p.slug)}" target="_blank" rel="noopener noreferrer">দেখুন ↗</a>` : ''}
+                    ${
+                      p.status === 'published'
+                        ? `<a class="btn btn-outline btn-sm" href="/${e(p.slug)}" target="_blank" rel="noopener noreferrer">দেখুন ↗</a>`
+                        : `<a class="btn btn-outline btn-sm" href="/${e(p.slug)}?preview=1" target="_blank" rel="noopener noreferrer">প্রিভিউ ↗</a>`
+                    }
                     <form method="post" action="${e(adminUrl('pages.php'))}" data-confirm="এই পেজটি স্থায়ীভাবে মুছে ফেলবেন?">
                       ${csrfField(session)}<input type="hidden" name="action" value="delete"><input type="hidden" name="page_id" value="${p.id}">
                       <button class="btn btn-danger btn-sm" type="submit">মুছুন</button>

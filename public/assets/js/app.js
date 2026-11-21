@@ -305,57 +305,70 @@
     }
   }
 
+  function getCustomContentFrames() {
+    return Array.from(document.querySelectorAll('iframe.custom-content-frame[data-auto-resize], iframe#published-page-content, iframe#published-post-content'));
+  }
+
+  function requestFrameHeight(frame) {
+    try {
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage({ type: 'fakir:request-height' }, '*');
+      }
+    } catch (_) {}
+  }
+
+  window.addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data || data.type !== 'fakir:content-height') return;
+    const height = Number(data.height);
+    if (!Number.isFinite(height) || height <= 0) return;
+
+    const frames = getCustomContentFrames();
+    for (const frame of frames) {
+      if (event.source === frame.contentWindow) {
+        const clamped = Math.max(240, Math.min(30000, Math.ceil(height)));
+        frame.style.height = clamped + 'px';
+        break;
+      }
+    }
+  });
+
   function initCustomContentFrames() {
-    const frames = Array.from(document.querySelectorAll('iframe.custom-content-frame[data-auto-resize], iframe#published-page-content, iframe#published-post-content'));
+    const frames = getCustomContentFrames();
     if (!frames.length) return;
 
-    const requestFrameHeight = (frame) => {
-      try {
-        if (frame.contentWindow) {
-          frame.contentWindow.postMessage({ type: 'fakir:request-height' }, '*');
-        }
-      } catch (_) {}
-    };
-
-    window.addEventListener('message', (event) => {
-      const data = event.data;
-      if (!data || data.type !== 'fakir:content-height') return;
-      const height = Number(data.height);
-      if (!Number.isFinite(height) || height <= 0) return;
-
-      for (const frame of frames) {
-        if (event.source === frame.contentWindow) {
-          const clamped = Math.max(240, Math.min(30000, Math.ceil(height)));
-          frame.style.height = clamped + 'px';
-          break;
-        }
-      }
-    });
-
     frames.forEach((frame) => {
+      if (frame.dataset.fakirHostBound) return;
+      frame.dataset.fakirHostBound = '1';
       frame.addEventListener('load', () => {
         requestFrameHeight(frame);
-        [80, 300, 900].forEach((delay) => window.setTimeout(() => requestFrameHeight(frame), delay));
+        [40, 150, 450, 1200, 2500].forEach((delay) => window.setTimeout(() => requestFrameHeight(frame), delay));
       });
       requestFrameHeight(frame);
-      [100, 400, 1200].forEach((delay) => window.setTimeout(() => requestFrameHeight(frame), delay));
+      [80, 280, 900, 2000].forEach((delay) => window.setTimeout(() => requestFrameHeight(frame), delay));
     });
 
     let resizeTimer = null;
     window.addEventListener('resize', () => {
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => {
-        frames.forEach(requestFrameHeight);
+        getCustomContentFrames().forEach(requestFrameHeight);
       }, 120);
     });
   }
 
-  window.addEventListener('DOMContentLoaded', () => {
+  const boot = () => {
     initMobileMenu();
     initCleanInPageNavigation();
     initHeroSlider();
     initHorizontalSlider();
     initGalleryAjax();
     initCustomContentFrames();
-  });
+  };
+
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 })();
