@@ -55,6 +55,20 @@ require_once dirname(__DIR__) . '/includes/header.php';
 <section class="published-custom-page">
   <div class="container">
     <h1 class="published-page-heading"><?= e((string) $page['title']) ?></h1>
+    <script>
+    (() => {
+      const frameId = 'published-page-content';
+      window.addEventListener('message', (event) => {
+        const frame = document.getElementById(frameId);
+        if (!frame || event.source !== frame.contentWindow) return;
+        const message = event.data;
+        if (!message || message.type !== 'fakir:content-height') return;
+        const height = Number(message.height);
+        if (!Number.isFinite(height) || height < 1) return;
+        frame.style.height = Math.ceil(Math.min(50000, Math.max(240, height))) + 'px';
+      });
+    })();
+    </script>
     <iframe
       id="published-page-content"
       class="custom-content-frame"
@@ -64,6 +78,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       loading="eager"
       scrolling="no"
+      onload="this.contentWindow.postMessage({type:'fakir:request-height'}, '*')"
       referrerpolicy="no-referrer"
     ></iframe>
   </div>
