@@ -62,6 +62,13 @@ html, body {
 body {
   padding-bottom: 1px !important;
 }
+/* Keep the custom document in normal page flow: its parent page owns scrolling. */
+body > *:not(script):not(style):not(link) {
+  position: static !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
 #__fakir_height_end__ {
   display: block !important;
   clear: both !important;
@@ -107,7 +114,12 @@ $reporter = <<<'HTML'
     }
     const bodyStyle = window.getComputedStyle(body);
     const bodyPb = parseFloat(bodyStyle.paddingBottom) || 0;
-    const height = Math.ceil(Math.max(240, contentBottom + bodyPb));
+    const height = Math.ceil(Math.max(
+      240,
+      contentBottom + bodyPb,
+      (root.scrollHeight || 0),
+      (body.scrollHeight || 0)
+    ));
     const curInnerHeight = window.innerHeight || 0;
     if (
       !force &&
