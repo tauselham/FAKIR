@@ -64,6 +64,20 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <?php endif; ?>
 
   <?php if ($post['post_type'] === 'custom'): ?>
+    <script>
+    (() => {
+      const frameId = 'published-post-content';
+      window.addEventListener('message', (event) => {
+        const frame = document.getElementById(frameId);
+        if (!frame || event.source !== frame.contentWindow) return;
+        const message = event.data;
+        if (!message || message.type !== 'fakir:content-height') return;
+        const height = Number(message.height);
+        if (!Number.isFinite(height) || height < 1) return;
+        frame.style.height = Math.ceil(Math.min(50000, Math.max(240, height))) + 'px';
+      });
+    })();
+    </script>
     <iframe
       class="custom-content-frame"
       data-auto-resize="true"
@@ -72,6 +86,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
       scrolling="no"
       loading="eager"
+      onload="this.contentWindow.postMessage({type:'fakir:request-height'}, '*')"
       referrerpolicy="no-referrer"
       id="published-post-content"
     ></iframe>
