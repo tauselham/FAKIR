@@ -93,13 +93,15 @@ $reporter = <<<'HTML'
     const body = document.body;
     if (!root || !body) return;
     let contentBottom = 0;
+    let contentTop = 0;
     const endNode = document.getElementById('__fakir_height_end__');
     if (endNode) {
       const endRect = endNode.getBoundingClientRect();
       contentBottom = Math.max(contentBottom, endRect.bottom + window.scrollY);
     }
-    // Include positioned and transformed descendants. 3D scenes often use
-    // absolutely-positioned cards, which do not contribute to body.scrollHeight.
+    // Measure the full visual bounds, not only the bottom. 3D galleries and
+    // perspective scenes can place transformed cards above the iframe's
+    // origin; without a top offset the browser clips that part permanently.
     for (const element of Array.from(body.querySelectorAll('*'))) {
       if (element.id === '__fakir_height_end__' || /^(SCRIPT|STYLE|LINK|META|TITLE)$/.test(element.tagName)) continue;
       const cs = window.getComputedStyle(element);
@@ -107,15 +109,24 @@ $reporter = <<<'HTML'
       const rect = element.getBoundingClientRect();
       if (!Number.isFinite(rect.bottom) || rect.width === 0 && rect.height === 0) continue;
       const mb = parseFloat(cs.marginBottom) || 0;
+      contentTop = Math.min(contentTop, rect.top + window.scrollY);
       contentBottom = Math.max(contentBottom, rect.bottom + window.scrollY + Math.max(0, mb));
     }
+
+    // Shift the entire embedded document down only when authored/transformed
+    // content extends above y=0. This keeps the top of 3D scenes visible while
+    // retaining their original transforms, positioning, and internal layout.
+    const topOffset = Math.max(0, Math.ceil(-contentTop));
+    body.style.position = 'relative';
+    body.style.top = topOffset + 'px';
+
     const bodyStyle = window.getComputedStyle(body);
     const bodyPb = parseFloat(bodyStyle.paddingBottom) || 0;
     const height = Math.ceil(Math.max(
       240,
-      contentBottom + bodyPb,
-      (root.scrollHeight || 0),
-      (body.scrollHeight || 0)
+      contentBottom + topOffset + bodyPb,
+      (root.scrollHeight || 0) + topOffset,
+      (body.scrollHeight || 0) + topOffset
     ));
     const curInnerHeight = window.innerHeight || 0;
     if (
