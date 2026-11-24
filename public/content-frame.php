@@ -62,13 +62,8 @@ html, body {
 body {
   padding-bottom: 1px !important;
 }
-/* Keep the custom document in normal page flow: its parent page owns scrolling. */
-body > *:not(script):not(style):not(link) {
-  position: static !important;
-  height: auto !important;
-  max-height: none !important;
-  overflow: visible !important;
-}
+/* Preserve authored layout rules (including positioned and 3D-transformed scenes).
+   The parent page owns scrolling; only the document viewport is allowed to grow. */
 #__fakir_height_end__ {
   display: block !important;
   clear: both !important;
@@ -103,14 +98,16 @@ $reporter = <<<'HTML'
       const endRect = endNode.getBoundingClientRect();
       contentBottom = Math.max(contentBottom, endRect.bottom + window.scrollY);
     }
-    for (const element of Array.from(body.children)) {
-      if (element.id === '__fakir_height_end__' || element.tagName === 'SCRIPT' || element.tagName === 'STYLE' || element.tagName === 'LINK') continue;
+    // Include positioned and transformed descendants. 3D scenes often use
+    // absolutely-positioned cards, which do not contribute to body.scrollHeight.
+    for (const element of Array.from(body.querySelectorAll('*'))) {
+      if (element.id === '__fakir_height_end__' || /^(SCRIPT|STYLE|LINK|META|TITLE)$/.test(element.tagName)) continue;
       const cs = window.getComputedStyle(element);
       if (cs.display === 'none' || cs.position === 'fixed') continue;
       const rect = element.getBoundingClientRect();
+      if (!Number.isFinite(rect.bottom) || rect.width === 0 && rect.height === 0) continue;
       const mb = parseFloat(cs.marginBottom) || 0;
-      const effHeight = cs.overflowY === 'visible' ? Math.max(rect.height, element.scrollHeight || 0) : rect.height;
-      contentBottom = Math.max(contentBottom, rect.top + window.scrollY + effHeight + Math.max(0, mb));
+      contentBottom = Math.max(contentBottom, rect.bottom + window.scrollY + Math.max(0, mb));
     }
     const bodyStyle = window.getComputedStyle(body);
     const bodyPb = parseFloat(bodyStyle.paddingBottom) || 0;
