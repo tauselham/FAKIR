@@ -58,7 +58,76 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <script>
     (() => {
       const frameId = 'published-page-content';
-      window.addEventListener('message', (event) => {
+      let galleryImages = [];
+      let galleryIndex = 0;
+      let overlay = null;
+      let image = null;
+      let caption = null;
+
+      function ensureGalleryPopup() {
+        if (overlay) return;
+        const style = document.createElement('style');
+        style.textContent = `
+          #fakir-gallery-popup { position:fixed; inset:0; z-index:2147483000; display:flex; align-items:center; justify-content:center; padding:64px 76px 54px; background:rgba(0,0,0,.94); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .2s ease,visibility .2s ease; }
+          #fakir-gallery-popup.is-open { opacity:1; visibility:visible; pointer-events:auto; }
+          #fakir-gallery-popup .fg-image-wrap { width:min(100%,1200px); height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; }
+          #fakir-gallery-popup img { display:block; max-width:100%; max-height:calc(100% - 34px); width:auto; height:auto; object-fit:contain; border:2px solid rgba(255,255,255,.2); border-radius:10px; box-shadow:0 12px 45px rgba(0,0,0,.65); }
+          #fakir-gallery-popup .fg-caption { color:#fff; font:14px system-ui,sans-serif; text-align:center; }
+          #fakir-gallery-popup button { position:absolute; display:grid; place-items:center; color:#fff; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.3); cursor:pointer; transition:background .2s,transform .2s; }
+          #fakir-gallery-popup button:hover { background:rgba(22,128,68,.85); }
+          #fakir-gallery-popup .fg-close { top:16px; right:20px; width:46px; height:46px; border-radius:50%; font-size:32px; }
+          #fakir-gallery-popup .fg-prev,#fakir-gallery-popup .fg-next { top:50%; width:48px; height:48px; border-radius:50%; transform:translateY(-50%); font-size:22px; }
+          #fakir-gallery-popup .fg-prev { left:18px; } #fakir-gallery-popup .fg-next { right:18px; }
+          @media(max-width:768px) { #fakir-gallery-popup { padding:58px 46px 42px; } #fakir-gallery-popup .fg-prev { left:6px; } #fakir-gallery-popup .fg-next { right:6px; } #fakir-gallery-popup .fg-prev,#fakir-gallery-popup .fg-next { width:38px;height:38px;font-size:18px; } #fakir-gallery-popup .fg-close { top:10px;right:10px;width:38px;height:38px;font-size:26px; } }
+        `;
+        document.head.appendChild(style);
+        overlay = document.createElement('div');
+        overlay.id = 'fakir-gallery-popup';
+        overlay.setAttribute('role','dialog');
+        overlay.setAttribute('aria-modal','true');
+        overlay.setAttribute('aria-label','Gallery image viewer');
+        overlay.innerHTML = '<button type="button" class="fg-close" aria-label="Close">&times;</button><button type="button" class="fg-prev" aria-label="Previous">&#10094;</button><div class="fg-image-wrap"><img alt="Gallery photograph"><div class="fg-caption"></div></div><button type="button" class="fg-next" aria-label="Next">&#10095;</button>';
+        document.body.appendChild(overlay);
+        image = overlay.querySelector('img');
+        caption = overlay.querySelector('.fg-caption');
+        overlay.querySelector('.fg-close').addEventListener('click', closeGalleryPopup);
+        overlay.querySelector('.fg-prev').addEventListener('click', () => showGalleryImage(-1));
+        overlay.querySelector('.fg-next').addEventListener('click', () => showGalleryImage(1));
+        overlay.addEventListener('click', event => { if (event.target === overlay) closeGalleryPopup(); });
+      }
+      function showGalleryImage(direction) {
+        if (!galleryImages.length) return;
+        galleryIndex = (galleryIndex + direction + galleryImages.length) % galleryImages.length;
+        image.src = galleryImages[galleryIndex];
+        caption.textContent = 'ছবি ' + (galleryIndex + 1) + ' / ' + galleryImages.length;
+      }
+      function closeGalleryPopup() {
+        if (!overlay) return;
+        overlay.classList.remove('is-open');
+        document.body.style.overflow = '';
+        image.removeAttribute('src');
+      }
+      window.addEventListener('keydown', event => {
+        if (!overlay || !overlay.classList.contains('is-open')) return;
+        if (event.key === 'Escape') closeGalleryPopup();
+        if (event.key === 'ArrowLeft') showGalleryImage(-1);
+        if (event.key === 'ArrowRight') showGalleryImage(1);
+      });
+      window.addEventListener('message', event => {
+        const frame = document.getElementById(frameId);
+        if (!frame || event.source !== frame.contentWindow) return;
+        const message = event.data;
+        if (!message || message.type !== 'fakir:gallery-open' || !Array.isArray(message.images)) return;
+        const safeImages = message.images.filter(url => typeof url === 'string' && /^https:\/\//i.test(url));
+        if (!safeImages.length) return;
+        galleryImages = safeImages;
+        galleryIndex = Math.max(0, Math.min(galleryImages.length - 1, Number(message.index) || 0));
+        ensureGalleryPopup();
+        showGalleryImage(0);
+        overlay.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+      });
+      window.addEventListener('message', event => {
         const frame = document.getElementById(frameId);
         if (!frame || event.source !== frame.contentWindow) return;
         const message = event.data;
