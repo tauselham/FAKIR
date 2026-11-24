@@ -94,10 +94,11 @@ $reporter = <<<'HTML'
     if (!root || !body) return;
     let contentBottom = 0;
     let contentTop = 0;
+    const currentTopOffset = parseFloat(body.style.top) || 0;
     const endNode = document.getElementById('__fakir_height_end__');
     if (endNode) {
       const endRect = endNode.getBoundingClientRect();
-      contentBottom = Math.max(contentBottom, endRect.bottom + window.scrollY);
+      contentBottom = Math.max(contentBottom, endRect.bottom + window.scrollY - currentTopOffset);
     }
     // Measure the full visual bounds, not only the bottom. 3D galleries and
     // perspective scenes can place transformed cards above the iframe's
@@ -109,8 +110,8 @@ $reporter = <<<'HTML'
       const rect = element.getBoundingClientRect();
       if (!Number.isFinite(rect.bottom) || rect.width === 0 && rect.height === 0) continue;
       const mb = parseFloat(cs.marginBottom) || 0;
-      contentTop = Math.min(contentTop, rect.top + window.scrollY);
-      contentBottom = Math.max(contentBottom, rect.bottom + window.scrollY + Math.max(0, mb));
+      contentTop = Math.min(contentTop, rect.top + window.scrollY - currentTopOffset);
+      contentBottom = Math.max(contentBottom, rect.bottom + window.scrollY - currentTopOffset + Math.max(0, mb));
     }
 
     // Shift the entire embedded document down only when authored/transformed
@@ -125,8 +126,8 @@ $reporter = <<<'HTML'
     const height = Math.ceil(Math.max(
       240,
       contentBottom + topOffset + bodyPb,
-      (root.scrollHeight || 0) + topOffset,
-      (body.scrollHeight || 0) + topOffset
+      (root.scrollHeight || 0) - currentTopOffset + topOffset,
+      (body.scrollHeight || 0) - currentTopOffset + topOffset
     ));
     const curInnerHeight = window.innerHeight || 0;
     if (
